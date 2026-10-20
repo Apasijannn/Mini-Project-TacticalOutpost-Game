@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58048d3c3b2decc4085882ad80774360, type: 3}
+  m_Name: EnemyCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Outpost.Enemy.EnemyCatalog
+  variants:
+  - id: walker
+    prefab: {fileID: 6305351538453668109, guid: fa9c3148ecdf60f4893fc2b2e863cd32, type: 3}
+    kind: 0
+    minWave: 1
+    maxWave: 3
+    weight: 3
+  - id: bloater
+    prefab: {fileID: 7385715081989746082, guid: 6e52eeb600e3f6342b00d7ef37ae9ce6, type: 3}
+    kind: 0
+    minWave: 1
+    maxWave: 3
+    weight: 1.5
+  - id: runner
+    prefab: {fileID: 5077894308056829063, guid: 928dd19d103e1b7438414dd1caa649e5, type: 3}
+    kind: 0
+    minWave: 1
+    maxWave: 3
+    weight: 2
+  - id: skinless
+    prefab: {fileID: 1112708866826532237, guid: f1303619348ead84f8b8fd2cfc8c87f9, type: 3}
+    kind: 0
+    minWave: 1
+    maxWave: 3
+    weight: 2
+  - id: boss_v1
+    prefab: {fileID: 8572678255343112396, guid: f40e24e86307ce14fa3c9470fe29c842, type: 3}
+    kind: 1
+    minWave: 3
+    maxWave: 3
+    weight: 1
+  - id: boss_v2
+    prefab: {fileID: 803027434180740904, guid: 777c71504f66cae44801d5bfeae76bec, type: 3}
+    kind: 1
+    minWave: 3
+    maxWave: 3
+    weight: 1
+  - id: boss_v3
+    prefab: {fileID: 3977549740464168111, guid: 3121d4e54220acb41b40217008d787c8, type: 3}
+    kind: 1
+    minWave: 3
+    maxWave: 3
+    weight: 1

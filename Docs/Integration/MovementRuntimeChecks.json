@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "controllerEnabled": true,
+  "distances": {
+    "W": 0.4708933,
+    "UpArrow": 0.485182941,
+    "A": 0.513081133,
+    "LeftArrow": 0.48115468,
+    "S": 0.476161867,
+    "DownArrow": 0.459545732,
+    "D": 0.529063463,
+    "RightArrow": 0.480873764
+  }
+}

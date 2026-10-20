@@ -1,0 +1,14 @@
+[
+  {
+    "name": "South pillar connection",
+    "length": 2.50766945,
+    "low": -12.7583609,
+    "high": -10.2506914
+  },
+  {
+    "name": "North pillar connection",
+    "length": 2.634389,
+    "low": 1.6446923,
+    "high": 4.27908134
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "clearToNextWaveSeconds": 0.2708397,
+  "pendingEnemiesPreserved": true,
+  "pendingBossPreserved": true,
+  "clearEvents": [
+    1,
+    2
+  ],
+  "finalVictory": true
+}

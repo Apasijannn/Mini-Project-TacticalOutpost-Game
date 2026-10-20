@@ -1,0 +1,442 @@
+{
+  "snapshot": "fe2f658b2dfccf9541b07e69fbdcbee7d1823cf1",
+  "summary": {
+    "source_scripts": 73,
+    "imported_scripts": 32,
+    "excluded_scripts": 41,
+    "core_scripts": 23,
+    "core_imported": 23,
+    "core_modified": 11
+  },
+  "scripts": [
+    {
+      "source": "Assets/ArtStore3D/Insurgent (Urban)/Editor/WelcomeWindow.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.AssetProps.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Assets.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Core.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Enemies.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.EnemyPrep.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Fixes.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Gameplay.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.GenFit.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Layout.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Layout2.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Player.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.PrefabLib.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Preview.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Props.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Relayout.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Scene.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Textures.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.WavesAudio.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostBuilder.Weapons.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostPlayTest.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostProbe.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/Outpost/OutpostWaveTest.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/OutpostLog/OutpostCompileLogger.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Editor/OutpostLog/OutpostWatcher.cs",
+      "category": "editor_builder_diagnostics",
+      "imported": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_Icon.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_Icon.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_M_R.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_M_R.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_MP.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_MP.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/AuxRadarColy.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/AuxRadarColy.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Custom_MP.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Custom_MP.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Destroy_Me.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Destroy_Me.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/MP.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/MP.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/Simple_Ai.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Simple_Ai.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Mini Mapa(Radar)/Scripts/WindowsFollow.cs",
+      "category": "vendor_demo",
+      "imported": true,
+      "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/WindowsFollow.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Nokobot/Modern Guns - Handgun/_Demo Assets/SimpleShoot.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Audio/EnemyAudio.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Audio/EnemyAudio.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Audio/OutpostAudio.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Audio/OutpostAudio.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyBrain.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyBrain.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyCatalog.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyCatalog.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyConfig.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyConfig.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyDebugSpawner.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyDebugSpawner.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyHealth.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyHealth.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/EnemyHealthBar.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyHealthBar.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/GeneratorHealth.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/GeneratorHealth.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/GeneratorHealthBar.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/GeneratorHealthBar.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Enemy/WaveDirector.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/WaveDirector.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Minimap/MinimapBlip.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Minimap/MinimapBlip.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Minimap/MinimapController.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Minimap/MinimapController.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/OutpostMarkers.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/OutpostMarkers.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Pickups/DropManager.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Pickups/DropManager.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Pickups/PickupItem.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Pickups/PickupItem.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/PlayArea.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/PlayArea.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/FpsBody.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsBody.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/FpsController.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsController.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/FpsHud.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsHud.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/FpsWeapon.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsWeapon.cs",
+      "content_modified": true
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/PlayerHealth.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/PlayerHealth.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/Outpost/Scripts/Player/WeaponManager.cs",
+      "category": "core_runtime",
+      "imported": true,
+      "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/WeaponManager.cs",
+      "content_modified": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Bike/BikeController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Buggy/BuggiAntiRollBar.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Buggy/BuggiController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Buggy/BuggiCrashController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Input_Compat.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/Input_Manager.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/ThirdPersonCamera.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/VehiclePipeline.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/RetroStyleGames/LastGuns/Base/Scripts/VehicleSelector.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Tensori/SkinlessZombie/Demo Scripts/AnimationController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Tensori/SkinlessZombie/Demo Scripts/AnimationItemData.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Tensori/SkinlessZombie/Demo Scripts/CameraController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/Tensori/SkinlessZombie/Demo Scripts/UIElementController.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs",
+      "category": "vendor_demo",
+      "imported": false
+    },
+    {
+      "source": "Assets/TutorialInfo/Scripts/Readme.cs",
+      "category": "vendor_demo",
+      "imported": false
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+[
+  {
+    "lane": "West",
+    "point": "West 01",
+    "position": [
+      -60.0,
+      0.236915112,
+      -4.240139
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 02",
+    "position": [
+      -60.0,
+      0.277908176,
+      -1.740139
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 03",
+    "position": [
+      -60.0,
+      0.254051238,
+      -6.740139
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 04",
+    "position": [
+      -60.0,
+      0.260140717,
+      0.759861
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 05",
+    "position": [
+      -60.0,
+      0.2915589,
+      -9.240139
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 06",
+    "position": [
+      -60.00195,
+      0.248931631,
+      3.5999856
+    ]
+  },
+  {
+    "lane": "West",
+    "point": "West 07",
+    "position": [
+      -59.9994278,
+      0.25025934,
+      -12.16
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 01",
+    "position": [
+      2.604821,
+      0.26656127,
+      55.0
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 02",
+    "position": [
+      5.104821,
+      0.308089674,
+      55.0
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 03",
+    "position": [
+      0.104820967,
+      0.236915112,
+      55.0
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 04",
+    "position": [
+      7.604821,
+      0.273012429,
+      55.0
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 05",
+    "position": [
+      -2.395179,
+      0.259826422,
+      55.0
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 06",
+    "position": [
+      10.5599995,
+      0.246478975,
+      54.9947624
+    ]
+  },
+  {
+    "lane": "North",
+    "point": "North 07",
+    "position": [
+      -5.43999863,
+      0.236915112,
+      55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 01",
+    "position": [
+      19.622261,
+      0.156915188,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 02",
+    "position": [
+      22.122261,
+      0.156915188,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 03",
+    "position": [
+      17.122261,
+      0.156915188,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 04",
+    "position": [
+      24.622261,
+      0.204265684,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 05",
+    "position": [
+      14.622261,
+      0.169328362,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 06",
+    "position": [
+      27.122261,
+      0.268229663,
+      -55.0
+    ]
+  },
+  {
+    "lane": "South",
+    "point": "South 07",
+    "position": [
+      12.122261,
+      0.183400065,
+      -55.0
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 5950fe102c09ad0478352d69e8ee3dc2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228176
+  packageName: MiniMap Modular (Radar)
+  packageVersion: 2.0
+  assetPath: Assets/Mini Mapa(Radar)/Scripts/Aux_MP.cs
+  uploadId: 763257

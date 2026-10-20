@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "checkedCount": 378,
+  "failures": [],
+  "roads": [
+    {
+      "name": "South 06",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 04",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 05",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 05",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 06",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 05",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 02",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 07",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 01",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 04",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 01",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 07",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 02",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 04",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 03",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 07",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 01",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 02",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "South 03",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "North 06",
+      "ground": "Road_set_v1_s_tile_1"
+    },
+    {
+      "name": "West 03",
+      "ground": "Road_set_v1_s_tile_1"
+    }
+  ]
+}

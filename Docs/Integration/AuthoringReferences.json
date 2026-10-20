@@ -1,0 +1,108 @@
+{
+  "missingScripts": 0,
+  "prefabs": [
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V1.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V2.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V3.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Bloater.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Runner.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Skinless.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Walker.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Pickups/Pickup_Ammo.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Pickups/Pickup_Health.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Prefabs/Adapted/Player_Industrial.prefab",
+      "missingScripts": 0
+    },
+    {
+      "path": "Assets/TacticalOutpost/Gameplay/Prefabs/Player_FPS.prefab",
+      "missingScripts": 0
+    }
+  ],
+  "playerCamera": true,
+  "bodyModel": true,
+  "ikManager": true,
+  "weapons": [
+    {
+      "name": "AK47",
+      "leftGrip": true,
+      "rightGrip": true
+    },
+    {
+      "name": "Pistol",
+      "leftGrip": true,
+      "rightGrip": true
+    }
+  ],
+  "catalog": [
+    {
+      "id": "walker",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "bloater",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "runner",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "skinless",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "boss_v1",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "boss_v2",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    },
+    {
+      "id": "boss_v3",
+      "prefab": true,
+      "config": true,
+      "animator": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d69b348bb93aeb4499017e6384869698
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228176
+  packageName: MiniMap Modular (Radar)
+  packageVersion: 2.0
+  assetPath: Assets/Mini Mapa(Radar)/Textures/MiniMap.renderTexture
+  uploadId: 763257
