@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e12183a3bfb2e3745a39c152857f1a4c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228176
+  packageName: MiniMap Modular (Radar)
+  packageVersion: 2.0
+  assetPath: Assets/Mini Mapa(Radar)/Prefab/Arrow_Dir.prefab
+  uploadId: 763257

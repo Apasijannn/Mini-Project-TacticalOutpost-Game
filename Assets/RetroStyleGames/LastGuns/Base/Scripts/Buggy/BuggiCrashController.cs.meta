@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 66f7d35cf6fb9da4bae837dec7ecf596
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 404292
+  packageName: Doomsday Pickup Truck - Game-Ready Post-Apocalyptic Car 3D Model
+  packageVersion: 1.0
+  assetPath: Assets/RetroStyleGames/LastGuns/Base/Scripts/Buggy/BuggiCrashController.cs
+  uploadId: 987182

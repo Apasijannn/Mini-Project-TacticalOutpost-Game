@@ -15,6 +15,8 @@ using Outpost.Env;
 public static partial class OutpostBuilder
 {
     static Transform envRoot, gMarkers;
+    // Area bermain di dalam pagar (XZ, meter). Pagar: x -61.7..63.8, z -35.0..32.3
+    static readonly Vector2 PlayMin = new Vector2(-61.8f, -34.6f), PlayMax = new Vector2(61.8f, 34.6f);
     static NavMeshSurface navSurface;
     static readonly List<EnvLane> lanes = new List<EnvLane>();
     static int coverCount;
@@ -41,7 +43,7 @@ public static partial class OutpostBuilder
 
     static void TrySetTag(GameObject go, string tag) { try { go.tag = tag; } catch (Exception) { Log("PERINGATAN: tag belum ada: " + tag); } }
 
-    static void BuildGameplayMarkers()
+    static void BuildGameplayMarkersOld()
     {
         gMarkers = Grp("Gameplay_Markers", envRoot);
         lanes.Clear();
@@ -153,31 +155,40 @@ public static partial class OutpostBuilder
     // ---------- pencahayaan ----------
     static void BuildLighting()
     {
+        // Tampilan mengikuti scene demo aset (Map_v1): matahari putih netral, langit Skybox_v9 asli, kabut abu-biru, ambient dingin.
         var sunGo = new GameObject("Sun (Directional Light)");
         sunGo.transform.SetParent(envRoot, false);
-        sunGo.transform.rotation = Quaternion.Euler(24f, -48f, 0f);
+        sunGo.transform.rotation = Quaternion.Euler(42f, -35f, 0f);
         var sun = sunGo.AddComponent<Light>();
         sun.type = LightType.Directional;
-        sun.color = new Color(1f, 0.74f, 0.5f);
-        sun.intensity = 2.3f;
+        sun.color = new Color(1f, 0.965f, 0.9f);
+        sun.intensity = 2.1f;
         sun.shadows = LightShadows.Soft;
         sun.shadowStrength = 0.92f;
         var sunData = sunGo.AddComponent<UniversalAdditionalLightData>();
         sunData.softShadowQuality = SoftShadowQuality.Medium;
         RenderSettings.sun = sun;
 
+        var fillGo = new GameObject("Sky Fill (Directional Light)");
+        fillGo.transform.SetParent(envRoot, false);
+        fillGo.transform.rotation = Quaternion.Euler(35f, 145f, 0f);
+        var fill = fillGo.AddComponent<Light>();
+        fill.type = LightType.Directional; fill.color = new Color(0.7f, 0.8f, 1f); fill.intensity = 0.25f; fill.shadows = LightShadows.None;
+
         var sky = AssetDatabase.LoadAssetAtPath<Material>(PackRoot + "/Textures/Skyboxes/Skybox_v9.mat");
-        if (sky != null) RenderSettings.skybox = sky; else Log("PERINGATAN: Skybox_v9 tidak ditemukan");
+        if (sky != null) RenderSettings.skybox = sky;
+        else Log("PERINGATAN: Skybox_v9 tidak ditemukan");
         RenderSettings.ambientMode = AmbientMode.Trilight;
-        RenderSettings.ambientSkyColor = new Color(0.50f, 0.58f, 0.70f);
-        RenderSettings.ambientEquatorColor = new Color(0.55f, 0.46f, 0.38f);
-        RenderSettings.ambientGroundColor = new Color(0.22f, 0.19f, 0.16f);
-        RenderSettings.ambientIntensity = 1.0f;
+        RenderSettings.ambientSkyColor = new Color(0.52f, 0.60f, 0.72f);
+        RenderSettings.ambientEquatorColor = new Color(0.42f, 0.46f, 0.52f);
+        RenderSettings.ambientGroundColor = new Color(0.22f, 0.21f, 0.20f);
+        RenderSettings.ambientIntensity = 1.3f;
         RenderSettings.reflectionIntensity = 0.8f;
         RenderSettings.fog = true;
-        RenderSettings.fogMode = FogMode.ExponentialSquared;
-        RenderSettings.fogDensity = 0.0034f;
-        RenderSettings.fogColor = new Color(0.66f, 0.62f, 0.6f);
+        RenderSettings.fogMode = FogMode.Linear;
+        RenderSettings.fogStartDistance = 35f;
+        RenderSettings.fogEndDistance = 330f;
+        RenderSettings.fogColor = new Color(0.512f, 0.561f, 0.596f);
 
         // volume pasca-proses
         EnsureFolder(Root);
@@ -186,12 +197,12 @@ public static partial class OutpostBuilder
         var profile = ScriptableObject.CreateInstance<VolumeProfile>();
         AssetDatabase.CreateAsset(profile, vpPath);
         var bloom = profile.Add<UnityEngine.Rendering.Universal.Bloom>(true);
-        bloom.threshold.Override(1.0f); bloom.intensity.Override(0.7f); bloom.scatter.Override(0.65f);
+        bloom.threshold.Override(1.1f); bloom.intensity.Override(0.35f); bloom.scatter.Override(0.65f);
         var tone = profile.Add<Tonemapping>(true); tone.mode.Override(TonemappingMode.ACES);
-        var vig = profile.Add<Vignette>(true); vig.intensity.Override(0.26f); vig.smoothness.Override(0.5f);
+        var vig = profile.Add<Vignette>(true); vig.intensity.Override(0.16f); vig.smoothness.Override(0.5f);
         var ca = profile.Add<ColorAdjustments>(true);
-        ca.postExposure.Override(0.25f); ca.contrast.Override(14f); ca.saturation.Override(10f);
-        var wb = profile.Add<WhiteBalance>(true); wb.temperature.Override(8f);
+        ca.postExposure.Override(0.1f); ca.contrast.Override(8f); ca.saturation.Override(-4f);
+        var wb = profile.Add<WhiteBalance>(true); wb.temperature.Override(-3f);
         foreach (var comp in profile.components) AssetDatabase.AddObjectToAsset(comp, profile);
         EditorUtility.SetDirty(profile);
         AssetDatabase.SaveAssets();
@@ -203,7 +214,7 @@ public static partial class OutpostBuilder
         // kamera utama di titik spawn pemain, menghadap jalur tengah
         var camGo = new GameObject("Main Camera");
         camGo.tag = "MainCamera";
-        camGo.transform.position = W(842, 290) + new Vector3(0, 1.7f, 0);
+        camGo.transform.position = playerSpawnPos + new Vector3(0, 1.7f, 0);
         camGo.transform.rotation = Quaternion.Euler(4f, 270f, 0f);
         var cam = camGo.AddComponent<Camera>();
         cam.fieldOfView = 70f; cam.nearClipPlane = 0.1f; cam.farClipPlane = 400f; cam.clearFlags = CameraClearFlags.Skybox;
@@ -229,7 +240,10 @@ public static partial class OutpostBuilder
         navGo.transform.SetParent(envRoot, false);
         navSurface = navGo.AddComponent<NavMeshSurface>();
         navSurface.agentTypeID = 0;
-        navSurface.collectObjects = CollectObjects.All;
+        // Hanya bagian di dalam pagar yang boleh dilalui (tanah di luar pagar tidak masuk navmesh -> musuh tidak bisa muncul/keluar ke sana)
+        navSurface.collectObjects = CollectObjects.Volume;
+        navSurface.center = new Vector3(PlayMin.x * 0.5f + PlayMax.x * 0.5f, 4f, PlayMin.y * 0.5f + PlayMax.y * 0.5f);
+        navSurface.size = new Vector3(PlayMax.x - PlayMin.x, 24f, PlayMax.y - PlayMin.y);
         navSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
         navSurface.layerMask = (1 << LGround) | (1 << LObstacle) | (1 << LCover) | (1 << LFence) | (1 << LGenerator);
         navSurface.defaultArea = 0;
@@ -348,9 +362,13 @@ public static partial class OutpostBuilder
         AssetDatabase.SaveAssets(); AssetDatabase.Refresh();
 
         Log(ConvertPackMaterials());
+        Log("material Tower: " + ConvertMaterialsIn("Assets/Tower"));
+        Log("material Industrial Props: " + TuneIndustrialMaterials());
+        Log(MakeBuildingsDoubleSided());
         ResetMeshAsset();
         BuildTextures();
         BuildMaterials();
+        EnsureMinimapIcons();
         AssetDatabase.SaveAssets();
 
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -367,6 +385,14 @@ public static partial class OutpostBuilder
         Log(GenerateCoverPoints());
         Log("--- validasi navigasi ---");
         Log(Validate());
+        BuildPlayer();   // setelah bake navmesh agar collider player tidak ikut terhitung
+        BuildEnemies();
+        PlaceEnemyDebugSpawner();
+        BuildPlayArea();
+        BuildDrops();
+        PlaceAudioManager();
+        PlaceWaveDirector();
+        BuildMinimap();
         if (missingPrefabs.Count > 0) { Log("PREFAB HILANG:"); foreach (var m in missingPrefabs) Log("  " + m); }
         Log("prefab pack dipakai: " + prefabCount);
 

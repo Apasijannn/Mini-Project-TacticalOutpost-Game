@@ -16,7 +16,7 @@ public static partial class OutpostBuilder
     {
         GameObject go;
         if (prefabCache.TryGetValue(rel, out go) && go != null) return go;
-        go = AssetDatabase.LoadAssetAtPath<GameObject>(PackRoot + "/" + rel);
+        go = AssetDatabase.LoadAssetAtPath<GameObject>(rel.StartsWith("Assets/") ? rel : PackRoot + "/" + rel);
         if (go == null) { if (!missingPrefabs.Contains(rel)) missingPrefabs.Add(rel); return null; }
         prefabCache[rel] = go;
         return go;
@@ -96,36 +96,9 @@ public static partial class OutpostBuilder
     }
 
     // ---------- barrel / peti / pallet / pipa ----------
-    static readonly string[] barrelPrefabs = {
-        "Barrels/Barrel_v1/Barrel_v1_LD2.prefab", "Barrels/Barrel_v2/Barrel_v2_single.prefab", "Barrels/Barrel_v3/Barrel_v3_single.prefab", "Barrels/Barrel_v1/Barrel_v1_LD3.prefab" };
 
-    static GameObject BarrelP(Transform parent, float x, float z, int variant = -1)
-    {
-        string rel = barrelPrefabs[variant >= 0 ? variant % barrelPrefabs.Length : rng.Next(barrelPrefabs.Length)];
-        var go = PlacePrefab(rel, parent, x, z, Rf(0, 360), 1f, 0f, LCover);
-        if (go != null) Slot(go, EnvCategory.Barrel, "Barrel", RBounds(go).size);
-        return go;
-    }
 
-    static void BarrelClusterP(Transform parent, float px, float py, int n)
-    {
-        Vector2 p = V(px, py);
-        if (n >= 3 && rng.NextDouble() < 0.6)
-        {
-            string rel = rng.NextDouble() < 0.5 ? "Barrels/Barrel_v2/Barrel_v2_quadro.prefab" : "Barrels/Barrel_v3/Barrel_v3_quadro.prefab";
-            var g = PlacePrefab(rel, parent, p.x, p.y, Rf(0, 360), 1f, 0f, LCover);
-            if (g != null) { Slot(g, EnvCategory.Barrel, "Quad", RBounds(g).size); n -= 3; }
-        }
-        for (int i = 0; i < n; i++) BarrelP(parent, p.x + Rf(-1.4f, 1.4f), p.y + Rf(-1.4f, 1.4f));
-    }
 
-    static GameObject BurningBarrelP(Transform parent, float px, float py)
-    {
-        Vector2 p = V(px, py);
-        var b = BarrelP(parent, p.x, p.y, 0);
-        if (b != null) Fire(b.transform, new Vector3(0f, 0.55f, 0f));
-        return b;
-    }
 
     static GameObject CrateP(Transform parent, float x, float z, float scale, float yaw, float baseY = 0f, bool longBox = false)
     {
@@ -183,13 +156,6 @@ public static partial class OutpostBuilder
         return g;
     }
 
-    static GameObject RoadBlockP(Transform parent, float px, float py, float yaw)
-    {
-        Vector2 p = V(px, py);
-        var g = PlacePrefab("Fences/Road_blocks/Road_block_v1/Road_block_v1.prefab", parent, p.x, p.y, yaw, 1.25f, 0f, LCover);
-        if (g != null) Slot(g, EnvCategory.Barrier, "RoadBlock", RBounds(g).size);
-        return g;
-    }
 
     static GameObject TankP(Transform parent, float px, float py, float scale)
     {

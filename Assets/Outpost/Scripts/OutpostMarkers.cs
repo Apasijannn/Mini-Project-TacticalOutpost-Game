@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Outpost.Env
 {
     public enum CoverHeight { Low, High }
-    public enum LaneId { None, North, Main, South, Base }
+    public enum LaneId { None, North, Main, South, Base, West, East }
 
     public enum EnvCategory
     {

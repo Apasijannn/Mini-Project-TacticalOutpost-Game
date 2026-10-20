@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4762945226235063864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4139131537277019775}
+  - component: {fileID: 8581778673796675849}
+  - component: {fileID: 6979609178659172203}
+  m_Layer: 0
+  m_Name: Cam_Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4139131537277019775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4762945226235063864}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 24.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &8581778673796675849
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4762945226235063864}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.01
+  far clip plane: 50
+  field of view: 60
+  orthographic: 1
+  orthographic size: 35
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 0
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 8400000, guid: d69b348bb93aeb4499017e6384869698, type: 2}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 0
+  m_AllowMSAA: 0
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!114 &6979609178659172203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4762945226235063864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44a5b7e6f758bce4dbf032b140bf27f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MS: {fileID: 0}
+  Player_RY: {fileID: 0}
+  Cam_Map: {fileID: 8581778673796675849}
+  LayerSelect:
+    serializedVersion: 2
+    m_Bits: 0
+  PosyMeLocal: {x: 0, y: 24.5, z: 0}
+  CamFixed: 1
+  SmothCam: 0.1
+  Aux_ClipPlane_Far: 50
+  CamSize: 35
+  Min_Dis_Icon: 30
+  IconScale: 0.7
+  mult: -0.16932116
+  Cam_MapT: {fileID: 4139131537277019775}
+  AngleText: 1
+  AngleText_C: {r: 1, g: 1, b: 1, a: 1}
+  SpriteTex_C: {r: 0.6850873, g: 0.7056604, b: 0.6803631, a: 1}
+  MM_Posy: {x: 750, y: -350}
+  MMSize: 1
+  BorderLine_Icon: {fileID: 21300000, guid: 7bd7556e745740d4585610c2dcb2d8f2, type: 3}
+  BorderLine_C: {r: 1, g: 1, b: 1, a: 1}
+  Fund_Icon: {fileID: 21300000, guid: 9435f48008c664c48855b1e2bf32c9a0, type: 3}
+  Fund_C: {r: 0.26415092, g: 0.23549303, b: 0.23549303, a: 1}
+  Central_Icon: {fileID: 21300000, guid: ebd228771423d6b48b95f17dff31dbf5, type: 3}
+  Central_C: {r: 1, g: 1, b: 1, a: 1}
+  MPT: {fileID: 0}
+  MPT1: {fileID: 0}
+  MPT2: {fileID: 0}
+  Ray_On: 1
+  Ray_Icon: {fileID: 21300000, guid: 07f844e11d545614f9ff10f185c1935d, type: 3}
+  Ray_C: {r: 0.5169811, g: 0.49844784, b: 0.49844784, a: 1}
+  Direction_On: 1
+  Dir_Scale: 1
+  Direction_Icon: {fileID: 21300000, guid: c75035de3d629864a80c7dda682da5af, type: 3}
+  Direction_C: {r: 1, g: 1, b: 1, a: 0.11764706}
+  Coordinates_On: 1
+  Coordinates_Icon: {fileID: 21300000, guid: 30885c8deefde404eb19152830e50a1a, type: 3}
+  Coordinates_C: {r: 1, g: 1, b: 1, a: 0.9647059}
+  Radar_On: 1
+  Radar_Type: 0
+  RadarPersecutor: 1
+  TimeViewOff: 1.5
+  SizeRad1: 0.1
+  SpeedRad1: 150
+  SpeedRad2and3: 2
+  Radar_C: {r: 0, g: 1, b: 0.20905471, a: 0.19607843}

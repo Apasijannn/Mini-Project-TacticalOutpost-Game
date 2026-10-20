@@ -362,10 +362,10 @@ public static partial class OutpostBuilder
     static void BuildMaterials()
     {
         mats.Clear();
-        MakeMat("sand", C(0.96f, 0.92f, 0.84f), "sand", "sand", 8f, 0.04f, 0f);
+        MakeMat("sand", C(0.78f, 0.82f, 0.9f), "sand", "sand", 8f, 0.04f, 0f);
         MakeMat("concrete", C(0.82f, 0.8f, 0.76f), "concrete", "concrete", 5f, 0.08f, 0f);
-        MakeMat("asphalt", C(0.62f, 0.62f, 0.64f), "pack:asphalt", null, 6f, 0.12f, 0f);
-        MakeMat("road", C(0.45f, 0.45f, 0.47f), "pack:asphalt", null, 6f, 0.14f, 0f);
+        MakeMat("asphalt", C(0.98f, 0.98f, 1.0f), "pack:asphalt", null, 6f, 0.12f, 0f);
+        MakeMat("road", C(0.72f, 0.72f, 0.74f), "pack:asphalt", null, 6f, 0.14f, 0f);
         MakeMat("pad", C(0.68f, 0.68f, 0.66f), "concrete", "concrete", 4f, 0.1f, 0f);
         MakeMat("bconcrete", C(0.74f, 0.71f, 0.66f), "concrete", "concrete", 3f, 0.08f, 0f);
         MakeMat("rubble", C(0.56f, 0.53f, 0.49f), "concrete", "concrete", 1.5f, 0.05f, 0f);

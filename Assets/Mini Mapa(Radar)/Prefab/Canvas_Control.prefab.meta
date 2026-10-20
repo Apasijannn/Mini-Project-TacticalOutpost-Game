@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 076b5bf5e295f244497cc71db4ea00d3
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228176
+  packageName: MiniMap Modular (Radar)
+  packageVersion: 2.0
+  assetPath: Assets/Mini Mapa(Radar)/Prefab/Canvas_Control.prefab
+  uploadId: 763257

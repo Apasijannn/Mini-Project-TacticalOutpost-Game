@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: e60e9b1b9c804ca4bba7706a7cec1a2a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228176
+  packageName: MiniMap Modular (Radar)
+  packageVersion: 2.0
+  assetPath: Assets/Mini Mapa(Radar)/Prefab/PlayerView.prefab
+  uploadId: 763257
