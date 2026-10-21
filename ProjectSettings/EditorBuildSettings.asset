@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Gameplay/TacticalOutpost_Menu.unity
+    guid: 48cbb493a91a4194dacf792e64419c70
+  - enabled: 1
     path: Assets/Scenes/Gameplay/TacticalOutpost_Game.unity
     guid: 0c122b71d662abd408799ea1752b661e
   - enabled: 1
