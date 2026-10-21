@@ -11,7 +11,7 @@ Dokumen ini merangkum implementasi gameplay Tactical Outpost yang ada di project
 - **Menang:** seluruh musuh di wave terakhir mati.
 - **Kalah:** HP player habis atau HP generator mencapai nol.
 - Setelah mati atau generator hancur, player bisa menekan **Enter** untuk memulai ulang gameplay.
-- Generator adalah objective tunggal dengan **400 HP**. Tembakan player tidak merusaknya.
+- Generator adalah objective tunggal dengan **1000 HP**. Tembakan player tidak merusaknya.
 - Script generator memiliki method `Repair()`, tetapi saat ini tidak ada gameplay call yang mengaktifkan repair. Jadi belum ada mekanik repair generator untuk player.
 
 ## HP dan damage melee
@@ -21,7 +21,7 @@ Damage di tabel adalah damage **per hit yang berhasil**. Cooldown menunjukkan je
 | Entity | HP | Damage ke player / hit | Damage ke generator / hit | Cooldown | Jarak serang | Jalan / lari |
 |---|---:|---:|---:|---:|---:|---:|
 | Player | 100 | — | — | — | — | 4,2 / 6,6 m/s saat sprint |
-| Generator | 400 | — | — | — | — | — |
+| Generator | 1000 | — | — | — | — | — |
 | Walker | 110 | 10 | 15 | 1,5 dtk | 1,7 m | 1,1 / 3,0 m/s |
 | Bloater | 150 | 14 | 21 | 1,7 dtk | 1,7 m | 0,9 / 2,4 m/s |
 | Runner | 80 | 9 | 13,5 | 1,2 dtk | 1,7 m | 1,4 / 3,9 m/s |
@@ -60,6 +60,10 @@ Pengambilan keputusan berjalan berkala (sekitar 0,15 detik). Zombie memakai `Nav
 - Boss memiliki sight radius **45 m**, FOV **220°**, close-sense **8 m**, hearing lebih kuat, dan ingatan posisi **14 detik**.
 - Tembakan mengirim noise event. Saat terkena tembakan, zombie memperoleh informasi posisi player.
 - Player yang terlihat/didengar dibandingkan dengan generator melalui skor. Skor generator dipengaruhi jarak, sisa HP generator, jumlah attacker lain, dan bonus kecil untuk mempertahankan target yang sama. Zombie cenderung membagi serangan ke attack point yang berbeda.
+- Alokasi target global memiliki kuota normal **ceil(50% × zombie hidup dengan AI aktif)**, termasuk boss dan sisa wave sebelumnya. Contoh: 24 zombie menyediakan 12 slot; 5 zombie menyediakan 3 slot. Kuota dihitung ulang saat jumlah zombie berubah dan tidak memaksa zombie yang belum mendeteksi player untuk mengejar. Slot mengikuti antrean **FIFO**: kontak yang lebih dahulu masuk mempertahankan urutan; tembakan baru tidak merebut slot yang sudah diisi. Bila beberapa kontak pertama muncul bersamaan, yang tertembak, mendengar kontak, lalu yang terdekat didahulukan. Zombie yang menunggu tetap bergerak menyerang generator.
+- Zombie yang terkena tembakan memberi alert ke zombie lain dalam radius **8 m**. Suara tembakan dari posisi player juga tetap terdeteksi melalui radius noise senjata dan hearing multiplier masing-masing varian. Kontak suara menaikkan minat mengejar selama 2 detik, kemudian mengikuti ingatan biasa; zombie yang terkena tembakan mempertahankan minat selama memoryTime (normal 8 detik, boss 14 detik). Alert baru masuk antrean dan tidak melewati kontak yang lebih dahulu menunggu.
+- Pengecualian jarak melee: jika player terlihat, beda tinggi kurang dari 1,8 m, dan jaraknya tidak melebihi **attackRange + 0,6 m** (normal 2,3 m; boss 3,1 m), zombie memprioritaskan player walaupun kuota sudah penuh, termasuk yang masih berjalan menuju generator. Zombie dekat ikut dihitung dalam kuota, tetapi jumlahnya boleh melampaui 50% untuk sementara. Setelah player keluar dari radius itu, zombie yang tidak mendapat slot FIFO kembali ke generator; serangan tertunda ke player dibatalkan. Alokasi diperiksa sekitar setiap 0,15 detik dan dihitung ulang setelah spawn, kematian, atau AI dinonaktifkan.
+- Zombie yang sudah mencapai jangkauan serang generator terkunci pada generator tersebut. Tembakan, noise, dan slot player yang kosong tidak mengalihkan komitmen ini. Player yang masuk jarak melee tetap dapat menarik reaksinya sementara; setelah player menjauh, zombie tersebut kembali ke generator walaupun slot pengejar player tersedia.
 - Generator memiliki enam attack point. Jalur dari spawn ke seluruh attack point dicatat terhubung di data validasi NavMesh.
 - Zombie biasa dapat stagger jika satu hit mencapai **12% HP maksimal**; Bloater menggunakan **20%**. Durasi stagger **0,35 detik**. Boss tidak dapat di-stagger.
 - Boss mulai enrage di **50% HP**: speed bertambah **30%**, cooldown menjadi **70%** dari nilai awal (1,05 detik), dan boss mengeluarkan roar. Scale runtime boss di scene ditargetkan sekitar **2,3×** zombie biasa.
@@ -143,3 +147,31 @@ Catatan authoring navigation mencatat semua 21 spawn dapat mencapai keenam attac
 - [Timed wave check record](Docs/Integration/TimedWaveChecks.json)
 
 > Angka konfigurasi di dokumen ini merepresentasikan scene/prefab gameplay yang sekarang. Catatan lama pada dokumen integrasi dapat berisi nilai wave yang sudah tidak dipakai.
+
+## Pembaruan menu dan cinematic — 21 Oktober 2026
+
+- Main menu menampilkan judul **BLACKOUT**, aerial view camp dengan gerakan kamera perlahan, serta 30 zombie dekoratif yang berjalan menuju generator. Mereka tidak memulai wave, menimbulkan damage, atau masuk ke daftar musuh gameplay.
+- Tombol Play di Unity Editor selalu memulai `TacticalOutpost_Menu`, melalui `OutpostPlayEntry` di folder Editor. Pengaturan start scene dipasang saat Editor dimuat dan sebelum masuk Play, termasuk bila pengaturannya sempat kosong. Build tetap memulai scene menu yang sudah berada di urutan pertama Build Settings. Scene yang sedang diedit tidak ditulis ulang. Pemeriksaan tersedia di `Docs/Integration/PlayEntryChecks.json`.
+- **Settings** berisi Master Volume, Mouse Sensitivity, Field of View, Head Bob, Fullscreen, dan Quality. Apply menyimpan pengaturan; meninggalkan halaman tanpa Apply membatalkan preview volume.
+- **Controls** menampilkan diagram keyboard, mouse, dan binding aktual. **Field Manual** berisi briefing, empat varian zombie normal, tiga varian boss, AK-47, dan M1911. Model dapat diputar dengan drag mouse dan berputar otomatis setelah tiga detik tidak disentuh, termasuk saat pause. Statistik diambil langsung dari config musuh dan prefab senjata. Boss cadangan diberi label karena tidak digunakan wave saat ini.
+- Kematian player menghentikan wave dan input, menampilkan kamera first person tumbang selama sekitar 1,5 detik, slow motion 0,25x, grayscale, blur, serta vignette. Waktu kembali normal secara bertahap setelah tumbang; zombie di dekat player tetap memainkan serangan ke tubuh yang sudah jatuh tanpa damage tambahan.
+- Kehancuran generator memulai cinematic drone selama 12 detik dengan orbit, camera shake, War FX untuk ledakan, dan Free Fire VFX untuk api. Ledakan generator terjadi sekitar detik 1,2, diikuti Power Station yang terhubung pipa pada detik 1,7 (selisih sekitar 0,5 detik), kemudian seluruh kelompok tangki serentak pada detik 2,2. Generator dan Power Station masing-masing terpecah menjadi 84 bagian. Pipe yang terpasang dan jalur penghubung runtuh. Panel tembok penahan kilang ikut pecah akibat shockwave, tanpa ledakan api tersendiri; pagar perimeter camp tidak menjadi target kehancuran. Setelah cinematic selesai, layar BLACKOUT muncul dan Enter memulai sesi baru.
+- Pecahan mesh merupakan potongan permukaan yang disiapkan di Editor dengan collider sederhana. Ini belum berupa fracture solid dengan penutup pada setiap permukaan potong. Kehancuran hanya terjadi saat runtime; layout industrial yang tersimpan tidak diubah.
+- Hasil pemeriksaan tersedia di [CinematicMenuChecks](Docs/Integration/CinematicMenuChecks.json) dan [BlackoutEndingChecks](Docs/Integration/BlackoutEndingChecks.json). Pemeriksaan dilakukan di Editor Play Mode; standalone build belum diperiksa.
+
+## Pembaruan HUD — 21 Oktober 2026
+
+- HUD menggunakan font, panel gelap, dan aksen amber yang sama dengan menu BLACKOUT. Panel senjata memiliki garis orange di kanan. Minimap kecil dan tactical map tetap berbentuk lingkaran, dengan ring amber tipis mengikuti tepi lingkaran dan tanpa panel kotak di belakangnya.
+- Notifikasi, peringatan wave/boss, dan teks akhir tampil bertahap dengan suara input elektronik. Pengetikan berhenti saat pause; volume mengikuti Master Volume. Angka health, ammo, dan countdown tetap diperbarui langsung.
+- Tidak ada tulisan **RELOADING** selama animasi reload. Petunjuk **Press R to reload** hanya muncul saat magasin kosong dan masih memiliki amunisi cadangan.
+- Pemeriksaan HUD, warna peringatan boss, pergantian senjata, health bar, serta prioritas M/Esc tercatat di [HudStyleChecks](Docs/Integration/HudStyleChecks.json).
+
+Pemeriksaan kuota target, alert di sekitar zombie yang tertembak, pengecualian melee, pengalihan kembali ke generator, penghitungan ulang setelah kematian, serta reset HP tersedia di [TargetQuotaChecks](Docs/Integration/TargetQuotaChecks.json). Hasil cinematic mencatat selisih ledakan gedung sekitar 0,50 detik setelah generator.
+
+## Audio ledakan cinematic — 21 Oktober 2026
+
+- Sumber audio berasal dari enam MP3 Dragon Studio yang diberikan pengguna di folder `xplosion`. Salinan sumber dipertahankan dalam `Assets/TacticalOutpost/Gameplay/Audio/Explosions/Sources`; nama asli tetap tersedia.
+- Generator memakai kombinasi Massive Explosion dan Nuclear Explosion yang difilter untuk gemuruh rendah, dengan durasi sekitar 8,48 detik. Gedung memakai Loud Explosion Sound dan Massive Explosion yang difilter, sekitar 4,28 detik. Kelompok tangki memakai Explosion Sound Effect dan Explosion FX, sekitar 2,74 detik.
+- Audio dipicu bersamaan dengan ledakan masing-masing: generator pada detik 1,2, gedung pada detik 1,7, dan kelompok tangki pada detik 2,2. Seluruh tangki memakai satu layer suara gabungan agar tidak menumpuk empat suara penuh sekaligus.
+- Ketiga mix berupa WAV mono 48 kHz dengan peak maksimum 0,7, fade singkat pada tepi clip, dan gain runtime berturut-turut 0,55 / 0,40 / 0,25. Spatial blend 0,65, min distance 30 m, max distance 200 m, dan Doppler dimatikan agar orbit drone tidak mengubah pitch. Master Volume dan pause audio tetap berlaku.
+- Data durasi dan peak gabungan tersedia di [ExplosionAudioMix](Docs/Integration/ExplosionAudioMix.json). Preview audio terpisah tersedia di `Temp/ExplosionMixPreview.wav`; preview ini tidak mencakup ambience atau suara api dari scene.

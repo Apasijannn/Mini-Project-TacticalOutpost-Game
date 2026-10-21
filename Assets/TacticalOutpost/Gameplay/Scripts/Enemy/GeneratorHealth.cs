@@ -13,7 +13,7 @@ namespace Outpost.Enemy
     {
         public static readonly List<GeneratorHealth> All = new List<GeneratorHealth>();
 
-        public float maxHealth = 400f;
+        public float maxHealth = 1000f;
         public float Health { get; private set; }
         public bool IsAlive { get { return Health > 0f; } }
         public float Fraction { get { return maxHealth > 0f ? Health / maxHealth : 0f; } }

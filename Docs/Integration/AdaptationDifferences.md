@@ -61,7 +61,7 @@ Daftar persis 41 scripts sumber yang tidak di-import tersedia di `RepoScriptCove
 | Navigation | Baked untuk geometri sumber | Asset baru `IndustrialGameplay.asset`, collider volume 160 x 30 x 145 m, center 2,5,0, agent type 0, voxel 0,16 m | Geometri map kita; data navigation environment lama tidak ditimpa. |
 | Generator objective | Generator_A di map sumber | Proxy gameplay pada generator besar berlampu merah di sekitar -5,34; 4,67; -29,11 | Visual dan lampu generator kita tidak dipindah/diubah. Proxy memakai trigger collider sesuai bounds visual. |
 | Generator attack points | Delapan titik sumber | Enam titik di sisi depan generator yang dapat diakses dari jaringan jalan utama | Titik pada NavMesh island terpisah diganti. Semua 21 spawn memiliki path lengkap ke keenam titik pada pemeriksaan authoring. |
-| Generator label | GENERATOR | POWER STATION | Menyesuaikan objective industrial; HP tetap 400. |
+| Generator label | GENERATOR | POWER STATION | Menyesuaikan objective industrial; HP dinaikkan menjadi 1000 pada 21 Oktober 2026. |
 | Minimap besar | Center 0,0,0; size 74 m | Center 2,0,0; size 100 m | Memuat map industrial dan jalur luarnya. |
 | Kamera minimap | Height 24,5 m; far clip 60 m | Height 40 m; far clip 100 m | Menempatkan kamera di atas struktur industrial dan memperluas jangkauan tampak. Small size tetap 27 m. |
 | Minimap culling/drop ground mask | Mask sumber | Mask gameplay juga mengecualikan layer Generator (12) | Objective proxy berupa trigger tidak menjadi permukaan pickup/render visual. Collider fisik generator asli tetap pada environment. |
@@ -116,7 +116,7 @@ Daftar persis 41 scripts sumber yang tidak di-import tersedia di `RepoScriptCove
 - Recoil, ADS, reload, ammo, hitscan, weapon switching dan movement masih logic sumber. Flexible Recoil System belum di-import/dipasang.
 - `EnemyBrain`, enemy configs/stats, health/headshot, animasi/controller dan boss enrage tetap sumber.
 - Drop chance, pickup rules, audio scripts dan clip yang dipakai tetap sumber. Referensi dihubungkan ulang ke scene kita.
-- Jumlah wave, HP player/generator, damage, ammo, boss scale dan timing selain cadence distribusi spawn tidak sengaja diubah untuk balancing.
+- Pada adaptasi awal, jumlah wave, HP player/generator, damage, ammo, boss scale dan timing selain cadence distribusi spawn tidak diubah untuk balancing. Konfigurasi terkini tercatat di GAMEPLAY_PRESENTATION_BRIEF.md; generator kini 1000 HP dan targeting memiliki antrean FIFO dengan kuota normal 50%, pengecualian melee, serta komitmen zombie yang sudah mencapai generator.
 
 ## 8. Fitur yang memang belum ada pada runtime sumber
 

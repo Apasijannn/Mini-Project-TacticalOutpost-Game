@@ -152,7 +152,101 @@ MonoBehaviour:
   primaryButton: {fileID: 201268487, guid: b9e44409689396443976ea7dac94177c, type: 3}
   secondaryButton: {fileID: 201268487, guid: b9e44409689396443976ea7dac94177c, type: 3}
   panelSprite: {fileID: 0}
-  font: {fileID: 0}
+  font: {fileID: 12800000, guid: 98a2263f9bdcb7141835986e2c5c063e, type: 3}
+  headingFont: {fileID: 11400000, guid: a55d2ea69354d4b46aad311fa8a1d1a9, type: 2}
+  bodyFont: {fileID: 11400000, guid: d0ee60e416271c14fad460801adfa83e, type: 2}
+  monoFont: {fileID: 11400000, guid: 66e5b853bf19e1040bedec479ebaf9e4, type: 2}
+  manualEntries:
+  - id: walker
+    description: A steady close-range threat. Never let a group reach the station
+      unchecked.
+    visual: {fileID: 6797759080110951857, guid: e477da5b37dc0984daa8b7465a82feb7, type: 3}
+    enemy: {fileID: 11400000, guid: dc4a388c3bd39f44e8b302cd9756ec4a, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 1
+  - id: bloater
+    description: A heavy shambler. Use open lanes to keep distance and aim for the
+      head.
+    visual: {fileID: 1026882827721392806, guid: 729094bffe4bec84ba2bd7a4a5fa2aa0, type: 3}
+    enemy: {fileID: 11400000, guid: b5f14f69107eef74388c1031e8dea703, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 1
+  - id: runner
+    description: A fast pursuer. Track your flanks and avoid reloading in the open.
+    visual: {fileID: 6458041249744934156, guid: c6325268413212d4a84710f894df13f9, type: 3}
+    enemy: {fileID: 11400000, guid: 980f54775413bc049ba257bccfd9b6b9, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 1
+  - id: skinless
+    description: An exposed infected. Keep moving and exploit its headshot multiplier.
+    visual: {fileID: 7779243225097284766, guid: 0683b92e42a6566488d3a1d74ebf88fd, type: 3}
+    enemy: {fileID: 11400000, guid: 53657501f0b8a3a41a21d7ace0ff773d, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 1
+  - id: boss_v1
+    description: The final-wave heavy. One enters through each gate. Enrages as its
+      health drops.
+    visual: {fileID: 6093955095576437743, guid: 9b7565b735a540843ad7728753cf8610, type: 3}
+    enemy: {fileID: 11400000, guid: 19edce8933f16c34a966a1b43681ba48, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 1
+  - id: boss_v2
+    description: An alternate heavy variant in the catalog. Not selected by the current
+      wave director.
+    visual: {fileID: 265036643593162914, guid: e8f10aa20cea40c40a723ac6803efa6e, type: 3}
+    enemy: {fileID: 11400000, guid: fb8c50cb88b152a4b872b5a0cf19cd81, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 0
+  - id: boss_v3
+    description: An alternate heavy variant in the catalog. Not selected by the current
+      wave director.
+    visual: {fileID: 5237825957439511800, guid: c0246c684178e8c48b1da25c02447e85, type: 3}
+    enemy: {fileID: 11400000, guid: b58a6908d9b5d1c46a0ba485f50639c6, type: 2}
+    weapon: {fileID: 0}
+    inCurrentWaves: 0
+  - id: AK47
+    description: Your primary automatic rifle. Fire short bursts for control; aim
+      down sights for distant contacts.
+    visual: {fileID: 8708785552288788177, guid: c34dcb8f2eb300045a517b7371b5adea, type: 3}
+    enemy: {fileID: 0}
+    weapon: {fileID: 5099347201407060845, guid: f31e8efed9aea7f4bb8ec89bc894ab8c, type: 3}
+    inCurrentWaves: 1
+  - id: Pistol
+    description: A semi-automatic backup. Switch when the rifle runs dry and make
+      each shot count.
+    visual: {fileID: 2447523499877510913, guid: 79bc4fbfceb0b1340ad44a3393c1fdd6, type: 3}
+    enemy: {fileID: 0}
+    weapon: {fileID: 4906098622733319547, guid: f31e8efed9aea7f4bb8ec89bc894ab8c, type: 3}
+    inCurrentWaves: 1
+  previewSpawns:
+  - {x: -60, y: 0.23691511, z: -5.5899997}
+  - {x: -60, y: 0.23691511, z: -4.24}
+  - {x: -60, y: 0.23691511, z: -2.8899999}
+  - {x: -58.274998, y: 0.23691511, z: -5.315002}
+  - {x: -58, y: 0.23691511, z: -4.24}
+  - {x: -58, y: 0.23691511, z: -2.8899999}
+  - {x: -56, y: 0.23691511, z: -5.5899997}
+  - {x: 1.2499999, y: 0.24720296, z: 55}
+  - {x: 2.6, y: 0.2664812, z: 55}
+  - {x: 3.9499998, y: 0.2889065, z: 55}
+  - {x: 1.2499999, y: 0.23691511, z: 53}
+  - {x: 2.6, y: 0.26102442, z: 53}
+  - {x: 3.9499998, y: 0.28964967, z: 53}
+  - {x: 1.2499999, y: 0.23691511, z: 51}
+  - {x: 18.27, y: 0.28418803, z: -37}
+  - {x: 19.62, y: 0.3044098, z: -37}
+  - {x: 20.970001, y: 0.3367747, z: -37}
+  - {x: 18.27, y: 0.27713057, z: -35}
+  - {x: 19.62, y: 0.24803576, z: -35}
+  - {x: 20.970001, y: 0.24741222, z: -35}
+  - {x: 18.27, y: 0.31691504, z: -33}
+  previewTargets:
+  - {x: -10.4, y: 0.39691544, z: -22.839476}
+  - {x: -7.5609045, y: 0.39691544, z: -22.839476}
+  - {x: -5.7609043, y: 0.39691544, z: -22.839476}
+  - {x: -3.9609044, y: 0.39691544, z: -22.839476}
+  - {x: -2.1609044, y: 0.39691544, z: -22.839476}
+  - {x: -0.36090422, y: 0.39691544, z: -22.839476}
 --- !u!4 &1001659770
 Transform:
   m_ObjectHideFlags: 0

@@ -48,10 +48,12 @@ public static class GameplayDebugChecks
         float deadline=Time.realtimeSinceStartup+25;
         while(!load.isDone||GameMenu.Instance==null||!GameMenu.Instance.mainMenu)
         {Check(Time.realtimeSinceStartup<deadline,"Menu did not load.");await Task.Delay(16);}
-        await Advance(.2f);
+        while(GameMenu.Instance.GetComponent<MenuBackdrop>()==null||!GameMenu.Instance.GetComponent<MenuBackdrop>().Ready)
+        {Check(Time.realtimeSinceStartup<deadline,"Menu backdrop did not load.");await Task.Delay(16);}
+        await Advance(.9f);
         Func<UnityEngine.UI.Button[]> buttons=()=>GameMenu.Instance.GetComponentsInChildren<UnityEngine.UI.Button>();
-        Check(buttons().Select(b=>b.name).SequenceEqual(new[]{"START","EXIT"}),"Main menu options differ.");
-        Check(buttons().All(b=>b.image.sprite!=null&&b.image.sprite.name=="UI Starter Pack_1"),"Menu art missing.");
+        Check(buttons().Select(b=>b.name).SequenceEqual(new[]{"START","SETTINGS","CONTROLS","FIELD MANUAL","EXIT"}),"Main menu options differ.");
+        Check(GameMenu.Instance.headingFont!=null&&GameMenu.Instance.bodyFont!=null&&GameMenu.Instance.monoFont!=null,"Menu typography missing.");
         Check(PlayerHealth.Instance==null&&EnemyHealth.Alive.Count==0,"Gameplay running behind main menu.");
         Check(UnityEngine.EventSystems.EventSystem.current!=null&&UnityEngine.EventSystems.EventSystem.current.GetComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>().actionsAsset!=null,"Menu has no UI input actions.");
         ScreenCapture.CaptureScreenshot("Assets/TacticalOutpost/Documentation/Debug/MainMenu.png");await Advance(.1f);
@@ -68,7 +70,7 @@ public static class GameplayDebugChecks
             InputSystem.QueueStateEvent(keyboard,new KeyboardState());await Advance(.05f);
             InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.Escape));await Task.Delay(250);
             Check(GameMenu.Instance.IsPaused&&Time.timeScale==0&&!player.InputEnabled&&AudioListener.pause,"Esc did not freeze gameplay/audio/input.");
-            Check(Cursor.lockState==CursorLockMode.None&&buttons().Select(b=>b.name).SequenceEqual(new[]{"RESUME","EXIT"}),"Pause controls/cursor incorrect.");
+            Check(Cursor.lockState==CursorLockMode.None&&buttons().Select(b=>b.name).SequenceEqual(new[]{"RESUME","SETTINGS","CONTROLS","FIELD MANUAL","EXIT"}),"Pause controls/cursor incorrect.");
             float pausedAt=Time.time;Vector3 position=player.transform.position;
             InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.W));await Task.Delay(250);
             Check(Time.time==pausedAt&&Vector3.Distance(position,player.transform.position)<.001f,"Pause clock/player moved.");
@@ -85,7 +87,7 @@ public static class GameplayDebugChecks
             Check(PlayerHealth.Instance==null&&EnemyHealth.Alive.Count==0&&Time.timeScale==1&&!AudioListener.pause,"Exit left gameplay or pause state behind.");
             buttons().Single(b=>b.name=="START").onClick.Invoke();await Ready();await Advance(.2f);
             Check(PlayerHealth.Instance.Health==100&&!GameMenu.Instance.IsPaused,"Starting again did not reset session.");
-            var result=new{passed=true,mainMenu="Start / Exit",pause="Resume / Exit",exitToMenu=true,mapEscapePriority=true,clockAndMovementFrozen=true,audioPaused=true,resumeRestoresInput=true,freshRestart=true};Save("MenuRuntimeChecks",result);return result;
+            var result=new{passed=true,mainMenu="Start / Settings / Controls / Field Manual / Exit",pause="Resume / Settings / Controls / Field Manual / Main Menu",exitToMenu=true,mapEscapePriority=true,clockAndMovementFrozen=true,audioPaused=true,resumeRestoresInput=true,freshRestart=true};Save("MenuRuntimeChecks",result);return result;
         }
         finally{InputSystem.RemoveDevice(keyboard);if(oldKeyboard!=null)oldKeyboard.MakeCurrent();}
     }
@@ -129,23 +131,23 @@ public static class GameplayDebugChecks
     {
         await ReloadGame();var d=WaveDirector.Instance;d.StopAllCoroutines();
         var hud=PlayerHealth.Instance.GetComponent<FpsHud>();
-        var death=(UnityEngine.UI.Text)typeof(FpsHud).GetField("deathText",Private).GetValue(hud);
+        var death=(TMPro.TMP_Text)typeof(FpsHud).GetField("deathText",Private).GetValue(hud);
         Check(death.text.Contains("DEAD")&&death.text.Contains("Press ENTER to try again"),"Death UI is not English.");
         var manager=PlayerHealth.Instance.GetComponentInChildren<WeaponManager>(true);var weapon=manager.Current;
         typeof(FpsWeapon).GetField("ammo",Private).SetValue(weapon,0);weapon.reserveAmmo=60;await Advance(.05f);
-        var message=(UnityEngine.UI.Text)typeof(FpsHud).GetField("msgText",Private).GetValue(hud);
+        var message=(TMPro.TMP_Text)typeof(FpsHud).GetField("msgText",Private).GetValue(hud);
         Check(message.text=="Press R to reload","Reload prompt is not English.");
         weapon.reserveAmmo=0;await Advance(.05f);Check(message.text=="Out of ammo. Find a resupply.","Empty-ammo prompt is not English.");
         manager.RefillAll();
         var player=PlayerHealth.Instance;player.TakeDamage(15,player.transform.position,Vector3.forward);
         var pickup=new GameObject("Temporary health UI check").AddComponent<Outpost.Pickups.PickupItem>();pickup.kind=Outpost.Pickups.PickupKind.Health;
         typeof(Outpost.Pickups.PickupItem).GetMethod("TryCollect",Private).Invoke(pickup,new object[]{player});await Advance(.05f);
-        var toast=(UnityEngine.UI.Text)typeof(FpsHud).GetField("toastText",Private).GetValue(hud);Check(toast.text.Contains(" HEALTH"),"Health pickup is not English.");
+        var toast=(TMPro.TMP_Text)typeof(FpsHud).GetField("toastText",Private).GetValue(hud);Check(toast.text.Contains(" HEALTH"),"Health pickup is not English.");
         typeof(WaveDirector).GetProperty("CurrentWave").GetSetMethod(true).Invoke(d,new object[]{3});
         d.bossDelay=1.2f;
         var sequence=(System.Collections.IEnumerator)typeof(WaveDirector).GetMethod("SpawnWave",Private).Invoke(d,new object[]{new WaveDirector.Wave{perSide=0,boss=true}});
         d.StartCoroutine(sequence);await Advance(.35f);
-        var title=(UnityEngine.UI.Text)typeof(WaveDirector).GetField("bannerText",Private).GetValue(d);
+        var title=(TMPro.TMP_Text)typeof(WaveDirector).GetField("bannerText",Private).GetValue(d);
         var glow=(UnityEngine.UI.Image)typeof(WaveDirector).GetField("bossGlow",Private).GetValue(d);
         Check(title.text=="BOSSES INBOUND"&&title.color.r>title.color.g*2,"Boss warning is not highlighted red.");
         Check(glow.color.a>.1f&&!glow.raycastTarget,"Boss glow is absent or blocks input.");
@@ -365,7 +367,7 @@ public static class GameplayDebugChecks
         foreach(var h in EnemyHealth.Alive.ToArray())UnityEngine.Object.Destroy(h.gameObject);
         var player=PlayerHealth.Instance.GetComponent<FpsController>();var oldPosition=player.transform.position;float oldYaw=player.transform.eulerAngles.y;
         bool oldEnabled=player.enabled;float oldTimeScale=Time.timeScale;
-        var generator=GeneratorHealth.All.Single();float initialHealth=generator.Health;
+        var generator=GeneratorHealth.All.Single();float initialHealth=generator.Health,originalMaxHealth=generator.maxHealth;
         var starts=UnityEngine.Object.FindObjectsByType<EnvSpawnPoint>(FindObjectsSortMode.None).Where(s=>s.group=="Enemy").GroupBy(s=>s.lane).Select(g=>g.OrderBy(p=>p.name).First()).ToArray();
         var bosses=director.catalog.variants.Where(v=>v.prefab.GetComponent<EnemyHealth>().config.kind==EnemyKind.Boss).ToArray();
         var normal=director.catalog.variants.First(v=>v.id=="walker");
@@ -405,7 +407,7 @@ public static class GameplayDebugChecks
             Time.timeScale=oldTimeScale;
             if(player){player.Teleport(oldPosition,oldYaw);player.enabled=oldEnabled;}
             foreach(var actor in actors)if(actor)UnityEngine.Object.Destroy(actor);
-            if(generator){generator.maxHealth=400;generator.ResetHealth();}
+            if(generator){generator.maxHealth=originalMaxHealth;generator.ResetHealth();}
         }
     }
 
@@ -494,15 +496,18 @@ public static class GameplayDebugChecks
         try
         {
             var hp=PlayerHealth.Instance;int id=hp.GetInstanceID();hp.TakeDamage(1000,hp.transform.position,Vector3.forward);
-            Check(hp.IsDead&&WaveDirector.Instance.CurrentPhase==WaveDirector.Phase.Defeat&&Time.timeScale==0,"Player death did not stop wave.");
-            var text=hp.GetComponentsInChildren<UnityEngine.UI.Text>(true).FirstOrDefault(t=>t.name=="DeathText");
+            Check(hp.IsDead&&WaveDirector.Instance.CurrentPhase==WaveDirector.Phase.Defeat&&PlayerDeathView.Instance.IsActive,"Player death did not stop wave.");
+            var text=hp.GetComponentsInChildren<TMPro.TMP_Text>(true).FirstOrDefault(t=>t.name=="DeathText");
             Check(text!=null&&text.text.StartsWith("DEAD"),"Death label is not DEAD.");
+            await Task.Delay(2200);
             await EnterAndWait(keyboard,id);
             Check(!PlayerHealth.Instance.IsDead&&PlayerHealth.Instance.Health==100,"Player did not reset after restart.");
             id=PlayerHealth.Instance.GetInstanceID();GeneratorHealth.All.Single().Damage(100000);
-            Check(WaveDirector.Instance.CurrentPhase==WaveDirector.Phase.Defeat&&Time.timeScale==0,"Generator defeat did not stop game.");
+            Check(WaveDirector.Instance.CurrentPhase==WaveDirector.Phase.Defeat,"Generator defeat did not stop game.");
+            float deadline=Time.realtimeSinceStartup+15;
+            while(!WaveDirector.Instance.GetComponent<Outpost.GeneratorDestruction>().Finished){Check(Time.realtimeSinceStartup<deadline,"Destruction cinematic did not finish.");await Task.Delay(30);}
             await EnterAndWait(keyboard,id);
-            Check(GeneratorHealth.All.Count==1&&GeneratorHealth.All[0].Health==400,"Generator did not reset.");
+            Check(GeneratorHealth.All.Count==1&&GeneratorHealth.All[0].Health==1000,"Generator did not reset.");
             var result=new{passed=true,deadLabel=true,playerDeathStopsWave=true,playerRestart=true,generatorDefeat=true,generatorRestart=true};Save("RestartRuntimeChecks",result);return result;
         }
         finally{InputSystem.RemoveDevice(keyboard);if(oldKeyboard!=null)oldKeyboard.MakeCurrent();}

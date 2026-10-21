@@ -100,6 +100,22 @@ public static class SetupWarFx
         finally{UnityEngine.Object.DestroyImmediate(go);}
     }
 
+    public static string GeneratorExplosion()
+    {
+        Folder(Root+"/Materials");
+        string path=Root+"/Generator explosion URP.prefab";
+        if(!AssetDatabase.LoadAssetAtPath<GameObject>(path)) Effect("Explosions/WFX_Explosion","Generator explosion URP",false,1);
+        var prefab=PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            // Multiply Alpha8 spark cards need their original custom shader; omit this decorative layer in URP.
+            foreach(var particles in prefab.GetComponentsInChildren<ParticleSystem>(true)) if(particles.name.Contains("Mult")) particles.gameObject.SetActive(false);
+            PrefabUtility.SaveAsPrefabAsset(prefab,path);
+        }
+        finally{PrefabUtility.UnloadPrefabContents(prefab);}
+        AssetDatabase.SaveAssets(); return path;
+    }
+
     public static object Apply()
     {
         if(EditorApplication.isPlaying)throw new InvalidOperationException("Exit Play Mode first.");

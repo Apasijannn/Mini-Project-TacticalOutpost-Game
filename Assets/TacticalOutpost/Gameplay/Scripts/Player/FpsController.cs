@@ -58,6 +58,7 @@ namespace Outpost.Player
 
         void Awake()
         {
+            Outpost.UI.GameOptions.ApplyToPlayer(this);
             cc = GetComponent<CharacterController>();
             if (playerCamera == null) playerCamera = GetComponentInChildren<Camera>();
             if (cameraRoot == null && playerCamera != null) cameraRoot = playerCamera.transform.parent;

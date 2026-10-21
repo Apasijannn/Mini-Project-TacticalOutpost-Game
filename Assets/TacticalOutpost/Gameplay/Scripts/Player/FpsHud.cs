@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+using Outpost.UI;
 
 namespace Outpost.Player
 {
@@ -38,12 +40,14 @@ namespace Outpost.Player
         Image[] hitMark = new Image[4];
         Image damageFlash, healthFill, healthBg, deathPanel, dot, crossImg, hitImg, headImg;
         float headUntil;
-        Image ammoIconImg;
-        Text ammoText, healthText, msgText, deathText, nameText, toastText;
+        TMP_Text ammoText, healthText, msgText, deathText, nameText, toastText;
+        MilitaryText promptTyping, toastTyping, deathTyping;
+        Image toastPanel, promptPanel;
+        bool deathShown;
         float hitUntil, flashAlpha, toastUntil;
         float spreadVis;
 
-        class Slot { public Image bg, frame, accent, icon; public Text num; public RectTransform rt; public float t; }
+        class Slot { public Image bg, accent, icon; public TMP_Text num; public RectTransform rt; public float t; }
         Slot[] slots;
 
         void Awake()
@@ -77,12 +81,26 @@ namespace Outpost.Player
             }
         }
         void OnDamaged(Vector3 d) { flashAlpha = Mathf.Min(0.55f, flashAlpha + 0.35f); }
-        void OnToast(string s, Color c) { if (toastText == null) return; toastText.text = s; toastText.color = c; toastUntil = Time.time + 1.6f; }
+        void OnToast(string s, Color c) { if (toastText == null) return; toastTyping.Speak(s); toastText.color = c; toastUntil = Time.time + 1.6f; }
         void OnDied()
         {
-            deathPanel.enabled = true; deathText.enabled = true;
+            var view = GetComponent<PlayerDeathView>();
+            if (view != null)
+            {
+                view.Begin();
+                foreach (Transform child in canvas.transform) if (child != deathPanel.transform && child != deathText.transform) child.gameObject.SetActive(false);
+                deathPanel.color = new Color(0, 0, 0, .13f);
+                var rect = (RectTransform)deathText.transform; rect.anchorMin = rect.anchorMax = new Vector2(.5f, .16f); rect.anchoredPosition = Vector2.zero;
+            }
+            else ShowDeath();
             if (controller != null) controller.InputEnabled = false;
             FpsController.LockCursor(false);
+        }
+        void ShowDeath()
+        {
+            if (deathShown) return;
+            deathShown = true; deathPanel.enabled = true; deathText.enabled = true;
+            deathTyping.Speak("DEAD\n<size=28>Get back in the fight. Press ENTER to try again.</size>");
         }
 
         Image MakeImage(string n, Transform parent, Color c, Vector2 size, Vector2 pos, Vector2 anchor)
@@ -96,19 +114,9 @@ namespace Outpost.Player
             return im;
         }
 
-        Text MakeText(string n, Transform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box)
+        TMP_Text MakeText(string n, Transform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box, bool mono = false)
         {
-            var go = new GameObject(n, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false);
-            var rt = (RectTransform)go.transform;
-            rt.anchorMin = rt.anchorMax = anchor; rt.pivot = anchor; rt.sizeDelta = box; rt.anchoredPosition = pos;
-            var tx = go.GetComponent<Text>();
-            tx.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            tx.fontSize = size; tx.alignment = align; tx.color = new Color(1f, 0.96f, 0.85f, 0.95f);
-            tx.horizontalOverflow = HorizontalWrapMode.Overflow; tx.verticalOverflow = VerticalWrapMode.Overflow;
-            tx.raycastTarget = false;
-            var sh = go.AddComponent<Shadow>(); sh.effectColor = new Color(0, 0, 0, 0.7f); sh.effectDistance = new Vector2(1.5f, -1.5f);
-            return tx;
+            return HudStyle.Text(n, parent, size, align, anchor, pos, box, mono);
         }
 
         void Build()
@@ -141,55 +149,53 @@ namespace Outpost.Player
             if (sprHitCross != null) { hitImg = MakeImage("HitSprite", root, new Color(1f, 1f, 1f, 0f), new Vector2(64, 64), Vector2.zero, mid); hitImg.sprite = sprHitCross; for (int i = 0; i < 4; i++) hitMark[i].enabled = false; }
             if (sprHeadCross != null) { headImg = MakeImage("HeadSprite", root, new Color(1f, 1f, 1f, 0f), new Vector2(84, 84), Vector2.zero, mid); headImg.sprite = sprHeadCross; }
 
-            msgText = MakeText("Msg", root, 30, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.3f), Vector2.zero, new Vector2(900, 60));
-            toastText = MakeText("Toast", root, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.36f), Vector2.zero, new Vector2(900, 60));
+            promptPanel = MakeImage("Prompt panel", root, HudStyle.Panel, new Vector2(680, 58), Vector2.zero, new Vector2(.5f, .3f));
+            toastPanel = MakeImage("Message panel", root, HudStyle.Panel, new Vector2(680, 58), Vector2.zero, new Vector2(.5f, .36f));
+            promptPanel.enabled = toastPanel.enabled = false;
+            msgText = MakeText("Msg", root, 25, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.3f), Vector2.zero, new Vector2(650, 58), true);
+            toastText = MakeText("Toast", root, 25, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.36f), Vector2.zero, new Vector2(650, 58), true);
             toastText.text = "";
+            promptTyping = msgText.gameObject.AddComponent<MilitaryText>(); toastTyping = toastText.gameObject.AddComponent<MilitaryText>();
 
             // ----- kanan bawah: daftar slot senjata (slot 1 paling bawah, seperti HUD loadout game FPS) -----
             int n = manager != null && manager.weapons != null ? manager.weapons.Length : 0;
             slots = new Slot[n];
             Vector2 br = new Vector2(1, 0);
+            MakeImage("Weapon panel", root, HudStyle.Panel, new Vector2(320, 132), new Vector2(-40, 40), br);
+            MakeImage("Weapon panel orange edge", root, HudStyle.Amber, new Vector2(3, 132), new Vector2(-40, 40), br);
+            var loadoutLabel = MakeText("Loadout label", root, 16, TextAnchor.LowerRight, br, new Vector2(-40, 336), new Vector2(320, 24), true); loadoutLabel.text = "LOADOUT"; loadoutLabel.color = HudStyle.Muted;
             for (int i = 0; i < n; i++)
             {
                 var s = new Slot();
-                float y = 168f + i * 78f;
-                s.bg = MakeImage("Slot" + (i + 1), root, new Color(0, 0, 0, 0.5f), new Vector2(300, 70), new Vector2(-48, y), br);
+                float y = 190f + i * 68f;
+                s.bg = MakeImage("Slot" + (i + 1), root, HudStyle.Panel, new Vector2(320, 58), new Vector2(-40, y), br);
                 s.rt = (RectTransform)s.bg.transform;
-                if (sprSlotBg != null) { s.bg.sprite = sprSlotBg; s.bg.type = Image.Type.Sliced; }
-                s.frame = MakeImage("Frame", s.bg.transform, new Color(1f, 1f, 1f, 0f), new Vector2(300, 70), Vector2.zero, new Vector2(0, 0));
-                if (sprSlotFrame != null) { s.frame.sprite = sprSlotFrame; s.frame.type = Image.Type.Sliced; } else s.frame.enabled = false;
-                s.accent = MakeImage("Accent", s.bg.transform, new Color(1f, 0.82f, 0.3f, 0f), new Vector2(4, 70), Vector2.zero, new Vector2(0, 0));
-                if (sprSlotFrame != null) s.accent.enabled = false;
-                s.num = MakeText("Num", s.bg.transform, 24, TextAnchor.MiddleLeft, new Vector2(0, 0.5f), new Vector2(16, 0), new Vector2(40, 40));
+                s.accent = MakeImage("Right orange edge", s.bg.transform, HudStyle.Amber, new Vector2(3, 58), Vector2.zero, new Vector2(1, 0));
+                s.num = MakeText("Num", s.bg.transform, 22, TextAnchor.MiddleLeft, new Vector2(0, 0.5f), new Vector2(16, 0), new Vector2(40, 40), true);
                 s.num.text = (i + 1).ToString();
-                s.icon = MakeImage("Icon", s.bg.transform, Color.white, new Vector2(200, 64), new Vector2(-12, 0), new Vector2(1, 0.5f));
+                s.icon = MakeImage("Icon", s.bg.transform, HudStyle.Ivory, new Vector2(220, 52), new Vector2(-16, 0), new Vector2(1, 0.5f));
                 s.icon.preserveAspect = true;
                 var w = manager.weapons[i];
                 if (w != null && w.icon != null) s.icon.sprite = w.icon; else s.icon.enabled = false;
                 slots[i] = s;
             }
-            nameText = MakeText("WeaponName", root, 26, TextAnchor.LowerRight, br, new Vector2(-52, 108), new Vector2(400, 40));
-            ammoText = MakeText("Ammo", root, 50, TextAnchor.LowerRight, br, new Vector2(-48, 42), new Vector2(400, 70));
-            ammoText.supportRichText = true;
-            if (sprAmmo != null) { var ai = MakeImage("AmmoIcon", root, new Color(1f, 0.93f, 0.7f, 0.9f), new Vector2(46, 46), new Vector2(-352, 52), br); ai.sprite = sprAmmo; ai.preserveAspect = true; ammoIconImg = ai; }
+            nameText = MakeText("WeaponName", root, 26, TextAnchor.LowerRight, br, new Vector2(-60, 136), new Vector2(280, 36));
+            ammoText = MakeText("Ammo", root, 48, TextAnchor.LowerRight, br, new Vector2(-60, 78), new Vector2(280, 58), true);
+            var ammoLabel = MakeText("Ammo label", root, 14, TextAnchor.LowerRight, br, new Vector2(-60, 55), new Vector2(280, 22), true); ammoLabel.text = "MAG / RESERVE"; ammoLabel.color = HudStyle.Muted;
 
-            healthBg = MakeImage("HealthBg", root, new Color(0, 0, 0, 0.45f), new Vector2(360, 18), new Vector2(60, 60), new Vector2(0, 0));
-            healthFill = MakeImage("HealthFill", root, new Color(0.35f, 0.85f, 0.4f, 0.95f), new Vector2(360, 18), new Vector2(60, 60), new Vector2(0, 0));
-            healthText = MakeText("HP", root, 26, TextAnchor.LowerLeft, new Vector2(0, 0), new Vector2(60, 84), new Vector2(300, 40));
-            if (sprBarBg != null)
-            {
-                healthBg.sprite = sprBarBg; healthBg.color = new Color(1f, 1f, 1f, 0.85f); healthBg.rectTransform.sizeDelta = new Vector2(372, 24); healthBg.rectTransform.anchoredPosition = new Vector2(104, 54);
-                healthFill.sprite = sprBarFill != null ? sprBarFill : sprBarBg; healthFill.type = Image.Type.Filled; healthFill.fillMethod = Image.FillMethod.Horizontal; healthFill.fillOrigin = 0;
-                healthFill.rectTransform.sizeDelta = new Vector2(366, 18); healthFill.rectTransform.anchoredPosition = new Vector2(107, 57);
-                healthText.rectTransform.anchoredPosition = new Vector2(104, 84);
-            }
-            if (sprHealth != null) { var hi = MakeImage("HealthIcon", root, new Color(0.45f, 0.95f, 0.5f, 0.95f), new Vector2(38, 38), new Vector2(54, 55), new Vector2(0, 0)); hi.sprite = sprHealth; hi.preserveAspect = true; }
+            var bl = Vector2.zero;
+            MakeImage("Vitals panel", root, HudStyle.Panel, new Vector2(320, 132), new Vector2(40, 40), bl);
+            MakeImage("Vitals orange edge", root, HudStyle.Amber, new Vector2(3, 132), new Vector2(40, 40), bl);
+            var vitals = MakeText("Vitals label", root, 16, TextAnchor.LowerLeft, bl, new Vector2(60, 140), new Vector2(280, 24), true); vitals.text = "VITALS"; vitals.color = HudStyle.Muted;
+            healthBg = MakeImage("HealthBg", root, new Color(.23f, .27f, .24f), new Vector2(280, 6), new Vector2(60, 62), bl);
+            healthFill = MakeImage("HealthFill", root, HudStyle.Amber, new Vector2(280, 6), new Vector2(60, 62), bl);
+            healthText = MakeText("HP", root, 44, TextAnchor.LowerLeft, bl, new Vector2(60, 82), new Vector2(280, 52), true);
 
             deathPanel = MakeImage("DeathPanel", root, new Color(0.1f, 0f, 0f, 0.65f), Vector2.zero, Vector2.zero, mid);
             var dr = (RectTransform)deathPanel.transform; dr.anchorMin = Vector2.zero; dr.anchorMax = Vector2.one; dr.offsetMin = dr.offsetMax = Vector2.zero;
             deathText = MakeText("DeathText", root, 54, TextAnchor.MiddleCenter, mid, Vector2.zero, new Vector2(1200, 200));
             deathText.text = "DEAD\n<size=28>Get back in the fight. Press ENTER to try again.</size>";
-            deathText.supportRichText = true;
+            deathTyping = deathText.gameObject.AddComponent<MilitaryText>();
             deathPanel.enabled = false; deathText.enabled = false;
         }
 
@@ -201,11 +207,10 @@ namespace Outpost.Player
                 var s = slots[i]; if (s == null) continue;
                 bool on = i == manager.CurrentIndex;
                 s.t = Mathf.MoveTowards(s.t, on ? 1f : 0f, 8f * Time.deltaTime);
-                s.bg.color = sprSlotBg != null ? Color.Lerp(new Color(0f, 0f, 0f, 0.55f), new Color(0.25f, 0.25f, 0.25f, 0.8f), s.t) : Color.Lerp(new Color(0, 0, 0, 0.5f), new Color(1f, 1f, 1f, 0.2f), s.t);
-                if (s.frame != null) s.frame.color = new Color(1f, 1f, 1f, s.t);
-                s.accent.color = new Color(1f, 0.82f, 0.3f, s.t);
+                s.bg.color = Color.Lerp(HudStyle.Panel, new Color(.18f, .15f, .09f, .96f), s.t);
+                s.accent.color = new Color(HudStyle.Amber.r, HudStyle.Amber.g, HudStyle.Amber.b, Mathf.Lerp(.3f, 1, s.t));
                 s.icon.color = Color.Lerp(new Color(1f, 1f, 1f, 0.6f), Color.white, s.t);
-                s.num.color = Color.Lerp(new Color(1f, 1f, 1f, 0.45f), new Color(1f, 0.9f, 0.5f, 1f), s.t);
+                s.num.color = Color.Lerp(HudStyle.Muted, HudStyle.Amber, s.t);
                 var w = manager.weapons[i];
                 // slot yang kehabisan amunisi total diredupkan merah
                 if (w != null && w.Ammo == 0 && w.Reserve == 0) s.icon.color = Color.Lerp(s.icon.color, new Color(1f, 0.3f, 0.3f, 0.7f), 0.7f);
@@ -219,12 +224,11 @@ namespace Outpost.Player
             if (wp != null)
             {
                 nameText.text = wp.displayName.ToUpper();
-                if (ammoIconImg != null) ammoIconImg.enabled = true;
                 {
-                    string r = wp.IsReloading ? "RELOADING" : wp.Ammo.ToString();
-                    ammoText.text = r + "  <size=28>| " + wp.Reserve + "</size>";
-                    msgText.text = (!wp.IsReloading && wp.Ammo == 0 && wp.Reserve > 0) ? "Press R to reload" :
-                                   (!wp.IsReloading && wp.Ammo == 0 && wp.Reserve == 0) ? "Out of ammo. Find a resupply." : "";
+                    ammoText.text = wp.Ammo + "  <size=28>| " + wp.Reserve + "</size>";
+                    promptTyping.Speak((!wp.IsReloading && wp.Ammo == 0 && wp.Reserve > 0) ? "Press R to reload" :
+                                   (!wp.IsReloading && wp.Ammo == 0 && wp.Reserve == 0) ? "Out of ammo. Find a resupply." : "");
+                    promptPanel.enabled = msgText.text.Length > 0;
                 }
 
                 // crosshair melebar saat bergerak/menembak
@@ -233,7 +237,7 @@ namespace Outpost.Player
                 target += wp.RecoilFraction * 6f;
                 if (wp.IsAiming) target = 3f + wp.RecoilFraction * 2f;
                 spreadVis = Mathf.Lerp(spreadVis, target, 14f * Time.deltaTime);
-                float a = wp.IsAiming ? 0.35f : 0.9f;
+                float a = MinimapController.Instance != null && MinimapController.Instance.IsLarge ? 0 : wp.IsAiming ? .35f : .9f;
                 Vector2[] offs = { new Vector2(-spreadVis - 7, 0), new Vector2(spreadVis + 7, 0), new Vector2(0, spreadVis + 7), new Vector2(0, -spreadVis - 7) };
                 for (int i = 0; i < 4; i++)
                 {
@@ -246,6 +250,7 @@ namespace Outpost.Player
                     crossImg.rectTransform.sizeDelta = new Vector2(sz, sz);
                     crossImg.color = new Color(1f, 1f, 1f, a);
                 }
+                dot.color = new Color(1, 1, 1, a);
             }
             bool hit = Time.time < hitUntil;
             if (hitImg != null) hitImg.color = new Color(1f, 1f, 1f, hit ? 1f : 0f);
@@ -260,19 +265,20 @@ namespace Outpost.Player
             {
                 float left = toastUntil - Time.time;
                 var c = toastText.color; c.a = Mathf.Clamp01(left / 0.5f); toastText.color = c;
-                ((RectTransform)toastText.transform).anchoredPosition = new Vector2(0f, Mathf.Clamp(1.6f - left, 0f, 1.6f) * 18f);
+                toastPanel.enabled = left > 0;
             }
             if (health != null)
             {
                 float f = health.Health / health.maxHealth;
-                if (sprBarBg != null) healthFill.fillAmount = f;
-                else { var rt = (RectTransform)healthFill.transform; rt.sizeDelta = new Vector2(360f * f, 18f); }
-                healthFill.color = Color.Lerp(new Color(0.9f, 0.2f, 0.15f, 0.95f), new Color(0.35f, 0.85f, 0.4f, 0.95f), f);
-                healthText.text = Mathf.CeilToInt(health.Health).ToString();
+                healthFill.rectTransform.sizeDelta = new Vector2(280f * f, 6);
+                healthFill.color = f < .3f ? HudStyle.Danger : HudStyle.Amber;
+                healthText.text = Mathf.CeilToInt(health.Health) + " <size=20>/ " + Mathf.CeilToInt(health.maxHealth) + " HP</size>";
                 if (health.IsDead)
                 {
+                    var view = GetComponent<PlayerDeathView>();
+                    if (view != null && view.Settled) ShowDeath();
                     var kb = Keyboard.current;
-                    if (kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame))
+                    if (Outpost.Enemy.WaveDirector.Instance == null && (view == null || view.Settled) && kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame))
                         SceneManager.LoadScene(gameObject.scene.buildIndex);
                 }
             }

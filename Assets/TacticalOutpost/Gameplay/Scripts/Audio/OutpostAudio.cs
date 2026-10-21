@@ -37,6 +37,9 @@ namespace Outpost.Audio
         public float bossHearDistance = 70f;
 
         AudioSource ui;
+        AudioSource radio;
+        AudioClip radioTick;
+        float lastRadioTick = -1f;
         PlayerHealth hooked;
 
         void Awake()
@@ -44,11 +47,20 @@ namespace Outpost.Audio
             Instance = this;
             ui = gameObject.AddComponent<AudioSource>();
             ui.playOnAwake = false; ui.spatialBlend = 0f;
+            radio = gameObject.AddComponent<AudioSource>(); radio.playOnAwake = false; radio.spatialBlend = 0f;
+            radioTick = AudioClip.Create("Terminal input", 400, 1, 22050, false);
+            var samples = new float[400];
+            for (int i = 0; i < samples.Length; i++)
+            {
+                float t = i / 22050f, envelope = Mathf.Sin(Mathf.PI * i / samples.Length);
+                samples[i] = (Mathf.Sin(t * Mathf.PI * 2 * 1350) + .25f * Mathf.Sin(t * Mathf.PI * 2 * 2100)) * envelope * .18f;
+            }
+            radioTick.SetData(samples, 0);
         }
 
         void OnEnable() { EnemyHealth.AnySpawned += OnEnemySpawned; }
         void OnDisable() { EnemyHealth.AnySpawned -= OnEnemySpawned; Unhook(); }
-        void OnDestroy() { if (Instance == this) Instance = null; }
+        void OnDestroy() { if (Instance == this) Instance = null; if (radioTick != null) Destroy(radioTick); }
 
         void Update()
         {
@@ -81,5 +93,11 @@ namespace Outpost.Audio
         public static void Switch() { if (Instance != null) Instance.Play2D(Instance.switchWeapon, Instance.switchVolume); }
         public static void PickAmmo() { if (Instance != null) Instance.Play2D(Instance.pickAmmo, Instance.pickVolume); }
         public static void PickHealth() { if (Instance != null) Instance.Play2D(Instance.pickHealth, Instance.pickVolume); }
+        public static void RadioTick()
+        {
+            var audio = Instance;
+            if (audio == null || Time.unscaledTime - audio.lastRadioTick < .055f || AudioListener.pause) return;
+            audio.lastRadioTick = Time.unscaledTime; audio.radio.PlayOneShot(audio.radioTick, .25f);
+        }
     }
 }

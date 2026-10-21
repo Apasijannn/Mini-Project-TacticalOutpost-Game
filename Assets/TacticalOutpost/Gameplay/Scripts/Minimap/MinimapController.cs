@@ -40,10 +40,17 @@ namespace Outpost.UI
         float refreshTimer;
         bool prevFog;
         Light sun; float prevSun;
+        Texture2D borderTexture;
+        Sprite borderSprite;
         const float BaseRT = 256f;   // ukuran RT asli aset (dasar kalibrasi ikon)
 
         void Awake() { Instance = this; }
-        void OnDestroy() { if (Instance == this) Instance = null; }
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            if (borderSprite != null) Destroy(borderSprite);
+            if (borderTexture != null) Destroy(borderTexture);
+        }
 
         public static bool CloseLargeMap()
         {
@@ -77,6 +84,42 @@ namespace Outpost.UI
 
         void Start()
         {
+            var mapCanvas = map.GetComponentInParent<Canvas>(); mapCanvas.overrideSorting = true; mapCanvas.sortingOrder = 70;
+            borderTexture = new Texture2D(256, 256, TextureFormat.RGBA32, false);
+            borderTexture.wrapMode = TextureWrapMode.Clamp;
+            var pixels = new Color[256 * 256];
+            for (int y = 0; y < 256; y++)
+                for (int x = 0; x < 256; x++)
+                {
+                    float radius = Vector2.Distance(new Vector2(x + .5f, y + .5f), new Vector2(128, 128));
+                    pixels[y * 256 + x] = new Color(1, 1, 1, Mathf.Clamp01(1.5f - Mathf.Abs(radius - 126)));
+                }
+            borderTexture.SetPixels(pixels); borderTexture.Apply();
+            borderSprite = Sprite.Create(borderTexture, new Rect(0, 0, 256, 256), new Vector2(.5f, .5f));
+            foreach (var image in map.GetComponentsInChildren<Image>(true))
+            {
+                if (image.name == "BorderLine")
+                {
+                    image.enabled = true; image.sprite = borderSprite; image.color = HudStyle.Amber;
+                    var fund = ms.Fund_Ima.rectTransform;
+                    // The vendor mask has 10% transparent padding; fit the ring to its visible circle.
+                    image.rectTransform.sizeDelta = fund.rect.size * .9f + Vector2.one * 4;
+                    image.rectTransform.pivot = new Vector2(.5f, .5f);
+                    image.rectTransform.position = fund.TransformPoint(fund.rect.center);
+                    image.raycastTarget = false;
+                }
+                else if (image.name == "Fund") image.color = HudStyle.Panel;
+                else if (image.name == "AngleTextG")
+                {
+                    image.color = HudStyle.Panel; image.rectTransform.anchoredPosition = new Vector2(0, 150);
+                }
+                else if (image.name == "Radar") image.color = new Color(HudStyle.Amber.r, HudStyle.Amber.g, HudStyle.Amber.b, .15f);
+            }
+            foreach (var label in map.GetComponentsInChildren<Text>(true))
+            {
+                if (GameMenu.Instance != null && GameMenu.Instance.font != null) label.font = GameMenu.Instance.font;
+                label.color = HudStyle.Ivory;
+            }
             sun = RenderSettings.sun;
             if (sun == null) foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None)) if (l.type == LightType.Directional) { sun = l; break; }
             if (mapCam != null) mapCam.enabled = false;   // dirender manual (~20x per detik) supaya hemat
@@ -102,8 +145,7 @@ namespace Outpost.UI
             map.localScale = new Vector3(s, s, 1f);
 
             Vector2 size = holder.rect.size;
-            float half = 150f * s;
-            Vector2 smallPos = new Vector2(-size.x * 0.5f + margin + half, size.y * 0.5f - margin - half);
+            Vector2 smallPos = new Vector2(-size.x * 0.5f + margin + 153f * s, size.y * 0.5f - margin - 175f * s);
             map.anchoredPosition = Vector2.Lerp(smallPos, Vector2.zero, e);
 
             if (dim != null) dim.color = new Color(0f, 0f, 0f, 0.42f * e);

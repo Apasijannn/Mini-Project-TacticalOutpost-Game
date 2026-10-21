@@ -21,10 +21,14 @@ namespace Outpost.Enemy
         public Animator animator;
 
         public State CurrentState { get { return state; } }
+        public string DebugTarget { get { return targetType == TargetType.Player ? "Player" : targetType == TargetType.Generator ? "Generator" : "None"; } }
         public bool IsAware { get { return Time.time - lastSeen < (config != null ? config.memoryTime : 8f); } }
 
         // reservasi titik serang generator: 1 titik = 1 zombie
         static readonly Dictionary<Transform, EnemyBrain> reserved = new Dictionary<Transform, EnemyBrain>();
+        static readonly List<EnemyBrain> active = new List<EnemyBrain>();
+        static readonly List<EnemyBrain> playerCandidates = new List<EnemyBrain>();
+        static float nextAllocation = -1f;
         static int blockMask = -1;
 
         NavMeshAgent agent;
@@ -48,6 +52,12 @@ namespace Outpost.Enemy
         float cooldownMul = 1f, speedMul = 1f;
         PlayerHealth playerHp;
         Transform playerTr;
+        GeneratorHealth decisionGen;
+        GeneratorHealth committedGenerator;
+        bool wantsPlayer, closeThreat, assignedPlayer;
+        float provokedUntil = -1f, lastHeard = -999f, playerDistance;
+        long playerRequestOrder;
+        static long nextPlayerRequestOrder;
 
         static readonly int pSpeed = Animator.StringToHash("Speed");
         static readonly int pAttack = Animator.StringToHash("Attack");
@@ -97,6 +107,8 @@ namespace Outpost.Enemy
 
         void OnEnable()
         {
+            if (!health.IsDead && !active.Contains(this)) active.Add(this);
+            nextAllocation = -1f;
             health.OnDamaged += OnDamaged;
             health.OnDied += OnDied;
             FpsWeapon.NoiseEmitted += OnNoise;
@@ -104,6 +116,7 @@ namespace Outpost.Enemy
 
         void OnDisable()
         {
+            active.Remove(this); playerRequestOrder = 0; nextAllocation = -1f;
             health.OnDamaged -= OnDamaged;
             health.OnDied -= OnDied;
             FpsWeapon.NoiseEmitted -= OnNoise;
@@ -129,6 +142,9 @@ namespace Outpost.Enemy
         void Update()
         {
             if (state == State.Dead || !agent.enabled || !agent.isOnNavMesh) return;
+            var deathView = PlayerDeathView.Instance;
+            if (deathView != null && deathView.IsActive) { WatchFallenPlayer(deathView.transform); return; }
+            AllocatePlayerTargets();
             UpdateAnimatorSpeed();
 
             switch (state)
@@ -147,6 +163,26 @@ namespace Outpost.Enemy
                 default:
                     if (Time.time >= nextThink) { nextThink = Time.time + 0.15f; Think(); }
                     break;
+            }
+        }
+
+        void WatchFallenPlayer(Transform corpse)
+        {
+            pendingHit = false;
+            float distance = Flat(corpse.position - transform.position).magnitude;
+            SetTargetPlayer();
+            if (distance > 8f) { agent.isStopped = true; if (animator != null) animator.SetFloat(pSpeed, 0); return; }
+            if (distance > config.attackRange)
+            {
+                state = State.Chase; agent.isStopped = false; MoveTo(corpse.position, false); UpdateAnimatorSpeed(); return;
+            }
+            state = State.AttackPlayer; agent.isStopped = true;
+            var direction = Flat(corpse.position - transform.position);
+            if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction), 180 * Time.deltaTime);
+            if (animator != null)
+            {
+                animator.SetFloat(pSpeed, 0);
+                if (Time.time >= nextAttackTime) { animator.SetTrigger(pAttack); nextAttackTime = Time.time + config.attackCooldown; }
             }
         }
 
@@ -191,27 +227,86 @@ namespace Outpost.Enemy
         {
             if (state == State.Dead || config == null) return;
             if ((pos - transform.position).magnitude > radius * config.hearingMultiplier) return;
+            HearGunfire(pos);
+        }
+
+        void HearGunfire(Vector3 pos)
+        {
             Vector2 j = Random.insideUnitCircle * 2f;
             lastKnownPos = pos + new Vector3(j.x, 0f, j.y);
             lastSeen = Mathf.Max(lastSeen, Time.time - config.memoryTime * 0.4f);   // ingatan suara lebih lemah dari melihat langsung
+            lastHeard = Time.time;
+            nextAllocation = -1f;
         }
 
         // ---------------------------------------------------------------- keputusan
 
-        void Think()
+        static void AllocatePlayerTargets()
         {
-            UpdatePerception();
+            if (Time.time < nextAllocation) return;
+            nextAllocation = Time.time + .15f;
+            playerCandidates.Clear();
+            foreach (var brain in active)
+            {
+                brain.UpdatePerception(); brain.ChooseTargets(); brain.assignedPlayer = false;
+                if (brain.wantsPlayer) playerCandidates.Add(brain);
+                else brain.playerRequestOrder = 0;
+            }
+            playerCandidates.Sort((a, b) =>
+            {
+                if (a.playerRequestOrder != b.playerRequestOrder)
+                {
+                    if (a.playerRequestOrder == 0) return 1;
+                    if (b.playerRequestOrder == 0) return -1;
+                    return a.playerRequestOrder.CompareTo(b.playerRequestOrder);
+                }
+                int hit = (Time.time < b.provokedUntil).CompareTo(Time.time < a.provokedUntil); if (hit != 0) return hit;
+                int heard = (Time.time - b.lastHeard < 2f).CompareTo(Time.time - a.lastHeard < 2f); if (heard != 0) return heard;
+                int distance = a.playerDistance.CompareTo(b.playerDistance);
+                return distance != 0 ? distance : a.GetInstanceID().CompareTo(b.GetInstanceID());
+            });
+            int slots = Mathf.CeilToInt(active.Count * .5f);
+            foreach (var brain in playerCandidates) if (brain.closeThreat) slots--;
+            for (int i = 0; i < playerCandidates.Count; i++)
+            {
+                var brain = playerCandidates[i];
+                if (brain.playerRequestOrder == 0) brain.playerRequestOrder = ++nextPlayerRequestOrder;
+                // Melee threats count toward the quota, but may exceed it until the player retreats.
+                brain.assignedPlayer = brain.closeThreat || brain.decisionGen == null || slots > 0;
+                if (brain.assignedPlayer && !brain.closeThreat) slots--;
+            }
+            foreach (var brain in active)
+            {
+                bool redirect = brain.targetType == TargetType.Player && !brain.assignedPlayer && brain.decisionGen != null;
+                bool engage = brain.targetType == TargetType.Generator && brain.assignedPlayer;
+                if (!redirect && !engage) continue;
+                brain.pendingHit = false; brain.ReleaseTarget(); brain.nextThink = 0f;
+                if (brain.state == State.Chase || brain.state == State.AttackPlayer || brain.state == State.AttackGenerator)
+                {
+                    brain.state = State.Advance;
+                    if (brain.agent.enabled && brain.agent.isOnNavMesh) brain.agent.isStopped = false;
+                }
+            }
+        }
+
+        void ChooseTargets()
+        {
 
             float playerScore = 0f;
             float memAge = Time.time - lastSeen;
             bool mem = memAge < config.memoryTime;
             float dPlayer = playerTr != null ? Vector3.Distance(transform.position, playerTr.position) : 999f;
             bool playerAlive = playerHp != null && !playerHp.IsDead;
+            playerDistance = dPlayer;
+            closeThreat = playerAlive && playerVisible && Flat(playerTr.position - transform.position).magnitude <= config.attackRange + .6f
+                && Mathf.Abs(playerTr.position.y - transform.position.y) < 1.8f;
             if (playerAlive)
             {
                 if (playerVisible) playerScore = 0.6f + 0.4f * Mathf.Clamp01(1f - dPlayer / config.sightRadius);
                 else if (mem) playerScore = 0.5f * (1f - memAge / config.memoryTime);
                 if (dPlayer < 5f) playerScore = 1f;
+                if (Time.time - lastHeard < 2f) playerScore = Mathf.Max(playerScore, 1.1f);
+                if (Time.time < provokedUntil) playerScore = Mathf.Max(playerScore, 1.1f);
                 if (config.kind == EnemyKind.Boss && (playerVisible || mem || dPlayer < 5f)) playerScore += 0.2f;
             }
 
@@ -226,11 +321,20 @@ namespace Outpost.Enemy
             }
 
             bool playerKnown = playerAlive && (playerVisible || mem || dPlayer < 5f);
-            bool goPlayer = playerKnown && (playerScore > bestGenScore || bestGen == null);
             if (state == State.Chase && targetType == TargetType.Player) playerScore += 0.08f;
-            goPlayer = playerKnown && (playerScore > bestGenScore || bestGen == null);
+            if (committedGenerator != null && !committedGenerator.IsAlive) committedGenerator = null;
+            if (committedGenerator != null) bestGen = committedGenerator;
+            decisionGen = bestGen;
+            wantsPlayer = closeThreat || committedGenerator == null && playerKnown && (playerRequestOrder > 0 || playerScore > bestGenScore || bestGen == null);
+        }
 
-            if (goPlayer)
+        void Think()
+        {
+            var bestGen = decisionGen;
+            bool mem = Time.time - lastSeen < config.memoryTime;
+            float dPlayer = playerDistance;
+
+            if (assignedPlayer)
             {
                 SetTargetPlayer();
                 Vector3 dest = playerVisible ? playerTr.position : (mem ? lastKnownPos : playerTr.position);
@@ -254,7 +358,11 @@ namespace Outpost.Enemy
                 if (targetGen.Body != null)
                 {
                     Vector3 cp = targetGen.Body.ClosestPoint(transform.position);
-                    if (Flat(cp - transform.position).magnitude <= config.attackRange + 0.5f && Time.time >= nextAttackTime) BeginAttack(TargetType.Generator);
+                    if (Flat(cp - transform.position).magnitude <= config.attackRange + 0.5f)
+                    {
+                        committedGenerator = targetGen;
+                        if (Time.time >= nextAttackTime) BeginAttack(TargetType.Generator);
+                    }
                 }
             }
         }
@@ -379,6 +487,11 @@ namespace Outpost.Enemy
             // ditembak: langsung tahu posisi player
             FindPlayer();
             if (playerTr != null) { lastKnownPos = playerTr.position; lastSeen = Time.time; }
+            provokedUntil = Time.time + config.memoryTime; nextAllocation = -1f;
+            if (playerTr != null)
+                foreach (var other in active)
+                    if (other != this && (other.transform.position - transform.position).sqrMagnitude <= 64f)
+                        other.HearGunfire(playerTr.position);
 
             if (config.kind == EnemyKind.Boss && !enraged && health.Fraction <= config.enrageHealthFraction)
             {
@@ -399,6 +512,7 @@ namespace Outpost.Enemy
 
         void OnDied(EnemyHealth h)
         {
+            active.Remove(this); nextAllocation = -1f;
             state = State.Dead;
             pendingHit = false;
             ReleaseTarget();

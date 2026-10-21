@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using Outpost.UI;
 
 namespace Outpost.Enemy
 {
@@ -20,7 +22,7 @@ namespace Outpost.Enemy
 
         Canvas canvas;
         Image fill, back;
-        Text nameText, hpText;
+        TMP_Text nameText, hpText;
         float damagedFlash, lastFraction = 1f;
         Camera cam;
 
@@ -44,14 +46,15 @@ namespace Outpost.Enemy
             go.transform.localScale = Vector3.one * (width / PxW);
             go.layer = 2;   // Ignore Raycast: tidak menghalangi peluru
 
-            back = NewImage("Bg", rt, PxW, PxH, barBackground, new Color(1f, 1f, 1f, 0.95f));
-            fill = NewImage("Fill", rt, PxW - 10f, PxH - 14f, barFill != null ? barFill : barBackground, Color.white);
-            fill.type = Image.Type.Filled; fill.fillMethod = Image.FillMethod.Horizontal; fill.fillOrigin = 0; fill.fillAmount = 1f;
+            back = NewImage("Bg", rt, PxW, PxH, null, HudStyle.Panel);
+            fill = NewImage("Fill", rt, PxW - 20f, 6, null, HudStyle.Amber);
+            fill.rectTransform.anchorMin = fill.rectTransform.anchorMax = fill.rectTransform.pivot = new Vector2(0, .5f);
+            fill.rectTransform.anchoredPosition = new Vector2(10, -15);
+            var edge = NewImage("Orange edge", rt, 3, PxH, null, HudStyle.Amber); edge.rectTransform.anchoredPosition = new Vector2(PxW*.5f-1.5f,0);
 
-            nameText = NewText("Name", rt, 56, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0f, PxH + 4f), new Vector2(PxW * 2f, 70f));
-            nameText.text = label; nameText.color = new Color(0.55f, 0.92f, 1f, 1f);
-            hpText = NewText("HP", rt, 36, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(PxW, PxH));
-            hpText.color = Color.white;
+            nameText = NewText("Name", rt, 34, TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0f, PxH + 4f), new Vector2(PxW, 48));
+            nameText.text = label; nameText.color = HudStyle.Ivory;
+            hpText = NewText("HP", rt, 26, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), new Vector2(0, 8), new Vector2(PxW, 34), true);
             if (generator != null) lastFraction = generator.Fraction;
         }
 
@@ -65,18 +68,9 @@ namespace Outpost.Enemy
             return im;
         }
 
-        Text NewText(string n, RectTransform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box)
+        TMP_Text NewText(string n, RectTransform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box, bool mono = false)
         {
-            var go = new GameObject(n, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false); go.layer = 2;
-            var rt = (RectTransform)go.transform; rt.anchorMin = rt.anchorMax = anchor; rt.pivot = anchor;
-            rt.anchoredPosition = pos; rt.sizeDelta = box;
-            var tx = go.GetComponent<Text>();
-            tx.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            tx.fontSize = size; tx.alignment = align; tx.raycastTarget = false;
-            tx.horizontalOverflow = HorizontalWrapMode.Overflow; tx.verticalOverflow = VerticalWrapMode.Overflow;
-            var sh = go.AddComponent<Shadow>(); sh.effectColor = new Color(0, 0, 0, 0.85f); sh.effectDistance = new Vector2(3f, -3f);
-            return tx;
+            var tx = HudStyle.Text(n, parent, size, align, anchor, pos, box, mono); tx.gameObject.layer = 2; return tx;
         }
 
         void LateUpdate()
@@ -96,9 +90,8 @@ namespace Outpost.Enemy
             lastFraction = f;
             damagedFlash = Mathf.MoveTowards(damagedFlash, 0f, 2.5f * Time.deltaTime);
 
-            fill.fillAmount = f;
-            Color good = new Color(0.3f, 0.9f, 0.35f), bad = new Color(0.95f, 0.18f, 0.12f);
-            Color col = f > 0.5f ? Color.Lerp(new Color(1f, 0.85f, 0.15f), good, (f - 0.5f) * 2f) : Color.Lerp(bad, new Color(1f, 0.85f, 0.15f), f * 2f);
+            fill.rectTransform.sizeDelta = new Vector2((PxW - 20) * f, 6);
+            Color col = f < .3f ? HudStyle.Danger : HudStyle.Amber;
             if (f < 0.25f && f > 0f) col = Color.Lerp(col, Color.white, 0.35f * (0.5f + 0.5f * Mathf.Sin(Time.time * 9f)));   // berkedip saat kritis
             fill.color = Color.Lerp(col, Color.white, damagedFlash * 0.7f);
             hpText.text = Mathf.CeilToInt(generator.Health) + " / " + Mathf.CeilToInt(generator.maxHealth);

@@ -164,7 +164,7 @@ public static class AdaptIndustrialGameplay
             objective.layer = 12; objective.transform.position = bounds.center;
             var body = objective.AddComponent<BoxCollider>(); body.size = bounds.size; body.isTrigger = true;
             var slot = objective.AddComponent<EnvGeneratorSlot>(); slot.id = "Industrial Generator"; slot.maxHp = 400;
-            var hp = objective.AddComponent<GeneratorHealth>(); hp.maxHealth = 400;
+            var hp = objective.AddComponent<GeneratorHealth>(); hp.maxHealth = 1000;
             var bar = objective.AddComponent<GeneratorHealthBar>(); bar.generator = hp; bar.width = 12; bar.label = "POWER STATION";
             bar.barBackground = Asset<Sprite>("Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_34.png");
             bar.barFill = Asset<Sprite>("Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_35.png");

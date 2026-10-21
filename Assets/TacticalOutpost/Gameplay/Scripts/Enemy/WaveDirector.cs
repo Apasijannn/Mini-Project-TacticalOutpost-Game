@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Outpost.Env;
 using Outpost.Player;
+using Outpost.UI;
+using TMPro;
 
 namespace Outpost.Enemy
 {
@@ -69,14 +71,17 @@ namespace Outpost.Enemy
         PlayerHealth playerHealth;
 
         Canvas canvas;
-        Text waveText, countText, bannerText, subText, endText;
-        Image endPanel;
+        CanvasGroup hudVisibility;
+        TMP_Text waveText, countText, bannerText, subText, endText;
+        MilitaryText bannerTyping, subTyping, endTyping;
+        Image endPanel, bannerBack, bannerEdge, endEdge;
         Image bossGlow;
         Sprite bossGlowSprite;
         bool dangerBanner;
         float bannerUntil, bannerStart;
         string bannerTitle = "";
         bool ended;
+        bool cinematic;
         float nextWaveAt = -1f;
 
         void Awake()
@@ -217,7 +222,8 @@ namespace Outpost.Enemy
             ended = true; CurrentPhase = Phase.Defeat;
             if (OnDefeat != null) OnDefeat();
             StopControls();
-            Time.timeScale = 0f;
+            if (PlayerDeathView.Instance != null) { Time.timeScale = 1f; PlayerDeathView.Instance.Begin(); }
+            else Time.timeScale = 0f;
         }
 
         List<EnvSpawnPoint> Shuffled(List<EnvSpawnPoint> src)
@@ -234,9 +240,18 @@ namespace Outpost.Enemy
             if (ended) return;
             ended = true; CurrentPhase = Phase.Defeat;
             if (OnDefeat != null) OnDefeat();
-            ShowEnd("OUTPOST LOST", "The generator is down. Press ENTER to try again.", new Color(0.35f, 0f, 0f, 0.7f));
             StopControls();
-            Time.timeScale = 0f;
+            var destruction = GetComponent<GeneratorDestruction>();
+            if (destruction != null && destruction.explosion != null) StartCoroutine(GeneratorEnding(destruction, g));
+            else { ShowEnd("OUTPOST LOST", "The generator is down. Press ENTER to try again.", new Color(0.35f, 0f, 0f, 0.7f)); Time.timeScale = 0f; }
+        }
+        IEnumerator GeneratorEnding(GeneratorDestruction destruction, GeneratorHealth generator)
+        {
+            cinematic = true;
+            yield return destruction.Play(generator);
+            canvas.gameObject.SetActive(true);
+            ShowEnd("BLACKOUT", "The outpost has fallen. Press ENTER to try again.", new Color(.02f, .025f, .03f, .35f));
+            Time.timeScale = 0f; cinematic = false;
         }
 
         void Victory()
@@ -264,32 +279,27 @@ namespace Outpost.Enemy
             dangerBanner = danger;
             bannerText.color = danger ? new Color(1f, 0.18f, 0.12f, 0f) : new Color(1f, 0.82f, 0.3f, 0f);
             subText.color = danger ? new Color(1f, 0.85f, 0.8f, 0f) : new Color(1f, 1f, 1f, 0f);
-            bannerText.text = title; subText.text = sub;
-            if (title != bannerTitle) { bannerTitle = title; bannerStart = Time.unscaledTime; }   // fade-in hanya saat judul berganti
+            if (title != bannerTitle)
+            {
+                bannerTitle = title; bannerStart = Time.unscaledTime;
+                bannerTyping.Speak(title); subTyping.Speak(sub);
+            }
+            else subTyping.Instant(sub);
             bannerUntil = Time.unscaledTime + Mathf.Max(0.3f, seconds);
         }
 
         void ShowEnd(string title, string sub, Color panel)
         {
             if (endPanel == null) return;
-            endPanel.color = panel; endPanel.enabled = true;
-            endText.text = title + "\n<size=28>" + sub + "</size>"; endText.enabled = true;
+            endPanel.color = new Color(HudStyle.Panel.r, HudStyle.Panel.g, HudStyle.Panel.b, .72f); endPanel.enabled = true;
+            endEdge.color = title == "OUTPOST SECURED" ? HudStyle.Amber : HudStyle.Danger; endEdge.enabled = true;
+            endText.enabled = true; endTyping.Speak(title + "\n<size=24>" + sub + "</size>");
             bannerUntil = 0f;
         }
 
-        Text MakeText(string n, Transform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box)
+        TMP_Text MakeText(string n, Transform parent, int size, TextAnchor align, Vector2 anchor, Vector2 pos, Vector2 box, bool mono = false)
         {
-            var go = new GameObject(n, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false);
-            var rt = (RectTransform)go.transform;
-            rt.anchorMin = rt.anchorMax = anchor; rt.pivot = anchor; rt.sizeDelta = box; rt.anchoredPosition = pos;
-            var tx = go.GetComponent<Text>();
-            tx.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            tx.fontSize = size; tx.alignment = align; tx.color = new Color(1f, 0.96f, 0.85f, 0.95f);
-            tx.horizontalOverflow = HorizontalWrapMode.Overflow; tx.verticalOverflow = VerticalWrapMode.Overflow;
-            tx.raycastTarget = false; tx.supportRichText = true;
-            var sh = go.AddComponent<Shadow>(); sh.effectColor = new Color(0, 0, 0, 0.75f); sh.effectDistance = new Vector2(2f, -2f);
-            return tx;
+            return HudStyle.Text(n, parent, size, align, anchor, pos, box, mono);
         }
 
         void BuildUi()
@@ -297,15 +307,18 @@ namespace Outpost.Enemy
             var cg = new GameObject("WaveHUD", typeof(Canvas), typeof(CanvasScaler));
             cg.transform.SetParent(transform, false);
             canvas = cg.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 60;
+            hudVisibility = cg.AddComponent<CanvasGroup>();
             var sc = cg.GetComponent<CanvasScaler>(); sc.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; sc.referenceResolution = new Vector2(1920, 1080); sc.matchWidthOrHeight = 0.5f;
             var top = new Vector2(0.5f, 1f);
-            waveText = MakeText("WaveText", cg.transform, 38, TextAnchor.UpperCenter, top, new Vector2(0, -22), new Vector2(700, 50));
-            countText = MakeText("CountText", cg.transform, 26, TextAnchor.UpperCenter, top, new Vector2(0, -68), new Vector2(700, 36));
+            HudStyle.Box("Wave status panel", cg.transform, top, new Vector2(0, -28), new Vector2(600, 106), HudStyle.Panel);
+            HudStyle.Box("Wave status top edge", cg.transform, top, new Vector2(0, -28), new Vector2(600, 2), HudStyle.Amber);
+            waveText = MakeText("WaveText", cg.transform, 34, TextAnchor.UpperCenter, top, new Vector2(0, -40), new Vector2(560, 45));
+            countText = MakeText("CountText", cg.transform, 18, TextAnchor.UpperCenter, top, new Vector2(0, -92), new Vector2(560, 28), true); countText.color = HudStyle.Muted;
             var glow = new GameObject("BossWarningGlow", typeof(RectTransform), typeof(Image));
             glow.transform.SetParent(cg.transform, false);
             var gr = (RectTransform)glow.transform;
             gr.anchorMin = gr.anchorMax = new Vector2(0.5f, 0.72f);
-            gr.sizeDelta = new Vector2(1500, 270); gr.anchoredPosition = new Vector2(0, -30);
+            gr.sizeDelta = new Vector2(1100, 220); gr.anchoredPosition = new Vector2(0, 0);
             var texture = new Texture2D(64, 16, TextureFormat.RGBA32, false);
             texture.wrapMode = TextureWrapMode.Clamp;
             for (int y = 0; y < 16; y++) for (int x = 0; x < 64; x++)
@@ -317,37 +330,48 @@ namespace Outpost.Enemy
             bossGlowSprite = Sprite.Create(texture, new Rect(0, 0, 64, 16), new Vector2(0.5f, 0.5f));
             bossGlow = glow.GetComponent<Image>(); bossGlow.sprite = bossGlowSprite;
             bossGlow.raycastTarget = false; bossGlow.color = Color.clear;
-            bannerText = MakeText("Banner", cg.transform, 84, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), Vector2.zero, new Vector2(1400, 120));
-            subText = MakeText("BannerSub", cg.transform, 32, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), new Vector2(0, -78), new Vector2(1400, 50));
+            var bannerAnchor = new Vector2(.5f, .72f);
+            bannerBack = HudStyle.Box("Transmission panel", cg.transform, bannerAnchor, Vector2.zero, new Vector2(980, 160), Color.clear);
+            bannerEdge = HudStyle.Box("Transmission edge", cg.transform, bannerAnchor, new Vector2(-490, 0), new Vector2(3, 160), Color.clear);
+            bannerText = MakeText("Banner", cg.transform, 64, TextAnchor.MiddleCenter, bannerAnchor, new Vector2(0, 19), new Vector2(920, 82));
+            subText = MakeText("BannerSub", cg.transform, 22, TextAnchor.MiddleCenter, bannerAnchor, new Vector2(0, -50), new Vector2(920, 38), true);
+            bannerTyping = bannerText.gameObject.AddComponent<MilitaryText>(); subTyping = subText.gameObject.AddComponent<MilitaryText>();
             bannerText.color = new Color(1f, 0.82f, 0.3f, 0f); subText.color = new Color(1f, 1f, 1f, 0f);
 
             var pgo = new GameObject("EndPanel", typeof(RectTransform), typeof(Image));
             pgo.transform.SetParent(cg.transform, false);
             var pr = (RectTransform)pgo.transform; pr.anchorMin = Vector2.zero; pr.anchorMax = Vector2.one; pr.offsetMin = pr.offsetMax = Vector2.zero;
             endPanel = pgo.GetComponent<Image>(); endPanel.raycastTarget = false; endPanel.enabled = false;
-            endText = MakeText("EndText", cg.transform, 64, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1400, 220));
+            endEdge = HudStyle.Box("End orange edge", cg.transform, new Vector2(.5f, .5f), new Vector2(0, 117), new Vector2(560, 3), HudStyle.Amber); endEdge.enabled = false;
+            endText = MakeText("EndText", cg.transform, 64, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1200, 200));
+            endTyping = endText.gameObject.AddComponent<MilitaryText>();
             endText.enabled = false;
         }
 
         void Update()
         {
+            if (hudVisibility != null) hudVisibility.alpha = MinimapController.Instance != null && MinimapController.Instance.IsLarge ? 0 : 1;
             if (waveText != null)
             {
                 bool started = CurrentWave > 0;
-                waveText.text = started ? "WAVE " + CurrentWave + " / " + TotalWaves : "";
-                countText.text = started && CurrentPhase != Phase.Victory ? "ZOMBIES: " + EnemiesAlive + (nextWaveAt > 0f ? "   NEXT WAVE IN " + Mathf.Max(0, Mathf.CeilToInt(nextWaveAt - Time.time)) + "s" : "   FINAL WAVE") : "";
+                waveText.text = started ? "WAVE " + CurrentWave.ToString("00") + " / " + TotalWaves.ToString("00") : "PREPARE TO DEFEND";
+                countText.text = started && CurrentPhase != Phase.Victory ? "CONTACTS " + EnemiesAlive + (nextWaveAt > 0f ? "   //   NEXT WAVE " + Mathf.Max(0, Mathf.CeilToInt(nextWaveAt - Time.time)) + "s" : "   //   FINAL WAVE") : "PROTECT THE GENERATOR";
             }
             if (bannerText != null)
             {
+                if (GameMenu.Instance != null && GameMenu.Instance.IsPaused) { bannerUntil += Time.unscaledDeltaTime; bannerStart += Time.unscaledDeltaTime; }
                 float left = bannerUntil - Time.unscaledTime;
                 float a = left <= 0f ? 0f : Mathf.Clamp01(Mathf.Min(left / 0.4f, (Time.unscaledTime - bannerStart) / 0.25f));
                 var c = bannerText.color; c.a = a; bannerText.color = c;
                 var c2 = subText.color; c2.a = a; subText.color = c2;
+                bannerBack.color = new Color(HudStyle.Panel.r, HudStyle.Panel.g, HudStyle.Panel.b, .94f * a);
+                var edgeColor = dangerBanner ? HudStyle.Danger : HudStyle.Amber; edgeColor.a = a; bannerEdge.color = edgeColor;
                 if (bossGlow != null)
                     bossGlow.color = new Color(0.65f, 0.005f, 0.005f, dangerBanner ? a * (0.38f + 0.08f * Mathf.Sin((Time.unscaledTime - bannerStart) * 5f)) : 0f);
             }
-            if (ended)
+            if (ended && !cinematic)
             {
+                if (PlayerDeathView.Instance != null && PlayerDeathView.Instance.IsActive && !PlayerDeathView.Instance.Settled) return;
                 var kb = Keyboard.current;
                 if (kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame))
                 {

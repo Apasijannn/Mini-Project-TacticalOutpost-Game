@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using Outpost.UI;
 
 namespace Outpost.Enemy
 {
@@ -21,7 +23,7 @@ namespace Outpost.Enemy
 
         Canvas canvas;
         Image fill, back;
-        Text nameText;
+        TMP_Text nameText;
         Transform follow;
         float shown;                           // 0..1 fade
         float damagedFlash;
@@ -46,22 +48,16 @@ namespace Outpost.Enemy
             go.transform.localScale = Vector3.one * (width / pxW);
             go.layer = 2;   // Ignore Raycast: tidak menghalangi peluru
 
-            back = NewImage("Bg", rt, pxW, pxH, barBackground, new Color(1f, 1f, 1f, 0.9f));
-            fill = NewImage("Fill", rt, pxW - 6f, pxH - 8f, barFill != null ? barFill : barBackground, Color.white);
-            fill.type = Image.Type.Filled; fill.fillMethod = Image.FillMethod.Horizontal; fill.fillOrigin = 0; fill.fillAmount = 1f;
+            back = NewImage("Bg", rt, pxW, pxH, null, HudStyle.Panel);
+            fill = NewImage("Fill", rt, pxW - 6f, 6, null, HudStyle.Amber);
+            fill.rectTransform.anchorMin = fill.rectTransform.anchorMax = fill.rectTransform.pivot = new Vector2(0, .5f);
+            fill.rectTransform.anchoredPosition = new Vector2(3,0);
 
             if (showName)
             {
-                var tgo = new GameObject("Name", typeof(RectTransform), typeof(Text));
-                tgo.transform.SetParent(rt, false); tgo.layer = 2;
-                var trt = (RectTransform)tgo.transform; trt.anchorMin = trt.anchorMax = new Vector2(0.5f, 0f); trt.pivot = new Vector2(0.5f, 0f);
-                trt.anchoredPosition = new Vector2(0f, pxH + 2f); trt.sizeDelta = new Vector2(pxW * 2f, 40f);
-                nameText = tgo.GetComponent<Text>();
-                nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                nameText.fontSize = 30; nameText.alignment = TextAnchor.LowerCenter; nameText.color = new Color(1f, 0.82f, 0.4f, 1f);
+                nameText = HudStyle.Text("Name", rt, 30, TextAnchor.LowerCenter, new Vector2(.5f,0), new Vector2(0,pxH+2), new Vector2(pxW*2,45)); nameText.gameObject.layer = 2;
+                nameText.color = HudStyle.Danger;
                 nameText.text = string.IsNullOrEmpty(label) ? "BOSS" : label.ToUpper(); nameText.raycastTarget = false;
-                nameText.horizontalOverflow = HorizontalWrapMode.Overflow; nameText.verticalOverflow = VerticalWrapMode.Overflow;
-                var sh = tgo.AddComponent<Shadow>(); sh.effectColor = new Color(0, 0, 0, 0.8f); sh.effectDistance = new Vector2(2f, -2f);
             }
             if (health != null) { follow = health.headBone != null ? health.headBone : transform; lastFraction = health.Fraction; }
             else follow = transform;
@@ -99,12 +95,11 @@ namespace Outpost.Enemy
             canvas.enabled = shown > 0.01f;
             if (!canvas.enabled) return;
 
-            fill.fillAmount = f;
-            Color good = new Color(0.3f, 0.9f, 0.35f), bad = new Color(0.95f, 0.18f, 0.12f);
-            Color c = f > 0.5f ? Color.Lerp(new Color(1f, 0.85f, 0.15f), good, (f - 0.5f) * 2f) : Color.Lerp(bad, new Color(1f, 0.85f, 0.15f), f * 2f);
+            fill.rectTransform.sizeDelta = new Vector2(294*f, 6);
+            Color c = showName || f < .3f ? HudStyle.Danger : HudStyle.Amber;
             c = Color.Lerp(c, Color.white, damagedFlash * 0.7f);
             c.a = shown; fill.color = c;
-            back.color = new Color(1f, 1f, 1f, 0.9f * shown);
+            back.color = new Color(HudStyle.Panel.r, HudStyle.Panel.g, HudStyle.Panel.b, .94f * shown);
             if (nameText != null) { var nc = nameText.color; nc.a = shown; nameText.color = nc; }
         }
     }
