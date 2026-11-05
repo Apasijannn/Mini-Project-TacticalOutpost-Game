@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b73954e5f55b33249bc3d23d78bd069c, type: 3}
+  m_Name: PCG_Profile
+  m_EditorClassIdentifier: Assembly-CSharp::Outpost.PCG.PcgProfile
+  useRandomSeed: 1
+  seed: 12345
+  floorTile: {fileID: 1000010587196672, guid: 8ec728fea85097b43ad9358333759bfa, type: 3}
+  fenceSpan: {fileID: 1000013039883512, guid: fee6e1da33beae9409089ab8a832464f, type: 3}
+  fenceEnd: {fileID: 1000011366982336, guid: 28b2b68147fce3c4187add1104d6ccd8, type: 3}
+  generator: {fileID: 1000010628347772, guid: 46132fa6877a42947bf1f7f15c09f435, type: 3}
+  generatorProps:
+  - {fileID: 1000013628716364, guid: ee5ce8c8eaa133d43a291b519c442236, type: 3}
+  cornerTower: {fileID: 4555483518542401179, guid: 98477f176c735294cb93c9570d28ea39, type: 3}
+  lamp: {fileID: 8204961345377711610, guid: 3a162d9b3eabf5541aeafc613988e630, type: 3}
+  spansPerSide: 15
+  gateSpans: 2
+  gateCornerMargin: 2
+  lampEverySpans: 2
+  obstacleCount: 34
+  obstacleTable:
+  - name: Cargo_container_v1_LD1close
+    prefab: {fileID: 1000011523426384, guid: 84147b87204d0a0478bae9558d656ea2, type: 3}
+    weight: 2
+  - name: Cargo_container_v1_LD2close
+    prefab: {fileID: 1000010817437606, guid: 58d97d456aead63499ac7d5316541f78, type: 3}
+    weight: 1
+  - name: Dumpsters_v1_garbadge
+    prefab: {fileID: 1000010037619014, guid: 721671003a026be4fb47107988831b38, type: 3}
+    weight: 1.5
+  - name: Dumpsters_v1_empty
+    prefab: {fileID: 1000014012932500, guid: 94a643c50b8c98e488ed29457fc57cb6, type: 3}
+    weight: 1
+  - name: PRE_Concrete Barrier_1
+    prefab: {fileID: 8750657081884944311, guid: 127719f23eb86414791826134cebfd74, type: 3}
+    weight: 1
+  - name: PRE_Concrete Barrier_2
+    prefab: {fileID: 8853547706426158158, guid: f1d5a351c2e43334d8a4d5941cddbaaf, type: 3}
+    weight: 1
+  - name: PRE_Concrete Barrier_3
+    prefab: {fileID: 2234124904036631929, guid: 5576ef04c387fab47b718258289891bb, type: 3}
+    weight: 1
+  - name: Road_block_v1
+    prefab: {fileID: 1000012744991898, guid: 36667f34d4b750c4695e409fb89b51f8, type: 3}
+    weight: 2
+  - name: Bags_on_pallet_v1_1
+    prefab: {fileID: 1000012006241372, guid: 6d21e769def7d504ea22abcb06173633, type: 3}
+    weight: 2
+  - name: Barrel_v2_quadro
+    prefab: {fileID: 1000012001423700, guid: efaf0e3818a9ab240983b51198f0a77a, type: 3}
+    weight: 1.5
+  - name: BurningBarrel_Military
+    prefab: {fileID: 3841960152753464365, guid: 6c811d5da93ddcd4885792eb618ba050, type: 3}
+    weight: 1
+  - name: BurningBarrel_Biohazard
+    prefab: {fileID: 7233406424736672362, guid: 5fc896cd2630f8345bb6719babc34869, type: 3}
+    weight: 0.5
+  obstacleGap: 2.5
+  generatorClearRadius: 9
+  gateClearRadius: 9
+  playerClearRadius: 6
+  wallMargin: 2.5
+  obstacleMaxAttempts: 40
+  maxLayoutAttempts: 5
+  maxDetourRatio: 1.8
+  dressingCount: 35
+  dressingTable:
+  - name: PRE_Barrel_Military
+    prefab: {fileID: 8878639991374550428, guid: 14f749f6114ac2840b290c4d48cf1570, type: 3}
+    weight: 1
+  dressingScale: {x: 0.85, y: 1.15}
+  dressingSpacing: 2
+  spawnZoneDepth: 10
+  spawnSpacing: 1.6
+  cachesPerWave: 3
+  supplyTable:
+  - kind: 0
+    weight: 60
+  - kind: 1
+    weight: 40
+  supplyMinRadius: 6
+  supplyMaxRadius: 30
+  supplySpacing: 6
+  supplyMinFromGate: 10

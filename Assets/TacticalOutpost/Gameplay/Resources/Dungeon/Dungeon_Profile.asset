@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34fc2f99581db584390fbc5bd1511164, type: 3}
+  m_Name: Dungeon_Profile
+  m_EditorClassIdentifier: Assembly-CSharp::Outpost.Dungeon.DungeonProfile
+  useRandomSeed: 1
+  seed: 12345
+  algorithm: 0
+  maxGenerationAttempts: 10
+  mapWidth: 60
+  mapHeight: 40
+  tileSize: 3.5
+  minLeafSize: 12
+  maxLeafSize: 20
+  minRoomSize: 5
+  roomMargin: 2
+  corridorWidth: 1
+  extraLoops: 1
+  skipCorridorChance: 0
+  walkers: 4
+  walkLength: 450
+  walkBrush: 2
+  walkStraightChance: 0.55
+  goalStrategy: 2
+  minStartGoalDistance: 25
+  safeRadiusCells: 3
+  enemyCount: 8
+  useEnemyDensity: 0
+  floorTilesPerEnemy: 50
+  itemCount: 5
+  safeRoomCount: 1
+  minEnemyDistance: 8
+  bossRoom: 1
+  treasureRule: 1
+  itemSpacing: 4
+  enemyTable:
+  - id: walker
+    weight: 50
+  - id: runner
+    weight: 25
+  - id: skinless
+    weight: 15
+  - id: bloater
+    weight: 10
+  itemTable:
+  - kind: 0
+    weight: 60
+  - kind: 1
+    weight: 40
+  propsPerRoom: 2
+  pathBuffer: 1
+  floorTile: {fileID: 0}
+  wallSpan: {fileID: 1000011737549872, guid: 8270a6a93cde92045a7d335d31b2ece4, type: 3}
+  wallColumn: {fileID: 0}
+  goalPrefab: {fileID: 0}
+  lamp: {fileID: 0}
+  corridorLight: {fileID: 0}
+  corridorLightSpacing: 7
+  propTable: []
+  safeZoneColor: {r: 0.15, g: 1, b: 0.35, a: 1}
+  pathColor: {r: 1, g: 0.72, b: 0.2, a: 1}
+  lineGlow: 4
+  lineWidth: 0.14

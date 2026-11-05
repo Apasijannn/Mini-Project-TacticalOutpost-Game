@@ -1,0 +1,242 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+using Outpost.Enemy;
+using Outpost.Env;
+
+namespace Outpost.PCG
+{
+    /// <summary>
+    /// Membuat rencana satu wave: lane berat (wave event), jenis zombie per lane (weighted random / difficulty budget),
+    /// dan posisi spawn (generate-and-test). Murni deterministik dari (seed, nomor wave) sehingga reproducible.
+    /// </summary>
+    public static class PcgWavePlanner
+    {
+        public sealed class Options
+        {
+            public int seed;
+            public int waveIndex;              // 0-based
+            public int normalCount;            // dipakai bila difficulty budget mati
+            public bool boss;
+            public string bossVariantId;
+            public Vector3? simulatedPlayer;   // eksperimen safe radius; runtime memakai cek ulang saat spawn
+            public bool recordMarkers = true;
+        }
+
+        public static WavePlan Plan(PcgWorld world, PcgProfile p, EnemyCatalog catalog, Options o, PcgStageStats stats, List<PcgMarker> markers)
+        {
+            var plan = new WavePlan { waveIndex = o.waveIndex };
+            if (world.lanes.Count == 0 || catalog == null) return plan;
+            var rng = PcgRandom.For(o.seed, "wave", o.waveIndex);
+
+            // ---- Wave event: lane berat
+            if (p.heavyLaneEvent && world.lanes.Count > 1) plan.heavyLane = world.lanes[rng.Range(0, world.lanes.Count)].lane;
+
+            // ---- Komposisi: lane + varian untuk setiap zombie biasa
+            var lanesForSpawn = new List<LaneZone>();
+            var variants = new List<EnemyVariant>();
+            int wave = o.waveIndex + 1;
+            if (p.useDifficultyBudget)
+            {
+                plan.budget = p.BudgetFor(o.waveIndex);
+                int remaining = plan.budget, guard = 0;
+                while (remaining > 0 && guard++ < 1000)
+                {
+                    var zone = PickLane(world, p, plan, rng);
+                    var v = PickVariant(p, catalog, zone.lane, wave, rng, remaining);
+                    if (v == null) break;                       // tidak ada varian yang masih terjangkau budget
+                    remaining -= p.CostOf(v.id);
+                    lanesForSpawn.Add(zone); variants.Add(v);
+                }
+                plan.budgetSpent = plan.budget - remaining;
+            }
+            else
+            {
+                var counts = DistributeCounts(world, p, plan, o.normalCount);
+                for (int i = 0; i < world.lanes.Count; i++)
+                    for (int k = 0; k < counts[i]; k++) lanesForSpawn.Add(world.lanes[i]);
+                rng.Shuffle(lanesForSpawn);                     // urutan muncul tetap bergantian antar lane
+                foreach (var zone in lanesForSpawn)
+                    variants.Add(PickVariant(p, catalog, zone.lane, wave, rng, int.MaxValue));
+            }
+
+            // ---- Posisi: generate-and-test per lane
+            var used = new Dictionary<LaneZone, List<Vector3>>();
+            foreach (var z in world.lanes) used[z] = new List<Vector3>();
+            var fixedIndex = new Dictionary<LaneZone, int>();
+            for (int i = 0; i < lanesForSpawn.Count; i++)
+            {
+                var zone = lanesForSpawn[i];
+                var v = variants[i];
+                if (v == null) continue;
+                var order = new SpawnOrder { variant = v, kind = EnemyKind.Normal, zone = zone };
+                Vector3 pos;
+                if (p.proceduralPositions && TryPlace(world, p, zone, world.normalFilter, p.checkRadius, p.minimumSpacing, used[zone], rng, o, stats, markers, out pos))
+                    order.position = pos;
+                else
+                {
+                    order.position = FixedPoint(zone, fixedIndex, rng, !p.proceduralPositions);
+                    order.fallback = p.proceduralPositions;
+                    if (order.fallback && stats != null) stats.fallback++;
+                }
+                used[zone].Add(order.position);
+                plan.normals.Add(order);
+                plan.Count(zone.lane, v.id);
+            }
+
+            // ---- Posisi cadangan (dipakai bila saat spawn posisi rencana masuk safe zone player / tertutup zombie)
+            if (p.proceduralPositions)
+                foreach (var zone in world.lanes)
+                {
+                    var q = new Queue<Vector3>();
+                    for (int k = 0; k < p.reservePerLane; k++)
+                    {
+                        Vector3 pos;
+                        if (TryPlace(world, p, zone, world.normalFilter, p.checkRadius, p.minimumSpacing, used[zone], rng, o, null, null, out pos))
+                        { q.Enqueue(pos); used[zone].Add(pos); }
+                    }
+                    plan.reserves[zone] = q;
+                }
+
+            // ---- Boss: urutan lane diacak oleh seed (wave event kedua)
+            if (o.boss)
+            {
+                var order = new List<LaneZone>(world.lanes);
+                if (p.randomBossOrder) rng.Shuffle(order);
+                foreach (var zone in order)
+                {
+                    var v = PickBoss(catalog, o.bossVariantId, wave, rng);
+                    if (v == null) continue;
+                    var b = new SpawnOrder { variant = v, kind = EnemyKind.Boss, zone = zone };
+                    var filter = PcgWorld.FilterFor(v.prefab);
+                    Vector3 pos;
+                    if (p.proceduralPositions && TryPlace(world, p, zone, filter, p.bossCheckRadius, p.minimumSpacing * 2f, used[zone], rng, o, stats, markers, out pos))
+                        b.position = pos;
+                    else { b.position = zone.points.Count > 0 ? zone.points[0].transform.position : zone.gateCenter; b.fallback = p.proceduralPositions; if (b.fallback && stats != null) stats.fallback++; }
+                    used[zone].Add(b.position);
+                    plan.bosses.Add(b);
+                }
+            }
+            return plan;
+        }
+
+        /// <summary>Generate-and-test: kandidat acak di zona, lalu diuji satu per satu sesuai aturan. maxAttempts sebagai pengaman.</summary>
+        public static bool TryPlace(PcgWorld w, PcgProfile p, LaneZone zone, NavMeshQueryFilter filter, float radius, float spacing,
+            List<Vector3> used, PcgRandom rng, Options o, PcgStageStats stats, List<PcgMarker> markers, out Vector3 result)
+        {
+            if (stats != null) stats.requested++;
+            for (int attempt = 0; attempt < p.maxAttemptsPerObject; attempt++)
+            {
+                if (stats != null) stats.attempts++;
+                Vector3 c = zone.RandomPoint(rng);
+                PcgRule rule = Validate(w, p, filter, radius, spacing, used, o, c, out result);
+                if (o.recordMarkers && markers != null) markers.Add(new PcgMarker { position = result, rule = rule, stage = 'W' });
+                if (rule == PcgRule.Accepted) { if (stats != null) stats.accepted++; return true; }
+                if (stats != null) stats.Reject(rule);
+            }
+            result = Vector3.zero;
+            return false;
+        }
+
+        static PcgRule Validate(PcgWorld w, PcgProfile p, NavMeshQueryFilter filter, float radius, float spacing, List<Vector3> used, Options o, Vector3 c, out Vector3 onNav)
+        {
+            onNav = c;
+            // Rule 1: masih di dalam pagar
+            if (!w.InArea(c, 1f)) return PcgRule.OutsideArea;
+            // Rule 2: berada di permukaan NavMesh (zombie bergerak dengan NavMeshAgent)
+            if (!w.SampleNav(c, 1.2f, filter, out onNav)) return PcgRule.OffNavMesh;
+            // Rule 3: tidak di dalam obstacle
+            if (w.Blocked(onNav, radius)) return PcgRule.Blocked;
+            // Rule 4: tidak menumpuk dengan spawn lain
+            foreach (var u in used) if (PcgWorld.Flat(u - onNav).sqrMagnitude < spacing * spacing) return PcgRule.Spacing;
+            // Rule 5: tidak terlalu dekat generator
+            if (w.generator != null && PcgWorld.Flat(w.generatorPos - onNav).magnitude < p.minDistanceFromGenerator) return PcgRule.NearGenerator;
+            // Rule 6: player safe zone (eksperimen); saat bermain dicek ulang di PcgManager.ResolveSpawn
+            if (o.simulatedPlayer.HasValue && PcgWorld.Flat(o.simulatedPlayer.Value - onNav).magnitude < p.minDistanceFromPlayer) return PcgRule.NearPlayer;
+            // Rule 7: jalur NavMesh lengkap ke generator
+            if (p.requirePathToGenerator && w.attackPoints.Count > 0 && !w.CanReachGenerator(onNav, filter)) return PcgRule.NoPath;
+            return PcgRule.Accepted;
+        }
+
+        static LaneZone PickLane(PcgWorld w, PcgProfile p, WavePlan plan, PcgRandom rng)
+        {
+            var weights = new List<float>();
+            foreach (var z in w.lanes) weights.Add(LaneShare(w, p, plan, z));
+            int i = rng.WeightedIndex(weights);
+            return w.lanes[Mathf.Max(0, i)];
+        }
+
+        static float LaneShare(PcgWorld w, PcgProfile p, WavePlan plan, LaneZone z)
+        {
+            if (plan.heavyLane == LaneId.None || w.lanes.Count < 2) return 1f / w.lanes.Count;
+            return z.lane == plan.heavyLane ? p.heavyLaneShare : (1f - p.heavyLaneShare) / (w.lanes.Count - 1);
+        }
+
+        /// <summary>Largest remainder: jumlah per lane sesuai porsi, totalnya tepat normalCount.</summary>
+        static int[] DistributeCounts(PcgWorld w, PcgProfile p, WavePlan plan, int total)
+        {
+            int n = w.lanes.Count;
+            var counts = new int[n];
+            var rest = new float[n];
+            int assigned = 0;
+            for (int i = 0; i < n; i++)
+            {
+                float exact = total * LaneShare(w, p, plan, w.lanes[i]);
+                counts[i] = Mathf.FloorToInt(exact); rest[i] = exact - counts[i]; assigned += counts[i];
+            }
+            while (assigned < total)
+            {
+                int best = 0;
+                for (int i = 1; i < n; i++) if (rest[i] > rest[best]) best = i;
+                counts[best]++; rest[best] = -1f; assigned++;
+            }
+            return counts;
+        }
+
+        static bool Matches(EnemyVariant v, EnemyKind kind, int wave)
+        {
+            return v != null && v.prefab != null && v.kind == kind && wave >= v.minWave && wave <= v.maxWave;
+        }
+
+        /// <summary>Weighted random memakai tabel lane (bila ada) atau bobot catalog. maxCost membatasi pilihan saat difficulty budget aktif.</summary>
+        public static EnemyVariant PickVariant(PcgProfile p, EnemyCatalog catalog, LaneId lane, int wave, PcgRandom rng, int maxCost)
+        {
+            var table = p.TableFor(lane);
+            var options = new List<EnemyVariant>();
+            var weights = new List<float>();
+            foreach (var v in catalog.variants)
+            {
+                if (!Matches(v, EnemyKind.Normal, wave)) continue;
+                if (p.useDifficultyBudget && p.CostOf(v.id) > maxCost) continue;
+                float wgt = v.weight;
+                if (table != null)
+                {
+                    wgt = 0f;
+                    foreach (var e in table.weights) if (e != null && e.variantId == v.id) { wgt = e.weight; break; }
+                }
+                options.Add(v); weights.Add(wgt);
+            }
+            int i = rng.WeightedIndex(weights);
+            return i < 0 ? null : options[i];
+        }
+
+        static EnemyVariant PickBoss(EnemyCatalog catalog, string bossId, int wave, PcgRandom rng)
+        {
+            if (!string.IsNullOrEmpty(bossId))
+                foreach (var v in catalog.variants) if (v != null && v.id == bossId && v.prefab != null) return v;
+            var options = new List<EnemyVariant>(); var weights = new List<float>();
+            foreach (var v in catalog.variants) if (Matches(v, EnemyKind.Boss, Mathf.Max(3, wave))) { options.Add(v); weights.Add(v.weight); }
+            int i = rng.WeightedIndex(weights);
+            return i < 0 ? null : options[i];
+        }
+
+        static Vector3 FixedPoint(LaneZone zone, Dictionary<LaneZone, int> index, PcgRandom rng, bool jitter)
+        {
+            if (zone.points.Count == 0) return zone.gateCenter;
+            int i; index.TryGetValue(zone, out i); index[zone] = i + 1;
+            Vector3 pos = zone.points[i % zone.points.Count].transform.position;
+            if (jitter) { var j = rng.InsideUnitCircle() * 0.6f; pos += new Vector3(j.x, 0f, j.y); }
+            return pos;
+        }
+    }
+}

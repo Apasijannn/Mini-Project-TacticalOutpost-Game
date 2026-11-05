@@ -1,0 +1,206 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+
+namespace Outpost.PCG
+{
+    /// <summary>
+    /// Procedural cover (barikade, sandbag, crate, barel) dan dressing kosmetik.
+    /// Cover memakai NavMeshObstacle (carving) dan divalidasi ulang: setelah dipasang, jalur zombie dari setiap lane
+    /// ke generator harus tetap lengkap dan tidak memutar lebih dari maxDetourRatio. Bila gagal, cover dibongkar dan dicoba lagi.
+    /// </summary>
+    public static class PcgLayoutGenerator
+    {
+        public sealed class Result
+        {
+            public readonly List<GameObject> covers = new List<GameObject>();
+            public readonly List<GameObject> dressing = new List<GameObject>();
+            public readonly Dictionary<string, int> coverCounts = new Dictionary<string, int>();
+        }
+
+        public static IEnumerator GenerateCover(PcgWorld w, PcgProfile p, int seed, Transform root, Result result, PcgStageStats stats, List<PcgMarker> markers)
+        {
+            if (!p.coverEnabled || p.coverCount <= 0 || !HasPrefabs(p.coverTable)) yield break;
+            var rng = PcgRandom.For(seed, "cover");
+
+            // Panjang jalur awal (tanpa cover) dari setiap lane dan dari posisi player ke generator.
+            var baseline = new Dictionary<LaneZone, float>();
+            foreach (var z in w.lanes)
+            {
+                Vector3 c; float len;
+                if (w.SampleNav(z.Center, 3f, w.normalFilter, out c) && w.PathToGenerator(c, w.normalFilter, out len)) baseline[z] = len;
+            }
+            Vector3 playerNav; float playerBase = -1f;
+            if (w.SampleNav(w.playerSpawn, 3f, w.normalFilter, out playerNav)) { float l; if (w.PathToGenerator(playerNav, w.normalFilter, out l)) playerBase = l; }
+
+            var weights = Weights(p.coverTable);
+            for (int i = 0; i < p.coverCount; i++)
+            {
+                stats.requested++;
+                bool placed = false;
+                for (int attempt = 0; attempt < p.coverMaxAttempts && !placed; attempt++)
+                {
+                    stats.attempts++;
+                    float angle = rng.Range(0f, Mathf.PI * 2f);
+                    float radius = Mathf.Sqrt(Mathf.Lerp(p.coverMinRadius * p.coverMinRadius, p.coverMaxRadius * p.coverMaxRadius, rng.Value));
+                    var entry = p.coverTable[Mathf.Max(0, rng.WeightedIndex(weights))];
+                    float yaw = rng.Range(0f, 360f);
+                    Vector3 candidate = w.generatorPos + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+
+                    Vector3 ground;
+                    PcgRule rule = PreCheck(w, p, candidate, result.covers, p.coverSpacing, p.coverMinFromAttackPoint, out ground);
+                    if (rule == PcgRule.Accepted && w.DistanceToLanes(ground) < p.coverMinFromLane) rule = PcgRule.NearLane;
+                    if (rule == PcgRule.Accepted && PcgWorld.Flat(w.playerSpawn - ground).magnitude < p.coverMinFromPlayerSpawn) rule = PcgRule.NearPlayer;
+                    if (rule == PcgRule.Accepted && w.TooSteep(ground, 1f, p.maxGroundSlope)) rule = PcgRule.Slope;
+
+                    GameObject go = null;
+                    if (rule == PcgRule.Accepted)
+                    {
+                        go = Spawn(entry.prefab, ground, yaw, 1f, root, out Vector3 localCenter, out Vector3 localSize);
+                        SetLayer(go, w.coverLayer);
+                        Quaternion rot = go.transform.rotation;
+                        Vector3 s = go.transform.lossyScale;
+                        Vector3 half = new Vector3(localSize.x * s.x * 0.47f, Mathf.Max(0.05f, (localSize.y * s.y - 0.3f) * 0.5f), localSize.z * s.z * 0.47f);
+                        Vector3 center = go.transform.TransformPoint(localCenter) + Vector3.up * 0.15f;   // dasar kotak diangkat 0,3 m: tanah tidak dihitung
+                        if (w.Overlaps(go.transform, center, half, rot)) rule = PcgRule.Blocked;
+                        else
+                        {
+                            var obstacle = go.AddComponent<NavMeshObstacle>();
+                            obstacle.shape = NavMeshObstacleShape.Box;
+                            obstacle.center = localCenter;
+                            obstacle.size = localSize;
+                            obstacle.carving = true;
+                            obstacle.carveOnlyStationary = false;
+                            yield return null; yield return null;          // tunggu NavMesh di-carve
+                            rule = CheckPaths(w, p, baseline, playerNav, playerBase);
+                            if (rule != PcgRule.Accepted) obstacle.enabled = false;
+                        }
+                    }
+
+                    markers.Add(new PcgMarker { position = ground, rule = rule, stage = 'C' });
+                    if (rule == PcgRule.Accepted)
+                    {
+                        placed = true; stats.accepted++;
+                        go.name = "PCG_Cover_" + i + "_" + entry.prefab.name;
+                        result.covers.Add(go);
+                        int n; result.coverCounts.TryGetValue(entry.prefab.name, out n); result.coverCounts[entry.prefab.name] = n + 1;
+                    }
+                    else
+                    {
+                        stats.Reject(rule);
+                        if (go != null)
+                        {
+                            go.SetActive(false);          // collider & carving langsung nonaktif untuk percobaan berikutnya
+                            Object.Destroy(go);
+                            if (rule == PcgRule.NoPath || rule == PcgRule.Detour) { yield return null; yield return null; }
+                        }
+                    }
+                }
+            }
+        }
+
+        static PcgRule CheckPaths(PcgWorld w, PcgProfile p, Dictionary<LaneZone, float> baseline, Vector3 playerNav, float playerBase)
+        {
+            foreach (var kv in baseline)
+            {
+                Vector3 c; float len;
+                if (!w.SampleNav(kv.Key.Center, 3f, w.normalFilter, out c) || !w.PathToGenerator(c, w.normalFilter, out len)) return PcgRule.NoPath;
+                if (len > kv.Value * p.maxDetourRatio) return PcgRule.Detour;
+            }
+            if (playerBase > 0f)
+            {
+                float len;
+                if (!w.PathToGenerator(playerNav, w.normalFilter, out len)) return PcgRule.NoPath;
+            }
+            return PcgRule.Accepted;
+        }
+
+        public static void GenerateDressing(PcgWorld w, PcgProfile p, int seed, Transform root, Result result, PcgStageStats stats, List<PcgMarker> markers)
+        {
+            if (!p.dressingEnabled || p.dressingCount <= 0 || !HasPrefabs(p.dressingTable) || w.area == null) return;
+            var rng = PcgRandom.For(seed, "dressing");
+            var weights = Weights(p.dressingTable);
+            var all = new List<GameObject>(result.covers);
+            for (int i = 0; i < p.dressingCount; i++)
+            {
+                stats.requested++;
+                for (int attempt = 0; attempt < p.dressingMaxAttempts; attempt++)
+                {
+                    stats.attempts++;
+                    Vector3 candidate = new Vector3(rng.Range(w.area.min.x, w.area.max.x), w.generatorPos.y, rng.Range(w.area.min.y, w.area.max.y));
+                    var entry = p.dressingTable[Mathf.Max(0, rng.WeightedIndex(weights))];
+                    float yaw = rng.Range(0f, 360f), scale = rng.Range(p.dressingScale.x, p.dressingScale.y);
+
+                    Vector3 ground;
+                    PcgRule rule = PreCheck(w, p, candidate, all, p.dressingSpacing, p.dressingMinFromAttackPoint, out ground, 0.3f);
+                    if (rule == PcgRule.Accepted && PcgWorld.Flat(w.playerSpawn - ground).magnitude < 2.5f) rule = PcgRule.NearPlayer;
+                    markers.Add(new PcgMarker { position = ground, rule = rule, stage = 'D' });
+                    if (rule != PcgRule.Accepted) { stats.Reject(rule); continue; }
+
+                    var go = Spawn(entry.prefab, ground, yaw, scale, root, out _, out _);
+                    foreach (var col in go.GetComponentsInChildren<Collider>(true)) { col.enabled = false; Object.Destroy(col); }   // kosmetik: tidak memengaruhi AI/physics
+                    go.name = "PCG_Dressing_" + i + "_" + entry.prefab.name;
+                    result.dressing.Add(go); all.Add(go);
+                    stats.accepted++;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>Aturan bersama: di dalam pagar, di atas NavMesh, tidak di dalam obstacle, spacing, jauh dari generator.</summary>
+        static PcgRule PreCheck(PcgWorld w, PcgProfile p, Vector3 candidate, List<GameObject> others, float spacing, float minFromAttack, out Vector3 ground, float radius = 0.6f)
+        {
+            ground = candidate;
+            if (!w.InArea(candidate, 2f)) return PcgRule.OutsideArea;
+            Vector3 onNav;
+            if (!w.ProjectToNav(candidate, out onNav, out ground)) return PcgRule.OffNavMesh;   // atap, tangki, atau area tanpa NavMesh
+            if (w.Blocked(ground, radius)) return PcgRule.Blocked;
+            foreach (var o in others)
+                if (o != null && PcgWorld.Flat(o.transform.position - ground).sqrMagnitude < spacing * spacing) return PcgRule.Spacing;
+            if (w.DistanceToAttackPoints(ground) < minFromAttack) return PcgRule.NearGenerator;
+            return PcgRule.Accepted;
+        }
+
+        static GameObject Spawn(GameObject prefab, Vector3 ground, float yaw, float scale, Transform root, out Vector3 localCenter, out Vector3 localSize)
+        {
+            var go = Object.Instantiate(prefab, ground, Quaternion.identity, root);
+            go.transform.localScale = prefab.transform.localScale * scale;
+            // Bounds dihitung sebelum rotasi supaya AABB = ukuran lokal.
+            Bounds b = new Bounds(ground, Vector3.zero); bool any = false;
+            foreach (var r in go.GetComponentsInChildren<Renderer>())
+            {
+                if (r is ParticleSystemRenderer) continue;
+                if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+            }
+            if (!any) b = new Bounds(ground + Vector3.up * 0.5f, Vector3.one);
+            // Letakkan dasar mesh tepat di tanah (prefab dengan pivot di tengah tidak melayang/tenggelam).
+            float lift = ground.y - b.min.y;
+            go.transform.position += Vector3.up * lift; b.center += Vector3.up * lift;
+            localCenter = go.transform.InverseTransformPoint(b.center);
+            localSize = new Vector3(b.size.x / Mathf.Max(0.001f, go.transform.lossyScale.x), b.size.y / Mathf.Max(0.001f, go.transform.lossyScale.y), b.size.z / Mathf.Max(0.001f, go.transform.lossyScale.z));
+            go.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+            return go;
+        }
+
+        static void SetLayer(GameObject go, int layer)
+        {
+            if (layer < 0) return;
+            foreach (var t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = layer;
+        }
+
+        static bool HasPrefabs(PrefabEntry[] table)
+        {
+            if (table == null) return false;
+            foreach (var e in table) if (e != null && e.prefab != null && e.weight > 0f) return true;
+            return false;
+        }
+
+        static List<float> Weights(PrefabEntry[] table)
+        {
+            var w = new List<float>();
+            foreach (var e in table) w.Add(e != null && e.prefab != null ? e.weight : 0f);
+            return w;
+        }
+    }
+}

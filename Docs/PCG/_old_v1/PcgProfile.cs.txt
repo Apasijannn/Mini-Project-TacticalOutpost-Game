@@ -1,0 +1,163 @@
+using System;
+using UnityEngine;
+using Outpost.Env;
+
+namespace Outpost.PCG
+{
+    [Serializable]
+    public class VariantWeight
+    {
+        public string variantId = "walker";
+        [Min(0f)] public float weight = 1f;
+    }
+
+    [Serializable]
+    public class LaneWeightTable
+    {
+        public LaneId lane = LaneId.West;
+        public VariantWeight[] weights = new VariantWeight[0];
+    }
+
+    [Serializable]
+    public class VariantCost
+    {
+        public string variantId = "walker";
+        [Min(1)] public int cost = 1;
+    }
+
+    [Serializable]
+    public class PrefabEntry
+    {
+        public string name;
+        public GameObject prefab;
+        [Min(0f)] public float weight = 1f;
+    }
+
+    public enum SupplyKind { Ammo, Health }
+
+    [Serializable]
+    public class SupplyEntry
+    {
+        public SupplyKind kind = SupplyKind.Ammo;
+        [Min(0f)] public float weight = 1f;
+    }
+
+    /// <summary>
+    /// Semua parameter Procedural Content Generation Tactical Outpost. Diubah lewat Inspector (asset Resources/PCG_Profile),
+    /// tanpa menyentuh kode. Nilai default di sini adalah konfigurasi demo.
+    /// </summary>
+    [CreateAssetMenu(menuName = "Outpost/PCG Profile", fileName = "PCG_Profile")]
+    public class PcgProfile : ScriptableObject
+    {
+        public const string ResourcePath = "PCG_Profile";
+
+        [Header("Seed")]
+        [Tooltip("True = seed baru setiap match (dari jam sistem). False = selalu memakai 'seed' di bawah.")]
+        public bool useRandomSeed = true;
+        public int seed = 12345;
+
+        [Header("Wave spawn (generate-and-test)")]
+        [Tooltip("False = kembali ke 21 titik spawn tetap (perilaku lama) untuk perbandingan.")]
+        public bool proceduralPositions = true;
+        [Tooltip("Kedalaman zona spawn dari garis gerbang ke arah dalam map (m).")]
+        public float zoneDepth = 8f;
+        [Tooltip("Tambahan lebar zona di kiri-kanan titik gerbang (m).")]
+        public float zoneWidthPadding = 1.5f;
+        public float checkRadius = 0.45f;
+        public float bossCheckRadius = 1.1f;
+        public float minimumSpacing = 1.6f;
+        public float minDistanceFromGenerator = 18f;
+        [Tooltip("Player safe zone. Dicek ulang saat zombie benar-benar muncul (posisi player live).")]
+        public float minDistanceFromPlayer = 12f;
+        public bool requirePathToGenerator = true;
+        [Min(1)] public int maxAttemptsPerObject = 40;
+        [Tooltip("Posisi cadangan per lane bila posisi rencana tidak aman saat spawn.")]
+        [Min(0)] public int reservePerLane = 6;
+
+        [Header("Weighted table per lane (kosong = bobot catalog)")]
+        public LaneWeightTable[] laneTables =
+        {
+            new LaneWeightTable { lane = LaneId.West, weights = new[] {
+                new VariantWeight { variantId = "walker", weight = 3f }, new VariantWeight { variantId = "bloater", weight = 1.5f },
+                new VariantWeight { variantId = "runner", weight = 2f }, new VariantWeight { variantId = "skinless", weight = 2f } } },
+            new LaneWeightTable { lane = LaneId.North, weights = new[] {
+                new VariantWeight { variantId = "walker", weight = 2f }, new VariantWeight { variantId = "bloater", weight = 1f },
+                new VariantWeight { variantId = "runner", weight = 4f }, new VariantWeight { variantId = "skinless", weight = 2f } } },
+            new LaneWeightTable { lane = LaneId.South, weights = new[] {
+                new VariantWeight { variantId = "walker", weight = 2f }, new VariantWeight { variantId = "bloater", weight = 3f },
+                new VariantWeight { variantId = "runner", weight = 1f }, new VariantWeight { variantId = "skinless", weight = 2f } } },
+        };
+
+        [Header("Wave event")]
+        [Tooltip("Setiap wave, seed memilih satu lane sebagai 'lane berat'.")]
+        public bool heavyLaneEvent = true;
+        [Range(0.34f, 0.9f)] public float heavyLaneShare = 0.5f;
+        [Tooltip("Urutan boss antar-lane diacak oleh seed, dengan jeda di antaranya.")]
+        public bool randomBossOrder = true;
+        public float bossStagger = 3f;
+
+        [Header("Difficulty budget (opsional)")]
+        [Tooltip("False = jumlah zombie tetap mengikuti WaveDirector (24/36/48). True = jumlah & komposisi dari budget.")]
+        public bool useDifficultyBudget = false;
+        public int[] waveBudgets = { 48, 80, 112 };
+        public VariantCost[] costs =
+        {
+            new VariantCost { variantId = "runner", cost = 1 }, new VariantCost { variantId = "walker", cost = 2 },
+            new VariantCost { variantId = "skinless", cost = 3 }, new VariantCost { variantId = "bloater", cost = 3 },
+        };
+
+        [Header("Supply cache (per wave)")]
+        public bool supplyEnabled = true;
+        [Min(0)] public int cachesPerWave = 3;
+        public SupplyEntry[] supplyTable = { new SupplyEntry { kind = SupplyKind.Ammo, weight = 60f }, new SupplyEntry { kind = SupplyKind.Health, weight = 40f } };
+        public float supplyMinRadius = 5f;
+        public float supplyMaxRadius = 30f;
+        public float supplyMinFromLane = 15f;
+        public float supplySpacing = 8f;
+        public float supplyMinFromPlayer = 4f;
+
+        [Header("Procedural cover")]
+        public bool coverEnabled = true;
+        [Min(0)] public int coverCount = 10;
+        public PrefabEntry[] coverTable = new PrefabEntry[0];
+        [Tooltip("Cover disebar pada cincin di sekitar generator (m).")]
+        public float coverMinRadius = 9f;
+        public float coverMaxRadius = 32f;
+        public float coverSpacing = 5f;
+        public float coverMinFromLane = 10f;
+        public float coverMinFromAttackPoint = 4f;
+        public float coverMinFromPlayerSpawn = 4f;
+        [Tooltip("Cover ditolak bila jalur zombie dari lane ke generator memanjang lebih dari rasio ini.")]
+        public float maxDetourRatio = 1.35f;
+        public float maxGroundSlope = 0.25f;
+        [Min(1)] public int coverMaxAttempts = 40;
+
+        [Header("Procedural dressing (kosmetik)")]
+        public bool dressingEnabled = true;
+        [Min(0)] public int dressingCount = 30;
+        public PrefabEntry[] dressingTable = new PrefabEntry[0];
+        public Vector2 dressingScale = new Vector2(0.85f, 1.2f);
+        public float dressingSpacing = 2.5f;
+        public float dressingMinFromAttackPoint = 3f;
+        [Min(1)] public int dressingMaxAttempts = 30;
+
+        public LaneWeightTable TableFor(LaneId lane)
+        {
+            if (laneTables == null) return null;
+            foreach (var t in laneTables) if (t != null && t.lane == lane && t.weights != null && t.weights.Length > 0) return t;
+            return null;
+        }
+
+        public int CostOf(string variantId)
+        {
+            if (costs != null) foreach (var c in costs) if (c != null && c.variantId == variantId) return Mathf.Max(1, c.cost);
+            return 2;
+        }
+
+        public int BudgetFor(int waveIndex)
+        {
+            if (waveBudgets == null || waveBudgets.Length == 0) return 0;
+            return waveBudgets[Mathf.Clamp(waveIndex, 0, waveBudgets.Length - 1)];
+        }
+    }
+}

@@ -1,0 +1,149 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using Outpost.Enemy;
+
+namespace Outpost.PCG
+{
+    /// <summary>
+    /// Eksperimen wajib Modul 09 dijalankan otomatis terhadap map asli (NavMesh + collider live), tanpa spawn zombie.
+    /// Tekan F9 saat Debug Mode. Hasil: Docs/PCG/ExperimentResults.md (Editor) atau persistentDataPath (build).
+    /// Semua eksperimen merencanakan Wave 3 (48 zombie + 3 boss), wave paling padat.
+    /// </summary>
+    public static class PcgExperimentRunner
+    {
+        public static string Run(PcgManager manager, EnemyCatalog catalog)
+        {
+            var world = manager.World;
+            var baseProfile = manager.profile;
+            var sb = new StringBuilder();
+            sb.AppendLine("# PCG Experiment Results — Tactical Outpost");
+            sb.AppendLine();
+            sb.AppendLine("Dibuat otomatis oleh `PcgExperimentRunner` (F9 pada Debug Mode) pada " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm") + ".");
+            sb.AppendLine("Semua baris merencanakan **Wave 3** (48 zombie biasa + 3 boss) pada map dan NavMesh asli. Kolom *Rejected* = kandidat yang gagal validasi; *Fallback* = zombie yang memakai titik gerbang tetap karena tidak menemukan posisi valid dalam `maxAttemptsPerObject`.");
+            sb.AppendLine();
+
+            // ---- Eksperimen 1: seed berbeda
+            sb.AppendLine("## Eksperimen 1 — Seed berbeda");
+            sb.AppendLine();
+            sb.AppendLine("| Seed | Spawned | Fallback | Attempts | Rejected | Heavy lane | Boss order | Layout hash | Rejection detail |");
+            sb.AppendLine("|---:|---:|---:|---:|---:|---|---|---:|---|");
+            foreach (int seed in new[] { 100, 200, 300 })
+            {
+                var r = PlanOnce(world, baseProfile, catalog, seed, null, p => { });
+                sb.AppendLine(Row(seed.ToString(), r));
+            }
+            sb.AppendLine();
+
+            // ---- Eksperimen 2: reproducibility
+            sb.AppendLine("## Eksperimen 2 — Reproducibility (seed 500 × 3)");
+            sb.AppendLine();
+            sb.AppendLine("| Run | Spawned | Fallback | Attempts | Rejected | Heavy lane | Boss order | Layout hash | Rejection detail |");
+            sb.AppendLine("|---:|---:|---:|---:|---:|---|---|---:|---|");
+            var hashes = new List<int>();
+            for (int i = 1; i <= 3; i++)
+            {
+                var r = PlanOnce(world, baseProfile, catalog, 500, null, p => { });
+                hashes.Add(r.plan.LayoutHash());
+                sb.AppendLine(Row(i.ToString(), r));
+            }
+            sb.AppendLine();
+            sb.AppendLine(hashes.Distinct().Count() == 1 ? "**Hasil: identik** — ketiga run menghasilkan layout hash yang sama." : "**Hasil: berbeda** — periksa sumber random di luar PcgRandom.");
+            sb.AppendLine();
+
+            // ---- Eksperimen 3: safe radius
+            var westish = world.lanes.Count > 0 ? world.lanes[0] : null;
+            sb.AppendLine("## Eksperimen 3 — Player safe radius (`minDistanceFromPlayer`)");
+            sb.AppendLine();
+            sb.AppendLine("Player disimulasikan berdiri di tengah zona lane **" + (westish != null ? westish.lane.ToString() : "-") + "** supaya radius benar-benar berpengaruh. Seed 500.");
+            sb.AppendLine();
+            sb.AppendLine("| Safe radius (m) | Spawned | Fallback | Attempts | Rejected | Heavy lane | Boss order | Layout hash | Rejection detail |");
+            sb.AppendLine("|---:|---:|---:|---:|---:|---|---|---:|---|");
+            foreach (float radius in new[] { 3f, 5f, 8f })
+            {
+                float rr = radius;
+                var r = PlanOnce(world, baseProfile, catalog, 500, westish != null ? westish.Center : (Vector3?)null, p => p.minDistanceFromPlayer = rr);
+                sb.AppendLine(Row(radius.ToString("0"), r));
+            }
+            sb.AppendLine();
+
+            // ---- Eksperimen 4: density
+            sb.AppendLine("## Eksperimen 4 — Density (`minimumSpacing`)");
+            sb.AppendLine();
+            sb.AppendLine("| Spacing (m) | Spawned | Fallback | Attempts | Rejected | Heavy lane | Boss order | Layout hash | Rejection detail |");
+            sb.AppendLine("|---:|---:|---:|---:|---:|---|---|---:|---|");
+            foreach (float spacing in new[] { 0.5f, 1.5f, 3.0f })
+            {
+                float sp = spacing;
+                var r = PlanOnce(world, baseProfile, catalog, 500, null, p => p.minimumSpacing = sp);
+                sb.AppendLine(Row(spacing.ToString("0.0"), r));
+            }
+            sb.AppendLine();
+
+            // ---- Eksperimen 5: weight
+            sb.AppendLine("## Eksperimen 5 — Weighted random (10.000 pemilihan, seed 500)");
+            sb.AppendLine();
+            sb.AppendLine("| Weight A : B : C | Hasil A | Hasil B | Hasil C |");
+            sb.AppendLine("|---|---:|---:|---:|");
+            foreach (var weights in new[] { new[] { 60f, 30f, 10f }, new[] { 33f, 33f, 34f } })
+            {
+                var rng = new PcgRandom(500);
+                var hits = new int[3];
+                for (int i = 0; i < 10000; i++) hits[rng.WeightedIndex(weights)]++;
+                sb.AppendLine("| " + string.Join(" : ", weights.Select(w => w.ToString("0"))) + " | " +
+                              string.Join(" | ", hits.Select(h => (h / 100f).ToString("0.0") + "%")) + " |");
+            }
+            sb.AppendLine();
+
+            // ---- Komposisi per lane (weighted table per lane)
+            sb.AppendLine("## Tambahan — Komposisi zombie per lane (seed 500, Wave 3)");
+            sb.AppendLine();
+            var comp = PlanOnce(world, baseProfile, catalog, 500, null, p => { }).plan;
+            sb.AppendLine("| Lane | Komposisi |");
+            sb.AppendLine("|---|---|");
+            foreach (var kv in comp.composition.OrderBy(k => k.Key))
+                sb.AppendLine("| " + kv.Key + (kv.Key == comp.heavyLane ? " (heavy)" : "") + " | " + string.Join(", ", kv.Value.OrderBy(k => k.Key).Select(k => k.Key + " " + k.Value)) + " |");
+            sb.AppendLine();
+
+            // ---- Layout match ini
+            sb.AppendLine("## Layout match saat eksperimen dijalankan");
+            sb.AppendLine();
+            sb.AppendLine("- Seed: " + manager.CurrentSeed);
+            sb.AppendLine("- Cover: " + manager.coverStats.accepted + "/" + manager.coverStats.requested + " (attempts " + manager.coverStats.attempts + "; ditolak: " + manager.coverStats.RejectionSummary() + ")");
+            sb.AppendLine("- Dressing: " + manager.dressingStats.accepted + "/" + manager.dressingStats.requested + " (ditolak: " + manager.dressingStats.RejectionSummary() + ")");
+            sb.AppendLine("- Supply terakhir: " + manager.supplyStats.accepted + "/" + manager.supplyStats.requested + " (ditolak: " + manager.supplyStats.RejectionSummary() + ")");
+
+            string dir = Application.isEditor ? Path.GetFullPath(Path.Combine(Application.dataPath, "..", "Docs", "PCG")) : Application.persistentDataPath;
+            Directory.CreateDirectory(dir);
+            string path = Path.Combine(dir, "ExperimentResults.md");
+            File.WriteAllText(path, sb.ToString());
+            Debug.Log("[PCG] Eksperimen selesai: " + path);
+            return path;
+        }
+
+        sealed class Outcome { public WavePlan plan; public PcgStageStats stats; }
+
+        static Outcome PlanOnce(PcgWorld world, PcgProfile baseProfile, EnemyCatalog catalog, int seed, Vector3? player, System.Action<PcgProfile> tweak)
+        {
+            var p = Object.Instantiate(baseProfile);
+            tweak(p);
+            var stats = new PcgStageStats("exp");
+            var plan = PcgWavePlanner.Plan(world, p, catalog, new PcgWavePlanner.Options
+            {
+                seed = seed, waveIndex = 2, normalCount = 48, boss = true, bossVariantId = "boss_v1", simulatedPlayer = player, recordMarkers = false,
+            }, stats, null);
+            Object.Destroy(p);
+            return new Outcome { plan = plan, stats = stats };
+        }
+
+        static string Row(string key, Outcome r)
+        {
+            var s = r.stats; var plan = r.plan;
+            return "| " + key + " | " + (plan.normals.Count + plan.bosses.Count) + " | " + s.fallback + " | " + s.attempts + " | " + s.TotalRejected +
+                   " | " + plan.heavyLane + " | " + string.Join(" > ", plan.bosses.Select(b => b.zone.lane)) + " | " + plan.LayoutHash() +
+                   " | " + s.RejectionSummary() + " |";
+        }
+    }
+}

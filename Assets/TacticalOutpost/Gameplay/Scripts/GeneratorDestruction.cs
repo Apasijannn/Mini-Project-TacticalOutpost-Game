@@ -135,6 +135,7 @@ namespace Outpost
         }
         static Transform Resolve(Scene scene, string path)
         {
+            if (!scene.IsValid() || !scene.isLoaded || string.IsNullOrEmpty(path)) return null;   // mode PCG: map industrial tidak dimuat
             foreach (var root in scene.GetRootGameObjects()) if (path != null && path.StartsWith(root.name + "/")) return root.transform.Find(path.Substring(root.name.Length + 1));
             return null;
         }
