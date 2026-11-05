@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "bosses": [
+    {
+      "name": "boss_v1(Clone)",
+      "moved": 7.14244652,
+      "agentType": -1372625422,
+      "height": 4.3,
+      "radius": 0.87,
+      "bakeHeight": 4.4,
+      "bakeRadius": 0.9,
+      "rootScale": "(1.00, 1.00, 1.00)",
+      "color": "RGBA(1.000, 0.120, 0.080, 1.000)"
+    },
+    {
+      "name": "boss_v2(Clone)",
+      "moved": 6.78437948,
+      "agentType": -1372625422,
+      "height": 4.3,
+      "radius": 0.87,
+      "bakeHeight": 4.4,
+      "bakeRadius": 0.9,
+      "rootScale": "(1.00, 1.00, 1.00)",
+      "color": "RGBA(1.000, 0.120, 0.080, 1.000)"
+    },
+    {
+      "name": "boss_v3(Clone)",
+      "moved": 5.90452,
+      "agentType": -1372625422,
+      "height": 4.3,
+      "radius": 0.87,
+      "bakeHeight": 4.4,
+      "bakeRadius": 0.9,
+      "rootScale": "(1.00, 1.00, 1.00)",
+      "color": "RGBA(1.000, 0.120, 0.080, 1.000)"
+    }
+  ],
+  "livingZombies": 4,
+  "radarTracked": 4,
+  "largeMap": true
+}

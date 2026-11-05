@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "weapons": [
+    {
+      "weapon": "AK47",
+      "particleCount": 1,
+      "impactCount": 1
+    },
+    {
+      "weapon": "Pistol",
+      "particleCount": 1,
+      "impactCount": 2
+    }
+  ],
+  "cleanup": true
+}

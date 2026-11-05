@@ -1,0 +1,116 @@
+{
+  "attackPoints": [
+    {
+      "name": "Attack 01",
+      "connected": true
+    },
+    {
+      "name": "Attack 02",
+      "connected": true
+    },
+    {
+      "name": "Attack 03",
+      "connected": true
+    },
+    {
+      "name": "Attack 04",
+      "connected": true
+    },
+    {
+      "name": "Attack 05",
+      "connected": true
+    },
+    {
+      "name": "Attack 06",
+      "connected": true
+    }
+  ],
+  "spawns": [
+    {
+      "name": "West 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "West 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "North 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "name": "South 07",
+      "reachableAttackPoints": 6
+    }
+  ],
+  "vertices": 8529,
+  "allConnected": true
+}

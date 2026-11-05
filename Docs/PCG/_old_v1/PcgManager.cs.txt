@@ -1,0 +1,398 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Outpost.Enemy;
+using Outpost.Env;
+using Outpost.Pickups;
+using Outpost.Player;
+
+namespace Outpost.PCG
+{
+    /// <summary>
+    /// Pusat Procedural Content Generation Tactical Outpost (Modul Praktikum 09, dikembangkan untuk map 3D).
+    /// Pipeline: Parameters → Seed → Pseudo Random → Candidate → Validation → Weighted Selection → Instantiation → Evaluation.
+    ///
+    /// Yang dibuat procedural:
+    ///  1. Cover tempur (NavMeshObstacle carving + validasi jalur zombie)        — sekali per match
+    ///  2. Dressing kosmetik (random rotation & scale, tanpa collider)           — sekali per match
+    ///  3. Rencana wave: lane berat, urutan boss, jenis zombie per lane, posisi — per wave
+    ///  4. Supply cache ammo/medkit                                               — per wave
+    ///
+    /// Ditambahkan otomatis oleh WaveDirector. Parameter ada di asset Resources/PCG_Profile.
+    /// </summary>
+    public class PcgManager : MonoBehaviour
+    {
+        public static PcgManager Instance { get; private set; }
+
+        /// <summary>Seed untuk match berikutnya (dipakai tombol debug restart). Null = ikuti profile.</summary>
+        public static int? PendingSeed;
+        static readonly List<int> seedHistory = new List<int>();
+        public static IReadOnlyList<int> SeedHistory { get { return seedHistory; } }
+        const int MaxHistory = 8, MaxMarkers = 700;
+
+        public PcgProfile profile;
+
+        [Header("Runtime debug (read only)")]
+        [SerializeField] int currentSeed;
+        [SerializeField] bool ready;
+        [SerializeField] int coversPlaced, dressingPlaced, suppliesPlaced;
+
+        public int CurrentSeed { get { return currentSeed; } }
+        public bool Ready { get { return ready; } }
+        public PcgWorld World { get; private set; }
+        public WavePlan CurrentPlan { get; private set; }
+
+        public readonly PcgStageStats waveStats = new PcgStageStats("Wave spawn");
+        public readonly PcgStageStats coverStats = new PcgStageStats("Cover");
+        public readonly PcgStageStats supplyStats = new PcgStageStats("Supply");
+        public readonly PcgStageStats dressingStats = new PcgStageStats("Dressing");
+        public readonly List<PcgMarker> markers = new List<PcgMarker>();
+        public readonly Dictionary<LaneId, Dictionary<string, int>> spawnedTotals = new Dictionary<LaneId, Dictionary<string, int>>();
+
+        EnemyCatalog catalog;
+        Transform root;
+        PcgLayoutGenerator.Result layout;
+        readonly List<GameObject> supplies = new List<GameObject>();
+        readonly Dictionary<SupplyKind, int> supplyCounts = new Dictionary<SupplyKind, int>();
+        int supplyWave = -1, supplyRoll;
+        GUIStyle label;
+
+        void Awake()
+        {
+            Instance = this;
+            if (profile == null) profile = Resources.Load<PcgProfile>(PcgProfile.ResourcePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<PcgProfile>();
+                Debug.LogWarning("[PCG] Resources/" + PcgProfile.ResourcePath + " tidak ditemukan; memakai nilai default tanpa prefab cover/dressing. " +
+                                 "Jalankan menu Tactical Outpost > PCG > Create Profile.", this);
+            }
+        }
+
+        void OnDestroy() { if (Instance == this) Instance = null; }
+
+        // ================================================================ setup per match
+
+        public IEnumerator Prepare(IList<EnvSpawnPoint> spawnPoints, EnemyCatalog enemyCatalog)
+        {
+            catalog = enemyCatalog;
+            ChooseSeed();
+            World = BuildWorld(spawnPoints);
+            root = new GameObject("PCG_Generated").transform;
+            layout = new PcgLayoutGenerator.Result();
+
+            coverStats.Reset(); dressingStats.Reset();
+            yield return PcgLayoutGenerator.GenerateCover(World, profile, currentSeed, root, layout, coverStats, markers);
+            PcgLayoutGenerator.GenerateDressing(World, profile, currentSeed, root, layout, dressingStats, markers);
+            coversPlaced = layout.covers.Count; dressingPlaced = layout.dressing.Count;
+            TrimMarkers();
+            ready = true;
+            Debug.Log("[PCG] Seed " + currentSeed + " | cover " + coverStats.accepted + "/" + coverStats.requested +
+                      " (ditolak: " + coverStats.RejectionSummary() + ") | dressing " + dressingStats.accepted + "/" + dressingStats.requested, this);
+        }
+
+        void ChooseSeed()
+        {
+            if (PendingSeed.HasValue) { currentSeed = PendingSeed.Value; PendingSeed = null; }
+            else if (profile.useRandomSeed) currentSeed = System.Environment.TickCount & 0x7fffffff;
+            else currentSeed = profile.seed;
+            seedHistory.Remove(currentSeed);
+            seedHistory.Insert(0, currentSeed);
+            if (seedHistory.Count > MaxHistory) seedHistory.RemoveAt(seedHistory.Count - 1);
+        }
+
+        PcgWorld BuildWorld(IList<EnvSpawnPoint> spawnPoints)
+        {
+            var w = new PcgWorld
+            {
+                area = PlayArea.Instance != null ? PlayArea.Instance : FindFirstObjectByType<PlayArea>(),
+                blockMask = PcgWorld.BuildBlockMask(),
+                coverLayer = LayerMask.NameToLayer("Cover"),
+            };
+            int probe = ~0;
+            foreach (var n in new[] { "Ignore Raycast", "UI", "Player", "Enemy", "Marker", "TransparentFX", "Water" })
+            { int l = LayerMask.NameToLayer(n); if (l >= 0) probe &= ~(1 << l); }
+            w.groundProbeMask = probe;
+
+            w.generator = GeneratorHealth.All.FirstOrDefault(g => g != null && g.IsAlive);
+            if (w.generator != null) w.generatorPos = w.generator.transform.position;
+
+            var normal = catalog != null ? catalog.variants.FirstOrDefault(v => v != null && v.prefab != null && v.kind == EnemyKind.Normal) : null;
+            var boss = catalog != null ? catalog.variants.FirstOrDefault(v => v != null && v.prefab != null && v.kind == EnemyKind.Boss) : null;
+            w.normalFilter = PcgWorld.FilterFor(normal != null ? normal.prefab : null);
+            w.bossFilter = PcgWorld.FilterFor(boss != null ? boss.prefab : null);
+
+            if (w.generator != null)
+                foreach (var t in w.generator.AttackPoints)
+                {
+                    Vector3 p;
+                    if (t != null && w.SampleNav(t.position, 1.5f, w.normalFilter, out p)) w.attackPoints.Add(p);
+                }
+
+            var player = PlayerHealth.Instance;
+            w.playerSpawn = player != null ? player.transform.position : w.generatorPos;
+
+            foreach (var group in spawnPoints.Where(s => s != null).GroupBy(s => s.lane))
+            {
+                var z = new LaneZone { lane = group.Key };
+                z.points.AddRange(group);
+                Vector3 c = Vector3.zero;
+                foreach (var s in z.points) c += s.transform.position;
+                z.gateCenter = c / z.points.Count;
+                Vector3 inward = PcgWorld.Flat(w.generatorPos - z.gateCenter);
+                z.inward = inward.sqrMagnitude > 0.01f ? inward.normalized : Vector3.forward;
+                z.right = Vector3.Cross(Vector3.up, z.inward).normalized;
+                float half = 0f;
+                foreach (var s in z.points) half = Mathf.Max(half, Mathf.Abs(Vector3.Dot(s.transform.position - z.gateCenter, z.right)));
+                z.halfWidth = half + profile.zoneWidthPadding;
+                z.depth = profile.zoneDepth;
+                w.lanes.Add(z);
+            }
+            w.lanes.Sort((a, b) => a.lane.CompareTo(b.lane));      // urutan stabil = reproducible
+            return w;
+        }
+
+        // ================================================================ wave
+
+        public WavePlan PlanWave(int waveIndex, int normalCount, bool boss, string bossVariantId)
+        {
+            waveStats.Reset();
+            markers.RemoveAll(m => m.stage == 'W');
+            CurrentPlan = PcgWavePlanner.Plan(World, profile, catalog, new PcgWavePlanner.Options
+            {
+                seed = currentSeed, waveIndex = waveIndex, normalCount = normalCount, boss = boss, bossVariantId = bossVariantId,
+            }, waveStats, markers);
+            TrimMarkers();
+            Debug.Log("[PCG] Wave " + (waveIndex + 1) + " | heavy lane " + CurrentPlan.heavyLane + " | spawn " + waveStats.accepted + "/" + waveStats.requested +
+                      " fallback " + waveStats.fallback + " | ditolak: " + waveStats.RejectionSummary() + " | hash " + CurrentPlan.LayoutHash(), this);
+            return CurrentPlan;
+        }
+
+        /// <summary>
+        /// Validasi runtime tepat saat zombie muncul: player safe zone (posisi player live) dan posisi tidak sedang ditempati zombie.
+        /// Bila gagal, posisi diganti dengan cadangan lane yang sudah direncanakan (tetap dari seed).
+        /// </summary>
+        public Vector3 ResolveSpawn(SpawnOrder order)
+        {
+            if (!profile.proceduralPositions) return order.position;
+            PcgRule rule = RuntimeCheck(order.position, order.kind == EnemyKind.Boss ? 2.5f : 0.9f);
+            if (rule == PcgRule.Accepted) return order.position;
+            waveStats.Reject(rule);
+            markers.Add(new PcgMarker { position = order.position, rule = rule, stage = 'W' });
+
+            Queue<Vector3> q;
+            if (CurrentPlan != null && CurrentPlan.reserves.TryGetValue(order.zone, out q))
+                while (q.Count > 0)
+                {
+                    Vector3 alt = q.Dequeue();
+                    if (RuntimeCheck(alt, 0.9f) == PcgRule.Accepted) { waveStats.substituted++; return alt; }
+                }
+            // Tidak ada cadangan aman: pilih titik gerbang tetap yang paling jauh dari player.
+            waveStats.substituted++;
+            var player = PlayerHealth.Instance;
+            Vector3 best = order.position; float bd = -1f;
+            foreach (var s in order.zone.points)
+            {
+                float d = player != null ? PcgWorld.Flat(s.transform.position - player.transform.position).magnitude : 0f;
+                if (d > bd) { bd = d; best = s.transform.position; }
+            }
+            return best;
+        }
+
+        PcgRule RuntimeCheck(Vector3 pos, float occupiedRadius)
+        {
+            var player = PlayerHealth.Instance;
+            if (player != null && !player.IsDead && PcgWorld.Flat(player.transform.position - pos).magnitude < profile.minDistanceFromPlayer) return PcgRule.NearPlayer;
+            foreach (var e in EnemyHealth.Alive)
+                if (e != null && !e.IsDead && PcgWorld.Flat(e.transform.position - pos).sqrMagnitude < occupiedRadius * occupiedRadius) return PcgRule.Occupied;
+            return PcgRule.Accepted;
+        }
+
+        public void RecordSpawn(SpawnOrder order)
+        {
+            if (order == null || order.zone == null || order.variant == null) return;
+            Dictionary<string, int> m;
+            if (!spawnedTotals.TryGetValue(order.zone.lane, out m)) spawnedTotals[order.zone.lane] = m = new Dictionary<string, int>();
+            int n; m.TryGetValue(order.variant.id, out n); m[order.variant.id] = n + 1;
+        }
+
+        // ================================================================ supply cache
+
+        public void PlaceSupply(int waveIndex) { supplyWave = waveIndex; supplyRoll = 0; DoPlaceSupply(); }
+
+        /// <summary>Debug: susun ulang supply wave ini dengan stream turunan berikutnya.</summary>
+        public void RerollSupply() { if (supplyWave < 0) return; supplyRoll++; DoPlaceSupply(); }
+
+        void DoPlaceSupply()
+        {
+            foreach (var s in supplies) if (s != null) Destroy(s);
+            supplies.Clear(); supplyCounts.Clear(); supplyStats.Reset();
+            markers.RemoveAll(m => m.stage == 'S');
+            suppliesPlaced = 0;
+            if (!profile.supplyEnabled || profile.cachesPerWave <= 0 || World == null || World.generator == null) return;
+            var drop = FindFirstObjectByType<DropManager>();
+            if (drop == null || profile.supplyTable == null || profile.supplyTable.Length == 0) return;
+
+            var rng = PcgRandom.For(currentSeed, "supply", supplyWave * 100 + supplyRoll);
+            var weights = profile.supplyTable.Select(e => e != null ? e.weight : 0f).ToList();
+            var player = PlayerHealth.Instance;
+            for (int k = 0; k < profile.cachesPerWave; k++)
+            {
+                supplyStats.requested++;
+                for (int attempt = 0; attempt < profile.maxAttemptsPerObject; attempt++)
+                {
+                    supplyStats.attempts++;
+                    float angle = rng.Range(0f, Mathf.PI * 2f);
+                    float radius = Mathf.Sqrt(Mathf.Lerp(profile.supplyMinRadius * profile.supplyMinRadius, profile.supplyMaxRadius * profile.supplyMaxRadius, rng.Value));
+                    var entry = profile.supplyTable[Mathf.Max(0, rng.WeightedIndex(weights))];
+                    float yaw = rng.Range(0f, 360f);
+                    Vector3 c = World.generatorPos + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+
+                    Vector3 ground = c;
+                    PcgRule rule = SupplyRule(c, player, out ground);
+                    markers.Add(new PcgMarker { position = ground, rule = rule, stage = 'S' });
+                    if (rule != PcgRule.Accepted) { supplyStats.Reject(rule); continue; }
+
+                    var prefab = entry.kind == SupplyKind.Ammo ? drop.ammoPrefab : drop.healthPrefab;
+                    if (prefab == null) { supplyStats.Reject(PcgRule.Blocked); continue; }
+                    var go = Instantiate(prefab, ground, Quaternion.Euler(0f, yaw, 0f), root);
+                    go.name = "PCG_Supply_" + entry.kind + "_" + k;
+                    var item = go.GetComponent<PickupItem>();
+                    if (item != null) item.lifetime = 100000f;          // bertahan sampai diganti supply wave berikutnya
+                    supplies.Add(go);
+                    int n; supplyCounts.TryGetValue(entry.kind, out n); supplyCounts[entry.kind] = n + 1;
+                    supplyStats.accepted++;
+                    break;
+                }
+            }
+            suppliesPlaced = supplies.Count;
+            TrimMarkers();
+            if (supplies.Count > 0)
+            {
+                int ammo, health; supplyCounts.TryGetValue(SupplyKind.Ammo, out ammo); supplyCounts.TryGetValue(SupplyKind.Health, out health);
+                HudEvents.ShowToast("SUPPLY CACHE  " + ammo + " AMMO  /  " + health + " MEDKIT", new Color(1f, 0.82f, 0.35f));
+            }
+        }
+
+        PcgRule SupplyRule(Vector3 c, PlayerHealth player, out Vector3 ground)
+        {
+            ground = c;
+            var w = World;
+            if (!w.InArea(c, 2f)) return PcgRule.OutsideArea;
+            Vector3 onNav;
+            if (!w.ProjectToNav(c, out onNav, out ground)) return PcgRule.OffNavMesh;
+            if (w.Blocked(ground, 0.4f)) return PcgRule.Blocked;
+            foreach (var s in supplies) if (s != null && PcgWorld.Flat(s.transform.position - ground).sqrMagnitude < profile.supplySpacing * profile.supplySpacing) return PcgRule.Spacing;
+            if (layout != null) foreach (var cv in layout.covers) if (cv != null && PcgWorld.Flat(cv.transform.position - ground).sqrMagnitude < 2.25f) return PcgRule.Spacing;
+            if (w.DistanceToLanes(ground) < profile.supplyMinFromLane) return PcgRule.NearLane;
+            if (w.DistanceToAttackPoints(ground) < 2.5f) return PcgRule.NearGenerator;
+            if (player != null && PcgWorld.Flat(player.transform.position - ground).magnitude < profile.supplyMinFromPlayer) return PcgRule.NearPlayer;
+            if (w.attackPoints.Count > 0 && !w.CanReachGenerator(onNav, w.normalFilter)) return PcgRule.NoPath;
+            return PcgRule.Accepted;
+        }
+
+        // ================================================================ debug / restart
+
+        public static void Restart(int seed)
+        {
+            PendingSeed = seed;
+            Time.timeScale = 1f;
+            var scene = Instance != null ? Instance.gameObject.scene : SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.buildIndex);
+        }
+
+        void TrimMarkers()
+        {
+            if (markers.Count > MaxMarkers) markers.RemoveRange(0, markers.Count - MaxMarkers);
+        }
+
+        static string Counts(Dictionary<string, int> m)
+        {
+            return m == null || m.Count == 0 ? "-" : string.Join(" ", m.OrderBy(k => k.Key).Select(k => k.Key + ":" + k.Value));
+        }
+
+        /// <summary>Dipanggil EnemyDebugSpawner.OnGUI saat Debug Mode (F8) aktif.</summary>
+        public void DrawDebugGUI(Camera cam)
+        {
+            if (label == null) label = new GUIStyle(GUI.skin.label) { fontSize = 12, wordWrap = false };
+
+            // Marker kandidat di dunia: hijau = diterima, merah = ditolak.
+            if (cam != null)
+            {
+                Vector3 camPos = cam.transform.position;
+                foreach (var m in markers)
+                {
+                    if ((m.position - camPos).sqrMagnitude > 90f * 90f) continue;
+                    var sp = cam.WorldToScreenPoint(m.position + Vector3.up * 0.2f);
+                    if (sp.z <= 0f) continue;
+                    var prev = GUI.color;
+                    GUI.color = m.rule == PcgRule.Accepted ? new Color(0.3f, 1f, 0.35f, 0.9f) : new Color(1f, 0.25f, 0.2f, 0.75f);
+                    float s = m.rule == PcgRule.Accepted ? 7f : 5f;
+                    GUI.DrawTexture(new Rect(sp.x - s * 0.5f, Screen.height - sp.y - s * 0.5f, s, s), Texture2D.whiteTexture);
+                    GUI.color = prev;
+                }
+            }
+
+            var lines = new List<string>();
+            lines.Add("PCG  SEED " + currentSeed + (profile.useRandomSeed ? " (random)" : " (fixed)") + "   history: " + string.Join(", ", seedHistory.Skip(1).Take(4)));
+            if (CurrentPlan != null)
+            {
+                lines.Add("Wave " + (CurrentPlan.waveIndex + 1) + "  heavy lane: " + CurrentPlan.heavyLane +
+                          (CurrentPlan.bosses.Count > 0 ? "  boss order: " + string.Join(" > ", CurrentPlan.bosses.Select(b => b.zone.lane)) : "") +
+                          (profile.useDifficultyBudget ? "  budget " + CurrentPlan.budgetSpent + "/" + CurrentPlan.budget : ""));
+                foreach (var kv in CurrentPlan.composition.OrderBy(k => k.Key)) lines.Add("  plan " + kv.Key + ": " + Counts(kv.Value));
+            }
+            lines.Add(Stage(waveStats) + "  fallback " + waveStats.fallback + "  swap " + waveStats.substituted);
+            lines.Add("  rejected: " + waveStats.RejectionSummary());
+            lines.Add(Stage(coverStats) + "  rejected: " + coverStats.RejectionSummary());
+            lines.Add(Stage(supplyStats) + "  " + string.Join(" ", supplyCounts.Select(k => k.Key + ":" + k.Value)) + "  rejected: " + supplyStats.RejectionSummary());
+            lines.Add(Stage(dressingStats) + "  rejected: " + dressingStats.RejectionSummary());
+            foreach (var kv in spawnedTotals.OrderBy(k => k.Key)) lines.Add("  spawned " + kv.Key + ": " + Counts(kv.Value));
+            lines.Add("F5 reroll supply | F6 new seed | F7 replay seed | F9 experiments");
+
+            float h = 16f * lines.Count + 12f, wdt = 520f;
+            var rect = new Rect(Screen.width - wdt - 10f, 120f, wdt, h);
+            GUI.Box(rect, GUIContent.none);
+            label.normal.textColor = new Color(1f, 0.86f, 0.45f);
+            for (int i = 0; i < lines.Count; i++)
+                GUI.Label(new Rect(rect.x + 8f, rect.y + 5f + i * 16f, wdt - 12f, 18f), lines[i], label);
+        }
+
+        static string Stage(PcgStageStats s)
+        {
+            return s.name + " " + s.accepted + "/" + s.requested + " (tries " + s.attempts + ")";
+        }
+
+        void OnDrawGizmos()
+        {
+            if (World == null) return;
+            var corners = new Vector3[4];
+            foreach (var z in World.lanes)
+            {
+                Gizmos.color = z.lane == (CurrentPlan != null ? CurrentPlan.heavyLane : LaneId.None) ? new Color(1f, 0.2f, 0.1f) : Color.cyan;
+                z.CornerPoints(corners);
+                for (int i = 0; i < 4; i++) Gizmos.DrawLine(corners[i] + Vector3.up * 0.2f, corners[(i + 1) % 4] + Vector3.up * 0.2f);
+            }
+            if (profile == null) return;
+            Gizmos.color = new Color(1f, 0.6f, 0.1f);
+            DrawCircle(World.generatorPos, profile.coverMinRadius); DrawCircle(World.generatorPos, profile.coverMaxRadius);
+            Gizmos.color = new Color(0.2f, 1f, 0.4f);
+            DrawCircle(World.generatorPos, profile.supplyMaxRadius);
+            var player = PlayerHealth.Instance;
+            if (player != null) { Gizmos.color = Color.red; DrawCircle(player.transform.position, profile.minDistanceFromPlayer); }
+        }
+
+        static void DrawCircle(Vector3 c, float r)
+        {
+            Vector3 prev = c + new Vector3(r, 0.2f, 0f);
+            for (int i = 1; i <= 48; i++)
+            {
+                float a = i / 48f * Mathf.PI * 2f;
+                Vector3 p = c + new Vector3(Mathf.Cos(a) * r, 0.2f, Mathf.Sin(a) * r);
+                Gizmos.DrawLine(prev, p); prev = p;
+            }
+        }
+    }
+}

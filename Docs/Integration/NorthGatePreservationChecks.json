@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "original": 3898,
+  "unmatchedOriginal": [],
+  "added": [
+    "North gate fence to pillar connectors",
+    "West north-gate pillar",
+    "West fence to pillar",
+    "Concrete_fence_v2_lattice_S",
+    "Concrete_fence_v2_S",
+    "East fence to pillar",
+    "Concrete_fence_v2_lattice_S",
+    "Concrete_fence_v2_S"
+  ],
+  "method": "Saved scene multiset: name, world transform, local scale, active flag at 0.0001 precision"
+}

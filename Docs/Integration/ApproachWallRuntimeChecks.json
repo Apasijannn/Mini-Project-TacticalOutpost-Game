@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "walls": 6,
+  "physicalRays": 12,
+  "navigationRays": 12,
+  "spawnJitterRoutes": 378
+}

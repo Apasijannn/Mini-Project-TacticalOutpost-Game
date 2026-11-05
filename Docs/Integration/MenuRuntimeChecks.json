@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "mainMenu": "Start / Exit",
+  "pause": "Resume / Exit",
+  "exitToMenu": true,
+  "mapEscapePriority": true,
+  "clockAndMovementFrozen": true,
+  "audioPaused": true,
+  "resumeRestoresInput": true,
+  "freshRestart": true
+}

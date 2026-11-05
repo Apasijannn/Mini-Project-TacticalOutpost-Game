@@ -1,0 +1,9 @@
+{
+  "northGatePillars": 2,
+  "connectionLengths": [
+    2.7685194,
+    2.77916145
+  ],
+  "wallColliders": 6,
+  "navMeshes": 2
+}

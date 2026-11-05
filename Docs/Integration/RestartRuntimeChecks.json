@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "deadLabel": true,
+  "playerDeathStopsWave": true,
+  "playerRestart": true,
+  "generatorDefeat": true,
+  "generatorRestart": true
+}

@@ -1,0 +1,21 @@
+{
+  "originalObjects": 3470,
+  "currentObjects": 3891,
+  "missing": [],
+  "changed": [
+    {
+      "name": "Road_block_v1 (18)",
+      "fields": [
+        "pos",
+        "rot"
+      ]
+    },
+    {
+      "name": "PlayerStart",
+      "fields": [
+        "pos",
+        "rot"
+      ]
+    }
+  ]
+}

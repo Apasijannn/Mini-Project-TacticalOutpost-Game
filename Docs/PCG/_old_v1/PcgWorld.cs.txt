@@ -1,0 +1,284 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+using Outpost.Enemy;
+using Outpost.Env;
+
+namespace Outpost.PCG
+{
+    /// <summary>Alasan sebuah kandidat posisi ditolak (atau diterima). Dipakai untuk statistik dan visual debug.</summary>
+    public enum PcgRule
+    {
+        Accepted,
+        OutsideArea,      // di luar pagar / PlayArea
+        OffNavMesh,       // tidak berada di permukaan jalan NavMesh
+        Blocked,          // bertabrakan dengan obstacle (Physics.CheckCapsule / OverlapBox)
+        Spacing,          // terlalu dekat object procedural lain
+        NearGenerator,    // terlalu dekat generator / attack point
+        NearPlayer,       // player safe zone
+        NearLane,         // terlalu dekat zona spawn zombie
+        NoPath,           // tidak ada jalur NavMesh lengkap ke generator
+        Detour,           // cover membuat jalur zombie memutar terlalu jauh
+        Slope,            // permukaan tidak rata
+        Occupied,         // saat spawn, posisi sedang ditempati zombie lain
+    }
+
+    public sealed class PcgStageStats
+    {
+        public readonly string name;
+        public int requested, accepted, fallback, attempts, substituted;
+        public readonly int[] rejected = new int[Enum.GetValues(typeof(PcgRule)).Length];
+
+        public PcgStageStats(string name) { this.name = name; }
+
+        public void Reset() { requested = accepted = fallback = attempts = substituted = 0; Array.Clear(rejected, 0, rejected.Length); }
+        public void Reject(PcgRule rule) { rejected[(int)rule]++; }
+
+        public int TotalRejected { get { int n = 0; for (int i = 1; i < rejected.Length; i++) n += rejected[i]; return n; } }
+
+        public string RejectionSummary()
+        {
+            var parts = new List<string>();
+            for (int i = 1; i < rejected.Length; i++) if (rejected[i] > 0) parts.Add(((PcgRule)i) + " " + rejected[i]);
+            return parts.Count == 0 ? "none" : string.Join(", ", parts);
+        }
+    }
+
+    public struct PcgMarker
+    {
+        public Vector3 position;
+        public PcgRule rule;
+        public char stage;   // W = wave, C = cover, S = supply, D = dressing
+    }
+
+    /// <summary>Zona spawn satu lane: persegi panjang mulai dari garis gerbang (titik spawn tetap) masuk ke dalam map.</summary>
+    public sealed class LaneZone
+    {
+        public LaneId lane;
+        public readonly List<EnvSpawnPoint> points = new List<EnvSpawnPoint>();
+        public Vector3 gateCenter, inward, right;
+        public float halfWidth, depth;
+
+        public Vector3 Center { get { return gateCenter + inward * (depth * 0.5f - 1f); } }
+        public Quaternion Facing { get { return Quaternion.LookRotation(inward, Vector3.up); } }
+
+        public Vector3 RandomPoint(PcgRandom r)
+        {
+            return gateCenter + right * r.Range(-halfWidth, halfWidth) + inward * r.Range(-1f, depth - 1f);
+        }
+
+        /// <summary>Jarak horizontal dari titik ke persegi zona (0 bila di dalam).</summary>
+        public float DistanceTo(Vector3 p)
+        {
+            Vector3 d = p - gateCenter; d.y = 0f;
+            float u = Vector3.Dot(d, right), v = Vector3.Dot(d, inward);
+            float du = Mathf.Max(0f, Mathf.Abs(u) - halfWidth);
+            float dv = v < -1f ? -1f - v : (v > depth - 1f ? v - (depth - 1f) : 0f);
+            return Mathf.Sqrt(du * du + dv * dv);
+        }
+
+        public void CornerPoints(Vector3[] four)
+        {
+            Vector3 a = gateCenter - inward * 1f, b = gateCenter + inward * (depth - 1f);
+            four[0] = a - right * halfWidth; four[1] = a + right * halfWidth;
+            four[2] = b + right * halfWidth; four[3] = b - right * halfWidth;
+        }
+    }
+
+    public sealed class SpawnOrder
+    {
+        public EnemyVariant variant;
+        public EnemyKind kind;
+        public LaneZone zone;
+        public Vector3 position;
+        public bool fallback;
+    }
+
+    public sealed class WavePlan
+    {
+        public int waveIndex;
+        public LaneId heavyLane = LaneId.None;
+        public int budget, budgetSpent;
+        public readonly List<SpawnOrder> normals = new List<SpawnOrder>();
+        public readonly List<SpawnOrder> bosses = new List<SpawnOrder>();
+        public readonly Dictionary<LaneZone, Queue<Vector3>> reserves = new Dictionary<LaneZone, Queue<Vector3>>();
+        public readonly Dictionary<LaneId, Dictionary<string, int>> composition = new Dictionary<LaneId, Dictionary<string, int>>();
+
+        public void Count(LaneId lane, string id)
+        {
+            Dictionary<string, int> m;
+            if (!composition.TryGetValue(lane, out m)) composition[lane] = m = new Dictionary<string, int>();
+            int n; m.TryGetValue(id, out n); m[id] = n + 1;
+        }
+
+        /// <summary>Sidik jari layout: sama persis untuk seed yang sama (dipakai uji reproducibility).</summary>
+        public int LayoutHash()
+        {
+            unchecked
+            {
+                int h = 17;
+                foreach (var o in normals) h = h * 31 + Mathf.RoundToInt(o.position.x * 100f) * 7 + Mathf.RoundToInt(o.position.z * 100f) + (o.variant != null ? o.variant.id.GetHashCode() : 0);
+                foreach (var o in bosses) h = h * 31 + Mathf.RoundToInt(o.position.x * 100f) * 7 + Mathf.RoundToInt(o.position.z * 100f);
+                return h;
+            }
+        }
+    }
+
+    /// <summary>Konteks map + fungsi validasi bersama (NavMesh, physics, jalur) untuk semua generator PCG.</summary>
+    public sealed class PcgWorld
+    {
+        public GeneratorHealth generator;
+        public Vector3 generatorPos;
+        public readonly List<Vector3> attackPoints = new List<Vector3>();
+        public Vector3 playerSpawn;
+        public readonly List<LaneZone> lanes = new List<LaneZone>();
+        public NavMeshQueryFilter normalFilter, bossFilter;
+        public int blockMask;
+        public int groundProbeMask;
+        public int coverLayer;
+        public PlayArea area;
+
+        readonly NavMeshPath path = new NavMeshPath();
+        static readonly Collider[] overlapBuffer = new Collider[32];
+
+        public static int BuildBlockMask()
+        {
+            int mask = ~0;
+            foreach (var n in new[] { "TransparentFX", "Ignore Raycast", "Water", "UI", "Player", "Enemy", "Ground", "Marker" })
+            {
+                int l = LayerMask.NameToLayer(n);
+                if (l >= 0) mask &= ~(1 << l);
+            }
+            return mask;
+        }
+
+        public static NavMeshQueryFilter FilterFor(GameObject prefab)
+        {
+            var agent = prefab != null ? prefab.GetComponent<NavMeshAgent>() : null;
+            return agent != null
+                ? new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask }
+                : new NavMeshQueryFilter { agentTypeID = 0, areaMask = NavMesh.AllAreas };
+        }
+
+        public bool InArea(Vector3 p, float margin)
+        {
+            return area == null || area.Contains(p, margin);
+        }
+
+        public bool SampleNav(Vector3 p, float radius, NavMeshQueryFilter filter, out Vector3 onNav)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(p, out hit, radius, filter)) { onNav = hit.position; return true; }
+            onNav = p; return false;
+        }
+
+        /// <summary>Panjang jalur NavMesh lengkap (PathComplete). False bila jalur terputus.</summary>
+        public bool PathLength(Vector3 from, Vector3 to, NavMeshQueryFilter filter, out float length)
+        {
+            length = 0f;
+            if (!NavMesh.CalculatePath(from, to, filter, path) || path.status != NavMeshPathStatus.PathComplete) return false;
+            var c = path.corners;
+            for (int i = 1; i < c.Length; i++) length += Vector3.Distance(c[i - 1], c[i]);
+            return true;
+        }
+
+        /// <summary>Jalur terpendek ke salah satu attack point generator.</summary>
+        public bool PathToGenerator(Vector3 from, NavMeshQueryFilter filter, out float length)
+        {
+            length = float.MaxValue;
+            bool any = false;
+            foreach (var ap in attackPoints)
+            {
+                float l;
+                if (PathLength(from, ap, filter, out l) && l < length) { length = l; any = true; }
+            }
+            return any;
+        }
+
+        /// <summary>Cukup satu attack point yang terjangkau (lebih murah dari PathToGenerator).</summary>
+        public bool CanReachGenerator(Vector3 from, NavMeshQueryFilter filter)
+        {
+            foreach (var ap in attackPoints)
+                if (NavMesh.CalculatePath(from, ap, filter, path) && path.status == NavMeshPathStatus.PathComplete) return true;
+            return false;
+        }
+
+        public float DistanceToAttackPoints(Vector3 p)
+        {
+            float best = float.MaxValue;
+            foreach (var ap in attackPoints) best = Mathf.Min(best, Flat(ap - p).magnitude);
+            if (generator != null) best = Mathf.Min(best, Flat(generatorPos - p).magnitude);
+            return best;
+        }
+
+        public float DistanceToLanes(Vector3 p)
+        {
+            float best = float.MaxValue;
+            foreach (var z in lanes) best = Mathf.Min(best, z.DistanceTo(p));
+            return best;
+        }
+
+        /// <summary>
+        /// Versi Physics.CheckSphere modul 09 untuk map 3D: kapsul dimulai 0,35 m di atas tanah supaya jalan/terrain/curb
+        /// tidak dihitung obstacle, tapi tembok, container, tangki, dan cover terdeteksi.
+        /// </summary>
+        public bool Blocked(Vector3 groundPos, float radius, float height = 1.8f)
+        {
+            Vector3 a = groundPos + Vector3.up * (0.35f + radius);
+            Vector3 b = groundPos + Vector3.up * Mathf.Max(0.35f + radius, height - radius);
+            return Physics.CheckCapsule(a, b, radius, blockMask, QueryTriggerInteraction.Ignore);
+        }
+
+        /// <summary>OverlapBox untuk object procedural yang sudah di-instantiate; collider milik object itu sendiri diabaikan.</summary>
+        public bool Overlaps(Transform self, Vector3 center, Vector3 halfExtents, Quaternion rotation)
+        {
+            int n = Physics.OverlapBoxNonAlloc(center, halfExtents, overlapBuffer, rotation, blockMask, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var c = overlapBuffer[i];
+                if (c != null && !c.transform.IsChildOf(self)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>Selisih tinggi tanah di empat sudut footprint (deteksi ramp/tangga/pinggiran deck).</summary>
+        public bool TooSteep(Vector3 groundPos, float halfSize, float maxDelta)
+        {
+            float min = float.MaxValue, max = float.MinValue;
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 o = groundPos + new Vector3(i % 2 == 0 ? -halfSize : halfSize, 2.5f, i < 2 ? -halfSize : halfSize);
+                RaycastHit hit;
+                if (!Physics.Raycast(o, Vector3.down, out hit, 5f, groundProbeMask, QueryTriggerInteraction.Ignore)) return true;
+                min = Mathf.Min(min, hit.point.y); max = Mathf.Max(max, hit.point.y);
+            }
+            return max - min > maxDelta;
+        }
+
+        /// <summary>
+        /// Proyeksikan titik XZ ke permukaan paling atas (raycast dari langit), lalu pastikan permukaan itu NavMesh.
+        /// Map punya beberapa ketinggian (jalan 0 m, deck 2,2 m), jadi kandidat tidak boleh memakai satu tinggi tetap.
+        /// Atap bangunan / container otomatis gagal karena bukan NavMesh.
+        /// </summary>
+        public bool ProjectToNav(Vector3 xz, out Vector3 onNav, out Vector3 ground)
+        {
+            ground = xz; onNav = xz;
+            RaycastHit hit;
+            if (!Physics.Raycast(new Vector3(xz.x, 80f, xz.z), Vector3.down, out hit, 200f, groundProbeMask, QueryTriggerInteraction.Ignore)) return false;
+            ground = hit.point;
+            if (!SampleNav(hit.point, 0.8f, normalFilter, out onNav)) return false;
+            return Mathf.Abs(onNav.y - ground.y) < 0.5f && Flat(onNav - ground).sqrMagnitude < 0.64f;
+        }
+
+        public bool GroundAt(Vector3 p, out Vector3 ground)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(p + Vector3.up * 2.5f, Vector3.down, out hit, 6f, groundProbeMask, QueryTriggerInteraction.Ignore))
+            { ground = hit.point; return true; }
+            ground = p; return false;
+        }
+
+        public static Vector3 Flat(Vector3 v) { v.y = 0f; return v; }
+    }
+}

@@ -1,0 +1,25 @@
+{
+  "checks": {
+    "passed": true,
+    "sharedMenuFonts": true,
+    "rectangularWeaponPanels": true,
+    "rightOrangeAccent": true,
+    "themedMinimapBorder": true,
+    "smallAndLargeMapInViewport": true,
+    "progressiveTyping": true,
+    "repeatedMessageDoesNotRestart": true,
+    "typingPausesWithMenu": true,
+    "electronicSound": true,
+    "masterVolumeAndPauseRespected": true,
+    "instantHealthAndAmmo": true,
+    "bossWarningRed": true,
+    "generatorHealthUpdated": true,
+    "weaponSwitchUpdated": true,
+    "noClippedHudText": true,
+    "viewport": [
+      1718,
+      827
+    ]
+  },
+  "noReloadingText": true
+}

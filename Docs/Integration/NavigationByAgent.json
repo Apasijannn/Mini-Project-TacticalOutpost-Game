@@ -1,0 +1,215 @@
+{
+  "failures": 0,
+  "checks": [
+    {
+      "agent": "Humanoid",
+      "spawn": "West 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "West 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "North 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Humanoid",
+      "spawn": "South 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "West 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "North 07",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 01",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 02",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 03",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 04",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 05",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 06",
+      "reachableAttackPoints": 6
+    },
+    {
+      "agent": "Industrial Boss",
+      "spawn": "South 07",
+      "reachableAttackPoints": 6
+    }
+  ]
+}

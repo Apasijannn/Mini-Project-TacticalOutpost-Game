@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "simulationSeconds": 257.881378,
+  "generatorDamage": 35377.5,
+  "actors": [
+    {
+      "name": "boss_v1(Clone)",
+      "lane": "North",
+      "moved": 77.5266342,
+      "distanceToGenerator": 1.63806534,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "Advance"
+    },
+    {
+      "name": "Zombie_Walker(Clone)",
+      "lane": "North",
+      "moved": 79.0480042,
+      "distanceToGenerator": 1.90102959,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "AttackGenerator"
+    },
+    {
+      "name": "boss_v2(Clone)",
+      "lane": "South",
+      "moved": 41.622654,
+      "distanceToGenerator": 1.86114311,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "AttackGenerator"
+    },
+    {
+      "name": "Zombie_Walker(Clone)",
+      "lane": "South",
+      "moved": 38.1011734,
+      "distanceToGenerator": 2.13705063,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "AttackGenerator"
+    },
+    {
+      "name": "boss_v3(Clone)",
+      "lane": "West",
+      "moved": 55.465992,
+      "distanceToGenerator": 1.6287117,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "Advance"
+    },
+    {
+      "name": "Zombie_Walker(Clone)",
+      "lane": "West",
+      "moved": 53.570858,
+      "distanceToGenerator": 2.024006,
+      "arrived": true,
+      "isOnNavMesh": true,
+      "path": "PathComplete",
+      "state": "AttackGenerator"
+    }
+  ]
+}

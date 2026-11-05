@@ -1,0 +1,131 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b73954e5f55b33249bc3d23d78bd069c, type: 3}
+  m_Name: PCG_Profile
+  m_EditorClassIdentifier: Assembly-CSharp::Outpost.PCG.PcgProfile
+  useRandomSeed: 1
+  seed: 12345
+  proceduralPositions: 1
+  zoneDepth: 14
+  zoneWidthPadding: 1.5
+  checkRadius: 0.45
+  bossCheckRadius: 1.1
+  minimumSpacing: 1.4
+  minDistanceFromGenerator: 18
+  minDistanceFromPlayer: 12
+  requirePathToGenerator: 1
+  maxAttemptsPerObject: 40
+  reservePerLane: 6
+  laneTables:
+  - lane: 5
+    weights:
+    - variantId: walker
+      weight: 3
+    - variantId: bloater
+      weight: 1.5
+    - variantId: runner
+      weight: 2
+    - variantId: skinless
+      weight: 2
+  - lane: 1
+    weights:
+    - variantId: walker
+      weight: 2
+    - variantId: bloater
+      weight: 1
+    - variantId: runner
+      weight: 4
+    - variantId: skinless
+      weight: 2
+  - lane: 3
+    weights:
+    - variantId: walker
+      weight: 2
+    - variantId: bloater
+      weight: 3
+    - variantId: runner
+      weight: 1
+    - variantId: skinless
+      weight: 2
+  heavyLaneEvent: 1
+  heavyLaneShare: 0.5
+  randomBossOrder: 1
+  bossStagger: 3
+  useDifficultyBudget: 0
+  waveBudgets: 300000005000000070000000
+  costs:
+  - variantId: runner
+    cost: 1
+  - variantId: walker
+    cost: 2
+  - variantId: skinless
+    cost: 3
+  - variantId: bloater
+    cost: 3
+  supplyEnabled: 1
+  cachesPerWave: 3
+  supplyTable:
+  - kind: 0
+    weight: 60
+  - kind: 1
+    weight: 40
+  supplyMinRadius: 5
+  supplyMaxRadius: 30
+  supplyMinFromLane: 15
+  supplySpacing: 8
+  supplyMinFromPlayer: 4
+  coverEnabled: 1
+  coverCount: 10
+  coverTable:
+  - name: Road block
+    prefab: {fileID: 1000012744991898, guid: 36667f34d4b750c4695e409fb89b51f8, type: 3}
+    weight: 4
+  - name: Sandbags on pallet
+    prefab: {fileID: 1000012006241372, guid: 6d21e769def7d504ea22abcb06173633, type: 3}
+    weight: 3
+  - name: Sandbags on pallet 2
+    prefab: {fileID: 1000011569870456, guid: 7664aa771caa1ce42965283fa24dbbd2, type: 3}
+    weight: 2
+  - name: Wooden crate
+    prefab: {fileID: 1000011585897626, guid: 9d1bb44d500a3ad489d3cb3a6900199f, type: 3}
+    weight: 2
+  - name: Barrel cluster
+    prefab: {fileID: 1000012001423700, guid: efaf0e3818a9ab240983b51198f0a77a, type: 3}
+    weight: 2
+  coverMinRadius: 9
+  coverMaxRadius: 32
+  coverSpacing: 5
+  coverMinFromLane: 10
+  coverMinFromAttackPoint: 4
+  coverMinFromPlayerSpawn: 4
+  maxDetourRatio: 1.35
+  maxGroundSlope: 0.25
+  coverMaxAttempts: 40
+  dressingEnabled: 1
+  dressingCount: 30
+  dressingTable:
+  - name: Construction cone
+    prefab: {fileID: 120450, guid: c0a97f89f66be1840abe0471300c737f, type: 3}
+    weight: 3
+  - name: Cinder block
+    prefab: {fileID: 134010, guid: 380c131da968d424ab4902f967bc23d5, type: 3}
+    weight: 3
+  - name: Pallet
+    prefab: {fileID: 137192, guid: 7260bcfd3e8d1774fbb6e6cb8ef1f5ee, type: 3}
+    weight: 2
+  - name: Single barrel
+    prefab: {fileID: 1000012364095318, guid: a62abbb708e3f49489bde29e5cfc3ebd, type: 3}
+    weight: 1
+  dressingScale: {x: 0.85, y: 1.2}
+  dressingSpacing: 2.5
+  dressingMinFromAttackPoint: 3
+  dressingMaxAttempts: 30

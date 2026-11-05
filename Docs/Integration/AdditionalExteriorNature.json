@@ -1,0 +1,847 @@
+{
+  "treeCount": 48,
+  "stumpCount": 36,
+  "seed": 202610202,
+  "objects": [
+    {
+      "name": "Stump 01 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        79.72697,
+        2.77272058,
+        -34.66146
+      ],
+      "scale": 1.03940547
+    },
+    {
+      "name": "Stump 02 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        -0.9742775,
+        0.713022351,
+        -71.24336
+      ],
+      "scale": 1.113603
+    },
+    {
+      "name": "Stump 03 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        81.65343,
+        6.0558815,
+        35.5548859
+      ],
+      "scale": 1.1497364
+    },
+    {
+      "name": "Stump 04 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        -90.61609,
+        1.56451476,
+        -24.1730938
+      ],
+      "scale": 0.8165789
+    },
+    {
+      "name": "Stump 05 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        46.8573723,
+        4.67966652,
+        95.10452
+      ],
+      "scale": 0.932148337
+    },
+    {
+      "name": "Dry tree 01 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        48.1917877,
+        5.18118,
+        81.3453445
+      ],
+      "scale": 0.7654722
+    },
+    {
+      "name": "Stump 06 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        -39.1271973,
+        2.87095046,
+        70.1861038
+      ],
+      "scale": 0.893431246
+    },
+    {
+      "name": "Stump 07 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        23.653286,
+        1.88004339,
+        94.10928
+      ],
+      "scale": 0.874475062
+    },
+    {
+      "name": "Dry tree 02 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        -50.1188965,
+        4.421527,
+        83.35047
+      ],
+      "scale": 0.8952122
+    },
+    {
+      "name": "Stump 08 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        93.34451,
+        4.14482975,
+        -42.8028259
+      ],
+      "scale": 0.8749176
+    },
+    {
+      "name": "Stump 09 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        -23.6318817,
+        1.327362,
+        -71.7915039
+      ],
+      "scale": 0.850557148
+    },
+    {
+      "name": "Stump 10 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        58.5475578,
+        4.112314,
+        -75.97845
+      ],
+      "scale": 1.01546264
+    },
+    {
+      "name": "Stump 11 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        94.11008,
+        3.16569543,
+        8.239464
+      ],
+      "scale": 0.9509298
+    },
+    {
+      "name": "Stump 12 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        62.9493332,
+        4.47764,
+        -95.5838852
+      ],
+      "scale": 0.910614669
+    },
+    {
+      "name": "Stump 13 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        91.6519852,
+        3.80937552,
+        -39.5748558
+      ],
+      "scale": 0.8569493
+    },
+    {
+      "name": "Dry tree 03 - Dry5818",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry5818.prefab",
+      "position": [
+        84.90563,
+        5.04441071,
+        27.3134823
+      ],
+      "scale": 0.911801636
+    },
+    {
+      "name": "Stump 14 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        -49.75254,
+        1.38368809,
+        58.7708855
+      ],
+      "scale": 1.21682835
+    },
+    {
+      "name": "Stump 15 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        -65.00807,
+        0.9762806,
+        17.4750633
+      ],
+      "scale": 1.04120624
+    },
+    {
+      "name": "Stump 16 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        101.954407,
+        3.00756764,
+        -30.6775322
+      ],
+      "scale": 0.8808511
+    },
+    {
+      "name": "Stump 17 - Stump_fresh_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_fresh_prefab.prefab",
+      "position": [
+        40.92575,
+        4.43723536,
+        80.00187
+      ],
+      "scale": 0.9625051
+    },
+    {
+      "name": "Stump 18 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        34.46768,
+        3.36606,
+        81.8412247
+      ],
+      "scale": 1.12359393
+    },
+    {
+      "name": "Stump 19 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        38.7671242,
+        1.87681329,
+        -76.7381439
+      ],
+      "scale": 0.911272049
+    },
+    {
+      "name": "Stump 20 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        -45.999054,
+        2.9950912,
+        66.7472458
+      ],
+      "scale": 1.0653851
+    },
+    {
+      "name": "Stump 21 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        55.2482376,
+        3.74809527,
+        -82.1976242
+      ],
+      "scale": 1.07829344
+    },
+    {
+      "name": "Stump 22 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        -85.78648,
+        5.17661667,
+        -88.05326
+      ],
+      "scale": 1.0657624
+    },
+    {
+      "name": "Stump 23 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        -54.67891,
+        3.91932273,
+        92.6004639
+      ],
+      "scale": 0.8439139
+    },
+    {
+      "name": "Stump 24 - Stump_fresh_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_fresh_prefab.prefab",
+      "position": [
+        -76.2412338,
+        5.06656,
+        -86.4407
+      ],
+      "scale": 0.802484751
+    },
+    {
+      "name": "Stump 25 - Stump_fresh_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_fresh_prefab.prefab",
+      "position": [
+        26.3199043,
+        2.36875057,
+        90.49553
+      ],
+      "scale": 0.8317255
+    },
+    {
+      "name": "Stump 26 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        98.3497,
+        6.83202839,
+        36.6253777
+      ],
+      "scale": 0.907895148
+    },
+    {
+      "name": "Stump 27 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        -17.2812119,
+        0.692258239,
+        -64.346756
+      ],
+      "scale": 0.924867034
+    },
+    {
+      "name": "Stump 28 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        98.72216,
+        4.709962,
+        22.5076942
+      ],
+      "scale": 0.9119345
+    },
+    {
+      "name": "Stump 29 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        31.0440941,
+        2.75519252,
+        72.67082
+      ],
+      "scale": 1.24416518
+    },
+    {
+      "name": "Stump 30 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        30.725708,
+        2.88185763,
+        75.669
+      ],
+      "scale": 1.1828059
+    },
+    {
+      "name": "Stump 31 - Stump_two_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_two_prefab.prefab",
+      "position": [
+        -18.39368,
+        1.295787,
+        69.06323
+      ],
+      "scale": 1.23317575
+    },
+    {
+      "name": "Stump 32 - Stump_fresh_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_fresh_prefab.prefab",
+      "position": [
+        -61.6595764,
+        0.7384583,
+        -43.5629921
+      ],
+      "scale": 1.24616218
+    },
+    {
+      "name": "Stump 33 - Stump_nobark_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_nobark_prefab.prefab",
+      "position": [
+        -80.52728,
+        5.1014595,
+        -90.09882
+      ],
+      "scale": 1.14656031
+    },
+    {
+      "name": "Stump 34 - Stump_fresh_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_fresh_prefab.prefab",
+      "position": [
+        37.6930847,
+        3.78863549,
+        73.52685
+      ],
+      "scale": 0.9909618
+    },
+    {
+      "name": "Stump 35 - Stump_old2_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old2_prefab.prefab",
+      "position": [
+        54.8679237,
+        3.75912642,
+        -79.27212
+      ],
+      "scale": 1.2319386
+    },
+    {
+      "name": "Stump 36 - Stump_old_prefab",
+      "prefab": "Assets/GreenBugGames/Scan Stump Vol.1/Prefabs/Stump_old_prefab.prefab",
+      "position": [
+        -59.39,
+        0.494227737,
+        28.0191021
+      ],
+      "scale": 1.06885564
+    },
+    {
+      "name": "Dry tree 04 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        -36.40287,
+        2.3175745,
+        95.4431152
+      ],
+      "scale": 0.845241666
+    },
+    {
+      "name": "Dry tree 05 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        84.38761,
+        3.55269337,
+        -40.4839134
+      ],
+      "scale": 0.9394421
+    },
+    {
+      "name": "Dry tree 06 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        81.3505249,
+        6.17348766,
+        -95.1458359
+      ],
+      "scale": 1.07625437
+    },
+    {
+      "name": "Dry tree 07 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        66.22945,
+        0.47683847,
+        -24.7514915
+      ],
+      "scale": 0.804029942
+    },
+    {
+      "name": "Dry tree 08 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        83.4672546,
+        7.140319,
+        42.4395256
+      ],
+      "scale": 1.05374694
+    },
+    {
+      "name": "Dry tree 09 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        -68.03794,
+        3.6502552,
+        -69.679306
+      ],
+      "scale": 0.9579877
+    },
+    {
+      "name": "Dry tree 10 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        43.41594,
+        4.27962971,
+        74.02333
+      ],
+      "scale": 0.8136977
+    },
+    {
+      "name": "Dry tree 11 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        86.88233,
+        10.9523153,
+        69.3462753
+      ],
+      "scale": 0.755860031
+    },
+    {
+      "name": "Dry tree 12 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        20.9878273,
+        1.74815547,
+        100.7494
+      ],
+      "scale": 0.8292446
+    },
+    {
+      "name": "Dry tree 13 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        105.574104,
+        2.276679,
+        -23.2513638
+      ],
+      "scale": 0.7733076
+    },
+    {
+      "name": "Dry tree 14 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        67.3470459,
+        8.399051,
+        82.25723
+      ],
+      "scale": 0.987854958
+    },
+    {
+      "name": "Dry tree 15 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        72.8927,
+        1.674815,
+        -37.14843
+      ],
+      "scale": 0.9342133
+    },
+    {
+      "name": "Dry tree 16 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -56.5519333,
+        4.985101,
+        72.6499252
+      ],
+      "scale": 0.8158687
+    },
+    {
+      "name": "Dry tree 17 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        -86.22136,
+        1.58316457,
+        -30.0291386
+      ],
+      "scale": 0.751318634
+    },
+    {
+      "name": "Dry tree 18 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        0.1698494,
+        0.960530639,
+        -76.973
+      ],
+      "scale": 0.8268388
+    },
+    {
+      "name": "Dry tree 19 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        1.648365,
+        0.5716485,
+        -87.43969
+      ],
+      "scale": 0.791004062
+    },
+    {
+      "name": "Dry tree 20 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        104.069366,
+        4.41592026,
+        21.6556644
+      ],
+      "scale": 1.038317
+    },
+    {
+      "name": "Dry tree 21 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        -25.390974,
+        1.43196762,
+        -93.41772
+      ],
+      "scale": 0.892452
+    },
+    {
+      "name": "Dry tree 22 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        104.25425,
+        6.19648075,
+        32.60136
+      ],
+      "scale": 0.7237004
+    },
+    {
+      "name": "Dry tree 23 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        -64.17543,
+        5.237506,
+        87.5606842
+      ],
+      "scale": 0.9219289
+    },
+    {
+      "name": "Dry tree 24 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        83.22917,
+        8.666495,
+        53.5372
+      ],
+      "scale": 1.02460957
+    },
+    {
+      "name": "Dry tree 25 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -56.5128059,
+        3.600133,
+        -79.74331
+      ],
+      "scale": 0.8904869
+    },
+    {
+      "name": "Dry tree 26 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        91.4644547,
+        7.24273,
+        40.6566124
+      ],
+      "scale": 0.75784725
+    },
+    {
+      "name": "Dry tree 27 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -16.5527573,
+        1.02794445,
+        -99.12813
+      ],
+      "scale": 0.9149883
+    },
+    {
+      "name": "Dry tree 28 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        85.55342,
+        3.25057125,
+        11.5400581
+      ],
+      "scale": 0.804003656
+    },
+    {
+      "name": "Dry tree 29 - Dry5818",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry5818.prefab",
+      "position": [
+        -56.1276665,
+        3.69970226,
+        -91.0663452
+      ],
+      "scale": 0.7675264
+    },
+    {
+      "name": "Dry tree 30 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        -16.9648972,
+        0.7937468,
+        97.16165
+      ],
+      "scale": 0.819130242
+    },
+    {
+      "name": "Dry tree 31 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        77.9392853,
+        1.841216,
+        -25.3517056
+      ],
+      "scale": 0.7773758
+    },
+    {
+      "name": "Dry tree 32 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        105.120018,
+        2.03323269,
+        -15.2409658
+      ],
+      "scale": 0.797883332
+    },
+    {
+      "name": "Dry tree 33 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        -49.8501625,
+        3.97178555,
+        70.70942
+      ],
+      "scale": 0.740376949
+    },
+    {
+      "name": "Dry tree 34 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        -40.67763,
+        3.22635555,
+        75.97518
+      ],
+      "scale": 0.8240183
+    },
+    {
+      "name": "Dry tree 35 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -79.9514542,
+        4.74968243,
+        -82.17598
+      ],
+      "scale": 0.7598065
+    },
+    {
+      "name": "Dry tree 36 - Dry7509",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry7509.prefab",
+      "position": [
+        96.1761856,
+        9.582828,
+        56.09729
+      ],
+      "scale": 0.7305295
+    },
+    {
+      "name": "Dry tree 37 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        -65.71093,
+        4.31246138,
+        -83.1161346
+      ],
+      "scale": 0.8025666
+    },
+    {
+      "name": "Dry tree 38 - Dry8872",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry8872.prefab",
+      "position": [
+        49.7403564,
+        5.605733,
+        90.8915
+      ],
+      "scale": 0.9504523
+    },
+    {
+      "name": "Dry tree 39 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -39.8388939,
+        1.80490577,
+        64.27791
+      ],
+      "scale": 0.7758697
+    },
+    {
+      "name": "Dry tree 40 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        44.1490059,
+        1.97170341,
+        -103.412491
+      ],
+      "scale": 0.933344543
+    },
+    {
+      "name": "Dry tree 41 - Dry4195",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4195.prefab",
+      "position": [
+        74.2218246,
+        9.453643,
+        81.41277
+      ],
+      "scale": 0.725208
+    },
+    {
+      "name": "Dry tree 42 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        97.86397,
+        5.54285336,
+        29.5750046
+      ],
+      "scale": 0.783815742
+    },
+    {
+      "name": "Dry tree 43 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        -77.30289,
+        4.811105,
+        -95.62989
+      ],
+      "scale": 0.7249254
+    },
+    {
+      "name": "Dry tree 44 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -88.41853,
+        4.885501,
+        -82.5068741
+      ],
+      "scale": 0.720688045
+    },
+    {
+      "name": "Dry tree 45 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        73.438385,
+        4.65786457,
+        -109.593155
+      ],
+      "scale": 1.07435536
+    },
+    {
+      "name": "Dry tree 46 - Dry4910",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry4910.prefab",
+      "position": [
+        64.31698,
+        7.689084,
+        73.0729
+      ],
+      "scale": 0.823485136
+    },
+    {
+      "name": "Dry tree 47 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        95.27894,
+        3.47511387,
+        13.5503149
+      ],
+      "scale": 0.749541759
+    },
+    {
+      "name": "Dry tree 48 - Dry3333",
+      "prefab": "Assets/Dry_Trees/Prefab/Dry3333.prefab",
+      "position": [
+        -0.947526,
+        0.5832757,
+        -93.0678253
+      ],
+      "scale": 0.8511608
+    }
+  ]
+}

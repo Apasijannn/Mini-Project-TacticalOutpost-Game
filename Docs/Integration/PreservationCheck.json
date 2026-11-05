@@ -1,0 +1,73 @@
+{
+  "checked": 2115,
+  "changed": [
+    "Assets/TacticalOutpost/Documentation/README.md",
+    "ProjectSettings/EditorBuildSettings.asset",
+    "ProjectSettings/TagManager.asset"
+  ],
+  "missing": [],
+  "moved": [
+    {
+      "source": "AgentScripts/ExteriorDressing.cs",
+      "destination": "Tools/SceneAuthoring/ExteriorDressing.cs"
+    },
+    {
+      "source": "AgentScripts/GeneratorDustBeams.cs",
+      "destination": "Tools/SceneAuthoring/GeneratorDustBeams.cs"
+    },
+    {
+      "source": "AgentScripts/GeneratorRedLights.cs",
+      "destination": "Tools/SceneAuthoring/GeneratorRedLights.cs"
+    },
+    {
+      "source": "AgentScripts/OutpostAssetAudit.cs",
+      "destination": "Tools/SceneAuthoring/OutpostAssetAudit.cs"
+    },
+    {
+      "source": "AgentScripts/OutpostBarrelDressing.cs",
+      "destination": "Tools/SceneAuthoring/OutpostBarrelDressing.cs"
+    },
+    {
+      "source": "AgentScripts/OutpostBuilder.cs",
+      "destination": "Tools/SceneAuthoring/OutpostBuilder.cs"
+    },
+    {
+      "source": "AgentScripts/OutpostNightLighting.cs",
+      "destination": "Tools/SceneAuthoring/OutpostNightLighting.cs"
+    },
+    {
+      "source": "AgentScripts/PipeSocketAudit.cs",
+      "destination": "Tools/SceneAuthoring/PipeSocketAudit.cs"
+    },
+    {
+      "source": "AgentScripts/ReplaceBarrelFire.cs",
+      "destination": "Tools/SceneAuthoring/ReplaceBarrelFire.cs"
+    },
+    {
+      "source": "AgentScripts/TowerFloodlights.cs",
+      "destination": "Tools/SceneAuthoring/TowerFloodlights.cs"
+    },
+    {
+      "source": "AgentScripts/WidenBarrelFire.cs",
+      "destination": "Tools/SceneAuthoring/WidenBarrelFire.cs"
+    },
+    {
+      "source": "Assets/Scenes/ArtistDemo_Reference.unity",
+      "destination": "Assets/Scenes/References/ArtistDemo_Reference.unity"
+    },
+    {
+      "source": "Assets/Scenes/ArtistDemo_Reference.unity.meta",
+      "destination": "Assets/Scenes/References/ArtistDemo_Reference.unity.meta"
+    },
+    {
+      "source": "Assets/Scenes/Outpost_Draft.unity",
+      "destination": "Assets/Scenes/Archive/Outpost_Draft.unity"
+    },
+    {
+      "source": "Assets/Scenes/Outpost_Draft.unity.meta",
+      "destination": "Assets/Scenes/Archive/Outpost_Draft.unity.meta"
+    }
+  ],
+  "unexpected_changes": [],
+  "environment_assets_unchanged": true
+}

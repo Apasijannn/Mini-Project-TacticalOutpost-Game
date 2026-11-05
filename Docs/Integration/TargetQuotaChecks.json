@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "normalPlayerFraction": 0.5,
+  "activeLivingDenominator": true,
+  "bossIncluded": true,
+  "fifoPreservesExistingPursuers": true,
+  "oldestWaitingGetsSlot": true,
+  "dynamicSpawnAndDeathQuota": true,
+  "oddCountsRoundUp": true,
+  "newHitDoesNotStealSlot": true,
+  "localHitAlertRadius": 8,
+  "nearbyHearingRecruitment": true,
+  "meleeCanExceedQuota": true,
+  "walkingEnemiesReactAtMelee": true,
+  "retreatRestoresFifo": true,
+  "generatorCommitmentIgnoresDistantGunfire": true,
+  "committedMeleeOverride": true,
+  "committedReturnsAfterRetreat": true,
+  "disabledBrainReleasesSlot": true,
+  "restartClean": true,
+  "generatorMaxHealth": 1000
+}

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "death": "DEAD\n<size=28>Get back in the fight. Press ENTER to try again.</size>",
+  "reload": "Press R to reload",
+  "emptyAmmo": "Out of ammo. Find a resupply.",
+  "bossTitle": "BOSSES INBOUND",
+  "redTitle": true,
+  "redGlow": true,
+  "warningBeforeArrival": true
+}

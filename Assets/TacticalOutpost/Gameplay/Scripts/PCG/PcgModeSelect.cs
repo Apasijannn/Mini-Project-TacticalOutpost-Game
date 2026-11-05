@@ -1,0 +1,196 @@
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using Outpost.UI;
+using Outpost.Dungeon;
+
+namespace Outpost.PCG
+{
+    /// <summary>
+    /// Pemilih mode setelah START OPERATION: Mini Project (game asli), Procedural Content Generation (Modul 09),
+    /// atau Procedural Dungeon (Modul 10, kartu ketiga; lihat Outpost.Dungeon.DungeonMode).
+    /// Ditempel otomatis ke GameMenu di scene menu oleh PcgMode; GameMenu sendiri tidak diubah.
+    /// Dua kartu berdampingan (kiri-kanan): gambar preview map, judul, dan deskripsi.
+    /// Gambar preview = render map asli, dibuat lewat menu Tactical Outpost → PCG → Capture Mode Previews
+    /// dan disimpan di Resources/PCG/Preview_MiniProject.png dan Preview_PCG.png.
+    /// </summary>
+    public sealed class PcgModeSelect : MonoBehaviour
+    {
+        public const string MiniPreviewPath = "PCG/Preview_MiniProject";
+        public const string PcgPreviewPath = "PCG/Preview_PCG";
+        public const string DungeonPreviewPath = "Dungeon/Preview_Dungeon";
+
+        GameMenu menu;
+        GameObject chooser;
+        CanvasGroup group;
+        Button firstChoice;
+
+        IEnumerator Start()
+        {
+            menu = GetComponent<GameMenu>();
+            Button start = null;
+            for (int frame = 0; frame < 60 && start == null; frame++)
+            {
+                yield return null;                                   // tunggu GameMenu selesai membangun UI
+                foreach (var b in GetComponentsInChildren<Button>(true))
+                    if (b.name == "START") { start = b; break; }
+            }
+            if (start == null) { Debug.LogWarning("[PCG] Tombol START OPERATION tidak ditemukan; pemilih mode tidak dipasang.", this); yield break; }
+            start.onClick.RemoveAllListeners();
+            start.onClick.AddListener(Open);
+            BuildUi();
+            chooser.SetActive(false);
+        }
+
+        void Update()
+        {
+            if (chooser == null || !chooser.activeSelf) return;
+            group.alpha = Mathf.MoveTowards(group.alpha, 1f, Time.unscaledDeltaTime * 5f);
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) Close();
+        }
+
+        void Open()
+        {
+            chooser.SetActive(true); group.alpha = 0f;
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(firstChoice.gameObject);
+        }
+
+        void Close() { chooser.SetActive(false); }
+
+        /// <summary>0 = Mini Project, 1 = PCG, 2 = Procedural Dungeon.</summary>
+        void Launch(int mode)
+        {
+            PcgMode.Active = mode == 1;
+            DungeonMode.Active = mode == 2;
+            chooser.SetActive(false);
+            menu.StartGame();
+        }
+
+        // ---------------------------------------------------------------- UI
+
+        // Tiga kartu berdampingan; lebar kartu dihitung dari jumlah kartu, gambar tetap 16:9.
+        const int Cards = 3;
+        const float PanelW = 1500, PanelH = 820, Gap = 30, CardH = 590;
+        const float CardW = (PanelW - 80 - Gap * (Cards - 1)) / Cards, ImageH = CardW * 9f / 16f;
+
+        void BuildUi()
+        {
+            chooser = new GameObject("PCG Mode Select", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            chooser.transform.SetParent(transform, false);
+            var canvas = chooser.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 205;
+            var scaler = chooser.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+            group = chooser.AddComponent<CanvasGroup>();
+
+            var shade = Box("Shade", chooser.transform, 0, 0, 0, 0, new Color(.015f, .025f, .027f, .86f));
+            var sr = shade.rectTransform; sr.anchorMin = Vector2.zero; sr.anchorMax = Vector2.one; sr.offsetMin = sr.offsetMax = Vector2.zero;
+            shade.raycastTarget = true;
+
+            var frame = At("Frame", chooser.transform, 0, 0, 1920, 1080);
+            frame.anchorMin = frame.anchorMax = frame.pivot = new Vector2(.5f, .5f); frame.anchoredPosition = Vector2.zero;
+
+            var panel = Box("Mode panel", frame, (1920 - PanelW) / 2, (1080 - PanelH) / 2, PanelW, PanelH, GameMenu.Panel).rectTransform;
+            Box("Top edge", panel, 0, 0, PanelW, 2, GameMenu.Amber);
+            Label("Category", panel, "OUTPOST COMMAND  /  SELECT OPERATION MODE", 40, 30, 900, 25, 15, GameMenu.Amber, menu.monoFont);
+            Label("Heading", panel, "CHOOSE YOUR OPERATION", 38, 60, 1000, 66, 52, GameMenu.Ivory, menu.headingFont);
+            MakeBackButton(panel, PanelW - 200, 30, 160, 45);
+
+            float cardY = 150;
+            firstChoice = MakeCard("MODE MINI PROJECT", panel, 40, cardY, "MODE 01", "MINI PROJECT", "Original industrial outpost. Focus: Game AI.",
+                "The existing industrial map. Three fixed lanes and 21 fixed spawn points. Gameplay and zombie AI stay exactly as before (perception, memory, FSM + utility).",
+                MiniPreviewPath, () => Launch(0));
+            var pcgCard = MakeCard("MODE PCG", panel, 40 + (CardW + Gap), cardY, "MODE 02", "PROCEDURAL CONTENT GENERATION", "Seeded procedural arena (Module 09).",
+                "A new arena is assembled from the project's own assets every match: gates, obstacles, spawn points, supply caches. Same seed = same layout. Every placement is validated.",
+                PcgPreviewPath, () => Launch(1));
+            var dungeonCard = MakeCard("MODE DUNGEON", panel, 40 + (CardW + Gap) * 2, cardY, "MODE 03", "PROCEDURAL DUNGEON", "BSP room-corridor dungeon (Module 10).",
+                "A walled compound is generated from a grid every run: BSP rooms, L-corridors, start, goal, zombies and supplies. Validated with BFS. Reach the generator to restore power.",
+                DungeonPreviewPath, () => Launch(2));
+
+            // Navigasi keyboard/gamepad kiri-kanan antar kartu (berantai).
+            firstChoice.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnRight = pcgCard };
+            pcgCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = firstChoice, selectOnRight = dungeonCard };
+            dungeonCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = pcgCard };
+
+            Label("Footer", panel, "Modes 01-02: protect the generator for 3 waves.  Mode 03: reach the generator.   ← → select  ·  ENTER start  ·  ESC back",
+                40, PanelH - 50, PanelW - 80, 30, 15, GameMenu.Muted, menu.monoFont);
+        }
+
+        Button MakeCard(string name, Transform parent, float x, float y, string tag, string title, string hint, string description,
+            string previewPath, UnityEngine.Events.UnityAction action)
+        {
+            var bg = Box(name, parent, x, y, CardW, CardH, Color.white); bg.raycastTarget = true;
+            var button = bg.gameObject.AddComponent<Button>(); button.targetGraphic = bg;
+            var colors = button.colors;
+            colors.normalColor = new Color(.075f, .095f, .095f, .96f);
+            colors.highlightedColor = new Color(.20f, .15f, .07f, 1f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.pressedColor = new Color(.32f, .22f, .08f, 1f);
+            colors.fadeDuration = .12f; button.colors = colors;
+
+            // Gambar preview map.
+            var sprite = Resources.Load<Sprite>(previewPath);
+            var shot = Box("Preview", bg.transform, 0, 0, CardW, ImageH, sprite != null ? Color.white : new Color(.03f, .04f, .04f, 1f));
+            if (sprite != null) { shot.sprite = sprite; shot.preserveAspect = false; }
+            else Label("No preview", shot.transform, "PREVIEW MAP BELUM DIBUAT\nTactical Outpost → PCG/Dungeon → Capture Preview", 0, 0, CardW, ImageH, 16,
+                GameMenu.Muted, menu.monoFont, TextAlignmentOptions.Center);
+            Box("Preview shade", bg.transform, 0, ImageH - 70, CardW, 70, new Color(0f, 0f, 0f, .45f));
+
+            var tagBox = Box("Tag", bg.transform, 16, 16, 110, 30, GameMenu.Amber);
+            Label("Tag text", tagBox.transform, tag, 0, 0, 110, 30, 15, new Color(.055f, .07f, .065f), menu.monoFont, TextAlignmentOptions.Center);
+
+            // Sorot kartu terpilih: garis amber bawah gambar + tepi kiri.
+            Box("Accent", bg.transform, 0, ImageH, CardW, 4, GameMenu.Amber);
+            Box("Edge", bg.transform, 0, 0, 3, CardH, GameMenu.Amber);
+
+            var head = Label("Title", bg.transform, title, 24, ImageH + 20, CardW - 48, 40, 30, GameMenu.Ivory, menu.headingFont);
+            head.enableAutoSizing = true; head.fontSizeMin = 18; head.fontSizeMax = 30;            // judul panjang tetap satu baris
+            Label("Hint", bg.transform, hint, 24, ImageH + 64, CardW - 48, 24, 15, GameMenu.Amber, menu.monoFont);
+            Label("Description", bg.transform, description, 24, ImageH + 96, CardW - 48, CardH - ImageH - 110, 18, GameMenu.Muted, menu.bodyFont);
+
+            button.onClick.AddListener(action);
+            return button;
+        }
+
+        void MakeBackButton(Transform parent, float x, float y, float width, float height)
+        {
+            var image = Box("BACK", parent, x, y, width, height, Color.white); image.raycastTarget = true;
+            var button = image.gameObject.AddComponent<Button>(); button.targetGraphic = image;
+            var colors = button.colors;
+            colors.normalColor = new Color(.085f, .11f, .11f, .92f);
+            colors.highlightedColor = new Color(.20f, .25f, .24f);
+            colors.selectedColor = colors.highlightedColor;
+            colors.pressedColor = new Color(.29f, .34f, .31f);
+            colors.fadeDuration = .12f; button.colors = colors;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+            Box("Edge", image.transform, 0, 0, 2, height, GameMenu.Amber);
+            Label("Label", image.transform, "BACK / ESC", 24, 0, width - 42, height, 20, GameMenu.Ivory, menu.headingFont, TextAlignmentOptions.MidlineLeft);
+            button.onClick.AddListener(Close);
+        }
+
+        RectTransform At(string name, Transform parent, float x, float y, float width, float height)
+        {
+            var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>(); rect.SetParent(parent, false);
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
+            rect.anchoredPosition = new Vector2(x, -y); rect.sizeDelta = new Vector2(width, height); return rect;
+        }
+
+        Image Box(string name, Transform parent, float x, float y, float width, float height, Color color)
+        {
+            var image = At(name, parent, x, y, width, height).gameObject.AddComponent<Image>();
+            image.color = color; image.raycastTarget = false; return image;
+        }
+
+        TMP_Text Label(string name, Transform parent, string text, float x, float y, float width, float height, float size, Color color,
+            TMP_FontAsset face, TextAlignmentOptions align = TextAlignmentOptions.TopLeft)
+        {
+            var label = At(name, parent, x, y, width, height).gameObject.AddComponent<TextMeshProUGUI>();
+            label.font = face != null ? face : TMP_Settings.defaultFontAsset;
+            label.text = text; label.fontSize = size; label.color = color; label.alignment = align;
+            label.raycastTarget = false; return label;
+        }
+    }
+}

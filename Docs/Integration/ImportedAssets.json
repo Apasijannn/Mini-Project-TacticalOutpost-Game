@@ -1,0 +1,1208 @@
+[
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Icons/Icon_48.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Icons/Icon_48.png",
+    "guid": "f67a3f8a1e03e2d4fb68d79478d93b7d",
+    "sha256": "a954c2da4848ec81a1786b6e85269ca70bf63f61fa3a1b3583bf92ac0be04295"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Icons/Icon_56.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Icons/Icon_56.png",
+    "guid": "3de3c88927a1ed7469944b0f0e885c0a",
+    "sha256": "9ba76a10b7c60e3ebd34dccb2bf4a3f3b29a1c7d1d6b7dd248d14a4a5b422110"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_14.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_14.png",
+    "guid": "d40b3ee592a661d47a55204d69a5f105",
+    "sha256": "df3f58a9a822b9c34f3bf6fcdbc46e8a5348e093b56d2e9c1e8f9ae367e194df"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_15.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_15.png",
+    "guid": "68c7fb360c1c6bf46a4699b67076b14b",
+    "sha256": "b1760f5fb9291ef2969bdc448b7a1ae6fd2cd29a8e0922654b307fb00a43d468"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_22.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_22.png",
+    "guid": "26db169d43b02194b985b58e62bd1182",
+    "sha256": "b40c31aa776cf901266c8c056e9308d72167b78d3732d16c6c4006c54bfce591"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_24.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_24.png",
+    "guid": "a8dbce4c13ec9d74aa4ef22c3183a834",
+    "sha256": "278d6d5af91911ccf3b2940ee2e06ca028816f605306c7a50693c9cd550f4720"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_32.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_32.png",
+    "guid": "5a60e74103c212943af8d3df4a46dd96",
+    "sha256": "c5891615d290a203207e24c116c038fb4742103dab62c9fcea906cc6f3b84b8f"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_34.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_34.png",
+    "guid": "1ee0afae1da9af5458a3c3084ed94b88",
+    "sha256": "44428b17c1048f55d7c2b16523117aa515a496d67bde5248d033c5700373a2e0"
+  },
+  {
+    "source": "Assets/2D Gui Shooter + Icons/Ui/Icon_35.png",
+    "destination": "Assets/ThirdParty/Gameplay/2D Gui Shooter + Icons/Ui/Icon_35.png",
+    "guid": "d8a9453770c85ac40b9d99b9977b861d",
+    "sha256": "735e8b6ad2bf733ec5fd39030bd7a550a8ee1695127e87238ccfed52a07c1d9b"
+  },
+  {
+    "source": "Assets/AmmoBox/AmmoBox.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/AmmoBox/AmmoBox.FBX",
+    "guid": "45fb3b613218da844b047d1f9349e0d6",
+    "sha256": "8f3ddf6691667b64057ff0adff6e69cca9e7889bfb2c226369fb198e39a4045f"
+  },
+  {
+    "source": "Assets/AmmoBox/AmmoBox.tga",
+    "destination": "Assets/ThirdParty/Gameplay/AmmoBox/AmmoBox.tga",
+    "guid": "8330362510e161043a31652a6683bc3c",
+    "sha256": "adba41cdadca2a1af97100fa21a8c66b40d0cc2aec5e1d03a0416bf82677f628"
+  },
+  {
+    "source": "Assets/AmmoBox/AmmoBox_bump.tga",
+    "destination": "Assets/ThirdParty/Gameplay/AmmoBox/AmmoBox_bump.tga",
+    "guid": "f7c67e9960f5aff47b77b3da14a94a98",
+    "sha256": "96d6dc14b1d8d5439d9b119532d2b5b741106b7c6b0289db1943936f1b63705f"
+  },
+  {
+    "source": "Assets/AmmoBox/Materials/AmmoBox.mat",
+    "destination": "Assets/ThirdParty/Gameplay/AmmoBox/Materials/AmmoBox.mat",
+    "guid": "644d55a5e31414a4e85d01cfef9ab1ee",
+    "sha256": "5d534e6bc265089094cfe5eea91d97f585af10b3774f83c3c68da4c656eafe7f"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Materials/Ak47_Mat.mat",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Materials/Ak47_Mat.mat",
+    "guid": "c6df1ede81957904ea3a2e5f352e4f15",
+    "sha256": "831dd1e8ace197ca68e85ba5140dfcc845739c66e99fb52518003a37fb15860a"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Materials/InsurgentUrban_Mat.mat",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Materials/InsurgentUrban_Mat.mat",
+    "guid": "2e3d6d77fb21c3c44ac14cb231090601",
+    "sha256": "b56b569a0861eb2ff3e95235ea149d11032d37e7480fe3769c12ed8d5edf46dd"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Model/Ak47.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Model/Ak47.fbx",
+    "guid": "ccbb361d3cdc5fd4aaca27d4bf4a76e9",
+    "sha256": "9e3203ba2d06503efeb362f721b4455f339f2e6b27908c39b376a3c784a1910e"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Model/InsurgentUrban.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Model/InsurgentUrban.fbx",
+    "guid": "4bd73410f1f65ae4da0232970b56b397",
+    "sha256": "8df8d55db81b380a0afda9bfb91e6517f68e87aa79f9dbde16c959ac0a3b0739"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Prefab/Ak47.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Prefab/Ak47.prefab",
+    "guid": "c73dfe6eccdbe2e478fc9fb0e6801be3",
+    "sha256": "99827d07504ca92994480b835590f3d3dec8ab1c7d3fa90a90044001a380568f"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Prefab/InsurgentUrban.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Prefab/InsurgentUrban.prefab",
+    "guid": "418549c423a213342987713be721f449",
+    "sha256": "4acb54a2e3e7d368189ffc16d14a487ec8e94a409d3b3c443a9e632be9630550"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Ak47_Albedo.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Ak47_Albedo.png",
+    "guid": "40a89bd67b95c874f8c4b9e0ca72c639",
+    "sha256": "af18457e9d6ec287b644a824136b13b288bde46c5e841d7d73ff04b08005c82c"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Ak47_MetallicSmoothness.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Ak47_MetallicSmoothness.png",
+    "guid": "72bd1da93e414a84f8e0ac9d6fd3305a",
+    "sha256": "f16d37b57caf656af116e7262bfa318da00ad968957df8226357756f9387290d"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Ak47_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Ak47_Normal.png",
+    "guid": "7da866b2cb45bde4f98fb858f9c7c299",
+    "sha256": "2eba55bb979cd3cd6d6ce19edec2fd95ace6d4798e60d816b4c48902585a0688"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_BaseMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_BaseMap.png",
+    "guid": "6071cf91cc3f80d4ebd9280935fcd8ce",
+    "sha256": "102da96c7d1fc6de3e938da4556609bafceb94c4cbd9cbd0f293986e89ba4d4f"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_MetallicSmoothness.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_MetallicSmoothness.png",
+    "guid": "2722e54392124964da828690cd7f0a30",
+    "sha256": "c4c4fddc35ec16e5a497c88ae65651c713e144fa649dc0cca5bed86f520853d7"
+  },
+  {
+    "source": "Assets/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/ArtStore3D/Insurgent (Urban)/Texture/Insurgent Urban_Normal.png",
+    "guid": "0dc15dc946e102c4291b284b5a4b3a1a",
+    "sha256": "3f96dc502c8f22980705d63a6cbd20a7a7e5243c9cf054885675b5bd09ad8a48"
+  },
+  {
+    "source": "Assets/Audio/ak47_reload.mp3",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/ak47_reload.mp3",
+    "guid": "59cf486eeff336d409178203f983ccbb",
+    "sha256": "c1acdf3043f54f3d828674f071ae23031c7d837e64cfdde3e5beda41f46e3943"
+  },
+  {
+    "source": "Assets/Audio/ak47_shoot_single.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/ak47_shoot_single.wav",
+    "guid": "0a33519a4742913458786d2f244b5df1",
+    "sha256": "66a76f9fd8a222e7fe5fd472b13fc9408e7848ba4adf534db6b2b0f63bb5827b"
+  },
+  {
+    "source": "Assets/Audio/empty_ammo.flac",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/empty_ammo.flac",
+    "guid": "5c10570ab6fb0a74b99b88d51bcee97a",
+    "sha256": "3eab30bcedc05ea59bbe5cc115ad88c7ba9bf2efbe16224df24767b7439503a1"
+  },
+  {
+    "source": "Assets/Audio/pick_ammo.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/pick_ammo.wav",
+    "guid": "0bef3d31f1122ec4fbdcf5b2a3705f6b",
+    "sha256": "549518ffe438150bb1027dd10a9868f6083ba3dbe1e11cf4e47ef1b29755a519"
+  },
+  {
+    "source": "Assets/Audio/pick_health.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/pick_health.wav",
+    "guid": "2afe5b4b07309e243928126139219c07",
+    "sha256": "5cfc6780164100d635a5b8f85c26b581a94a1bc653308568aa215cfb7af3b35c"
+  },
+  {
+    "source": "Assets/Audio/pistol_reload.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/pistol_reload.wav",
+    "guid": "d5ac6d507fbf6a6469994f76cd74997b",
+    "sha256": "ba9d72c1097f89047641f15a7341774321a1270ffdd94ed2a53588179cefa4f9"
+  },
+  {
+    "source": "Assets/Audio/pistol_shoot.mp3",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/pistol_shoot.mp3",
+    "guid": "de59bf9aed598874a8b5059962aef0d9",
+    "sha256": "e106a8ace99d66ee581387694d7c2db6fa849ebf6f1eda2c32cffbe7119afdc2"
+  },
+  {
+    "source": "Assets/Audio/player_dead.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/player_dead.wav",
+    "guid": "c27f6d5ed9071d145b04d05cb4fe825b",
+    "sha256": "f62aa0b96ba2100568cb2c9fe90a4f1bf88384b2343b7d2619910e8bc2067ded"
+  },
+  {
+    "source": "Assets/Audio/player_run.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/player_run.wav",
+    "guid": "2145b91bed427b04cb0e9b4b0b526869",
+    "sha256": "5778801d268495847a4ede7644bc439f0c024084b8c7bede869cac8fbf0ff0b4"
+  },
+  {
+    "source": "Assets/Audio/player_walk.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/player_walk.wav",
+    "guid": "ffbc3d7bf8b5f2247aefa07caa4601b5",
+    "sha256": "7677e95411df6ad8c592fcf828a0ae3ffe57f429099b805785e9b6be007c9ed1"
+  },
+  {
+    "source": "Assets/Audio/switch_weapon.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/switch_weapon.wav",
+    "guid": "8b9826506c4637a42817b510e17e4ac8",
+    "sha256": "ba0566de58e0296e1af4452bd5c75f5ab212028142b39f77aff67444f240821d"
+  },
+  {
+    "source": "Assets/Audio/zombie.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/zombie.wav",
+    "guid": "20fdf67633e82b647ac42d7103c9e6f8",
+    "sha256": "4387b2aa8a4b5ba0ad1af129ab290a4dd543ec193f6b33c0d39f6714a5147097"
+  },
+  {
+    "source": "Assets/Audio/zombie_bite.wav",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/zombie_bite.wav",
+    "guid": "f6d107115b2d81d42bfb32881203b13b",
+    "sha256": "4edff6f735a75677fb8ff76a90b0124adc62bf191510c956df73f79a0161e6e7"
+  },
+  {
+    "source": "Assets/Audio/zombie_bos.mp3",
+    "destination": "Assets/ThirdParty/Gameplay/Audio/zombie_bos.mp3",
+    "guid": "51baeb1bc85ca004c9f1a037f401cc28",
+    "sha256": "a6ce0153fdd410eaf77e2e559fea4affbd20c876ad93e4663c64b09a1cd2bbfd"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Materials/FirstAid_Red.mat",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Materials/FirstAid_Red.mat",
+    "guid": "026cb6e42ef5d7a42a11ed06e7596e55",
+    "sha256": "b39d48daf7687f40c917725f214ee228f27f0a73d4bb2196b94dce0822e6c5de"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Meshes/FirstAidKit.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Meshes/FirstAidKit.fbx",
+    "guid": "4e3859e7d4623f64ca345e315aebd6e6",
+    "sha256": "aef13d54b618c0c49ee7ce3d0945193116d7bf6cf7a75a64161e236679206e1c"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_AlbedoTransparency.png",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_AlbedoTransparency.png",
+    "guid": "cabf14510af798d48b14c5c7e37d696c",
+    "sha256": "bef3fc12067405d46a4b74edcc7afbe2a4b987ed4690494b1fc50e72b28aebff"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_AmbientOcclusion.png",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_AmbientOcclusion.png",
+    "guid": "7e994e1535c6f9e498560b31fbff41cb",
+    "sha256": "2d1f763e28fc8ba3d120f9a45dfd896e5eab69af70a9032eda4e9055f3bf13f8"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_MetallicSmoothness.png",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_MetallicSmoothness.png",
+    "guid": "249d74acacea33842866b4076bd4ce84",
+    "sha256": "57d2442d412ce08ea42b988010dcca3ec68cf0fbceb5168a5279b917b190f03c"
+  },
+  {
+    "source": "Assets/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/GeeKay3D/First-Aid-Set/Assets/Textures/red/FirstAidKit_red_Normal.png",
+    "guid": "6cc1e3b323158a1489b093ebad616ff7",
+    "sha256": "4b40047159097d52b7faee33e14610ac37aef1bb9b1af7546503f55a722ea34e"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Arrows/Seta4.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Arrows/Seta4.png",
+    "guid": "493cc09de0e323f45bc80785b2f1f38b",
+    "sha256": "4e8c84c986b33277c73d5dee3ead8d03a025f1c083f3afaf604cb283bed428fb"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/BordersLines/1.2.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/BordersLines/1.2.png",
+    "guid": "7bd7556e745740d4585610c2dcb2d8f2",
+    "sha256": "bb6131ab4da396497f1559df99291dd82839c5adf0be559fad4a2886c001bc6c"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Coordinates/7.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Coordinates/7.png",
+    "guid": "30885c8deefde404eb19152830e50a1a",
+    "sha256": "076d6fb2885ad859bd41a70de0bf201701f89d8b67daa51c73a99ca4c029bc93"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Dirs/Dir.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Dirs/Dir.png",
+    "guid": "c75035de3d629864a80c7dda682da5af",
+    "sha256": "7a8b6dbf3ede1fd23c3c8f726332c500ae6d885037aa5dc67b68a26c69ce1340"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Funds/2.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Funds/2.png",
+    "guid": "9435f48008c664c48855b1e2bf32c9a0",
+    "sha256": "a2d233c57bbefdc58aa458bdeaa7bbda8fb14f974bec774086c916006ab17d1a"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Geral/64x64/Player0.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Geral/64x64/Player0.png",
+    "guid": "ebd228771423d6b48b95f17dff31dbf5",
+    "sha256": "65270b5fe3cd5102789d35f73dbe59f8bee34a28685fc32205b407338aa030ac"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Geral/64x64/TA.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Geral/64x64/TA.png",
+    "guid": "23e36bdf0610b9446949505acbfeb0a8",
+    "sha256": "5d85309b031aeb9b3a7d1c40c7279ce84957789562c28e19e787c2f5ba161478"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/MM/Life Enemy.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/MM/Life Enemy.png",
+    "guid": "51264ecb94caf55498d361d2837ac9c3",
+    "sha256": "b77cf8c16bd187f9421e3835fca4d6bbbd8c5d770b47fe88ab94b6fe61f32488"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/MM/enemy.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/MM/enemy.png",
+    "guid": "cc7a2970847e7bc40bfd3e3fc8970565",
+    "sha256": "ff33ee39175b61508b33fc032df2b35ba3e1dd89586df586bb479b6a0da76fc2"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Radar/Radar000.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Radar/Radar000.png",
+    "guid": "11cee310e2b8b3240bc896ee081d2334",
+    "sha256": "ec6078acc9241fd09a33acccb4cc843c423bc30a0ccb5c6a41e4e2231f4ad177"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Radar/Radar10.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Radar/Radar10.png",
+    "guid": "7c1c1f9ce01e530478061477ce2f6197",
+    "sha256": "f59428810d658ce5cfe6ff55dcc76eb7d55a0304c7d9dc3c3426854617ac5937"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Radar/Radar20.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Radar/Radar20.png",
+    "guid": "e9585416c160f4646a985381857d7fb9",
+    "sha256": "67cd100655f325e053699b88daabbc9bd9b88a469b8c97bd4419af79fd559bc8"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Icons/Rays/Ray8.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Icons/Rays/Ray8.png",
+    "guid": "07f844e11d545614f9ff10f185c1935d",
+    "sha256": "aa8b19f688e0ff83205e3a41bb2033db5df85b15be1d8983a07871e12a43a336"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Prefab/Arrow_Icon.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Prefab/Arrow_Icon.prefab",
+    "guid": "8f86c64edbf4e8f409f223c53b573e99",
+    "sha256": "f6e6bfd177b8116b0eb8366bf63cbdd2774c26eb01e8d5e518e20a942938f3d5"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Prefab/Cam_Map.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Prefab/Cam_Map.prefab",
+    "guid": "66692875275d4f542a37db7a14fac6c1",
+    "sha256": "42f7bcc40d92dad8641ef08da944feb6907e33d4db7e881c2709659a0a5026b0"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Prefab/Icon.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Prefab/Icon.prefab",
+    "guid": "3d7185b66ab16fc479b0a502d3d2ebc1",
+    "sha256": "23d02a73cdc00979b13a2a7ae38cbf3f98a7b625582c5360af1de0dd83621812"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Prefab/Icon_Arrow.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Prefab/Icon_Arrow.prefab",
+    "guid": "e1df2ebb153c1044587cd06a35cd3b0c",
+    "sha256": "f6ca10dc3cb48a4a94eabb20b9b6f12b70ffd87011bf9f6d73614593c9fe64f7"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Prefab/Map_Status.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Prefab/Map_Status.prefab",
+    "guid": "8744ea31e8fbd4342971794a50b1b1ef",
+    "sha256": "fb06ed5d7092a1557555af073c8b9cbd99da4042473c383a0a989c25e63ecf79"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/AuxRadarColy.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/AuxRadarColy.cs",
+    "guid": "601503957646cc74d8e37a54bb4c7fe2",
+    "sha256": "cb84cc79fb836e71e24afc2fca2cb6d121fdd2db21c23afb357e56ddaf185418"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_Icon.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_Icon.cs",
+    "guid": "aa4ab2ed216d9084594fc45ffcdc66b8",
+    "sha256": "eb6c5faaf8543dd486c1d0da268098c1850b42ed4fdea91cfd591e2fb7427551"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_MP.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_MP.cs",
+    "guid": "5950fe102c09ad0478352d69e8ee3dc2",
+    "sha256": "0e59d967e34462f03f87105c50f0aa461f77868b085b259881021dca6327642c"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Aux_M_R.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Aux_M_R.cs",
+    "guid": "2163109d064ea184d939bda8c8b3e902",
+    "sha256": "e0f771ac92e088e5bbfd9ea3e7da64beb736acc803f1f4066322dd4c9d94ca9f"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Custom_MP.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Custom_MP.cs",
+    "guid": "2135d55686b2f5b4fb1963dd23cdde17",
+    "sha256": "016a14d6a5d5a4abb1ef37e107324573f938dc31733d1c4b454f90c634d51293"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Destroy_Me.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Destroy_Me.cs",
+    "guid": "2da282042a95e884fa55db05f479c6d3",
+    "sha256": "f87bc837ca3573b5a27c4c2aac968c86ccceb54672c7409fcf09e76bf5067e0a"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/MP.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/MP.cs",
+    "guid": "44a5b7e6f758bce4dbf032b140bf27f2",
+    "sha256": "6adc36aa7715d95de34872f4510630382872cecbb438db25739ae03cab490e02"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/Simple_Ai.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/Simple_Ai.cs",
+    "guid": "77ff93b32b111514cbb5cedb6f6ccdc2",
+    "sha256": "cdeef0684cd5c59a8264eb51f0cc30adf0ca5b914d7b5e6b6c56bb3f017dbcd9"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Scripts/WindowsFollow.cs",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Scripts/WindowsFollow.cs",
+    "guid": "e1c4394ee28e76e4b8c3c9d208b19c42",
+    "sha256": "107069b20fd3bac15a4f6bc8654a51d53b1d18a3349940eb98fea3d42101f067"
+  },
+  {
+    "source": "Assets/Mini Mapa(Radar)/Textures/MiniMap.renderTexture",
+    "destination": "Assets/ThirdParty/Gameplay/Mini Mapa(Radar)/Textures/MiniMap.renderTexture",
+    "guid": "d69b348bb93aeb4499017e6384869698",
+    "sha256": "ceadde345eec3b78c4d977951067442e4d72dc0a786639fdfae1c2951ef03b68"
+  },
+  {
+    "source": "Assets/Mutant1/Material/Mutated1_MAT.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Material/Mutated1_MAT.mat",
+    "guid": "b20d7c47e4b68e041a421b628001a60e",
+    "sha256": "9e76bdf31f5e2c0fd57bc5c92bc35fe08e31e7f324869beff7960308dc0914b9"
+  },
+  {
+    "source": "Assets/Mutant1/Material/Mutated1_V2_MAT.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Material/Mutated1_V2_MAT.mat",
+    "guid": "20a5e8d2158ec6e49a5f8f3260d12e60",
+    "sha256": "cccdd129fce1ae95e06a998d60bec126dc773afd9a2e25039b1786ef3ece216e"
+  },
+  {
+    "source": "Assets/Mutant1/Material/Mutated1_V3_MAT.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Material/Mutated1_V3_MAT.mat",
+    "guid": "1234d42b3f3f9bb41b7c486cf6882ea1",
+    "sha256": "4bea7c36c8e5c0908887a8d74c19c2286d7cca3b3f27e118c44235906aa0256d"
+  },
+  {
+    "source": "Assets/Mutant1/Mesh/Mutated1.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Mesh/Mutated1.fbx",
+    "guid": "27c70984b9f4990489d83faa91f41371",
+    "sha256": "53157c59bea6dfa95dae162417f66b76c9959d47cbaad86578c638f0fd12c17c"
+  },
+  {
+    "source": "Assets/Mutant1/Prefab/Mutated1.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Prefab/Mutated1.prefab",
+    "guid": "d22e9a5553194624ba40dbf39fd94518",
+    "sha256": "48c0947d8c5e4f3c890e8532247b95645bdf28a233f82e9b76fa12b999916cec"
+  },
+  {
+    "source": "Assets/Mutant1/Prefab/Mutated1_V2.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Prefab/Mutated1_V2.prefab",
+    "guid": "275e058f5be6fd7459e80acfdba9addf",
+    "sha256": "3fb4392113256dfdc7a2cf2d1ecf99f085932fbdf0a023dbe049d9a47cd5d11c"
+  },
+  {
+    "source": "Assets/Mutant1/Prefab/Mutated1_V3.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Prefab/Mutated1_V3.prefab",
+    "guid": "8f317dd6ea755c245930aa07e0fc3714",
+    "sha256": "0a790ab163dfbd368dc437b483617268ce2b22da6bd3a138152d4157d5c2a110"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutan1_V2_Basecolor.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutan1_V2_Basecolor.png",
+    "guid": "945a94f6fc3fd3544a0ca6448e0c38ea",
+    "sha256": "413507c8cb4a33c852b8c1e14356c30b2bd33c34bcf958af415d14a215046cfe"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutant1_BaseColor.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutant1_BaseColor.png",
+    "guid": "7a945d5abe42b8b48a2212f37f2193a7",
+    "sha256": "f156ff6b42981a4b7a5a5cfa5b8327f6dc94251253f12179b93d865b2cb23846"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutant1_MaskMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutant1_MaskMap.png",
+    "guid": "b38c99b481cadb64294d86b27c1a04dd",
+    "sha256": "f65ae842eded704d55033a54825d1978f740e99edf027ee575d92469f1e1f41d"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutant1_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutant1_Normal.png",
+    "guid": "30c68bbc94237f14bba842fb330c3e0c",
+    "sha256": "32d259d20bc6ecc613109807064b908b4846bbc6dfbd85fdf13252b112ca1fa3"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutant1_V2_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutant1_V2_Normal.png",
+    "guid": "4abb8a98305c6e94bb5e514870ad7431",
+    "sha256": "9844afa6bf27d64a55a4784e91c0cc79842c7cc3ddce07fcdcc06ffde10109ea"
+  },
+  {
+    "source": "Assets/Mutant1/Textures/Mutant1_V3_Basecolor.png",
+    "destination": "Assets/ThirdParty/Gameplay/Mutant1/Textures/Mutant1_V3_Basecolor.png",
+    "guid": "b4764181fe8b2434ea01a0654beea796",
+    "sha256": "38935d8d420b4fe410c75b0efb27cb346699f338780b92d54f27e244946706e8"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Animations/M1911 Handgun Controller.controller",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Animations/M1911 Handgun Controller.controller",
+    "guid": "03d1fe4e93c9d4445b3a611df2ee5713",
+    "sha256": "39422e43d02b536d28d10f38338cb246699588504406b692848f2a48a220ab8f"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Animations/M1911@Fire.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Animations/M1911@Fire.anim",
+    "guid": "d34b4dd27ff9e5942b1871319d0f0db7",
+    "sha256": "f9d3099303cb7cc83a26f4f7b2d6af70dc81c24560587848b02dcdae25046628"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Materials/M1911 Handgun_Black.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Materials/M1911 Handgun_Black.mat",
+    "guid": "ef4deb7b6cac3794694ab402e74b3e7e",
+    "sha256": "0df9db158931cb5c6d8cb84efe00b81a24bd0d9f4c96921f09afb86fc824737a"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Materials/M1911 Handgun_Steel.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Materials/M1911 Handgun_Steel.mat",
+    "guid": "a22ca1073de33674b8cd0036fcb92947",
+    "sha256": "6c9fb1331a97cf05ec17708a4280ea38b784a81693a8630a3aae23f35edc8f6a"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Materials/M1911 Magazine_Black.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Materials/M1911 Magazine_Black.mat",
+    "guid": "ad4be7b2be81ece4cbe850cfede8b9de",
+    "sha256": "b0382f5003807d59c4a1ac52adefcf22ceb9c7ba57ee8ffb0b6f24a361a3cdc9"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Materials/M1911 Magazine_Steel.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Materials/M1911 Magazine_Steel.mat",
+    "guid": "8ca21f01f2c5c9c4aa7e714faf94251e",
+    "sha256": "369dc36df37a2d3035493c9f7bf81693cb710847bdae1541f902d97522e5e73b"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Meshes/M1911 Handgun.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Meshes/M1911 Handgun.fbx",
+    "guid": "3d87184bf4725b841b26693d2234fffd",
+    "sha256": "e1ce9a5b5d4ee5c0935849f36fa1e06338f9fde285b798a3a9b70c99a75ddb45"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Meshes/M1911 Magazine.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Meshes/M1911 Magazine.fbx",
+    "guid": "40ea87bfb6dc64349a6b3363f1955b6a",
+    "sha256": "d1d1f5d9e8597f4227da84eb1d6795955298ce473580cc2bfe2ee0d77259b09d"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Albedo_Black.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Albedo_Black.png",
+    "guid": "d962094b1569b2a488f813051a429e39",
+    "sha256": "826c33f178f33160ce76951a60f77b0daae72e2a2c5c43550732545b76ad3813"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Albedo_Steel.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Albedo_Steel.png",
+    "guid": "7474c63c5c65b1b4fa45a47bd1bf528f",
+    "sha256": "22099ce65308d0d3ba0f66e24daf695ce9a25bbeab0d83458752af4e81acdc31"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_MetallicSmoothness.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_MetallicSmoothness.png",
+    "guid": "1ed6c1c5fa7989e4597a77c8148b0876",
+    "sha256": "7071ee65094a7dd64f15d3ee6c86c9eff6b8d5b4a01e63eae12958757efa0ddf"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Handgun_Normal.png",
+    "guid": "476d8958242d6014fb5ae5916a7e9815",
+    "sha256": "a1d7aa5ff62251ab057b9fff4a080228806cd0f75f9d80fa765ed23314bea94d"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Albedo_Black.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Albedo_Black.png",
+    "guid": "c11766a3d3e2f124eb11ea77d2d2fd99",
+    "sha256": "7a70beac0fff0fde98cbb239b37dd3bd2c866d358c80638e1c89565615fbc062"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Albedo_Steel.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Albedo_Steel.png",
+    "guid": "7714950642003ee488bdddb49dd229e0",
+    "sha256": "e81d2d3b47b2e265b3bc79b898834fe41aa0aa97c4f4604aeeb0ef17cf7b9b12"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_MetallicSmoothness.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_MetallicSmoothness.png",
+    "guid": "0b3650749f4c1b045bc33f08bb4f2f62",
+    "sha256": "f3c2638e3999b1bdaab58aaebc163690855e856d0dcb7e4aa9a6436fffcfdf33"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/Textures/M1911_Magazine_Normal.png",
+    "guid": "9700d9e5832c89944afd7ef24f4d919e",
+    "sha256": "033b329a59548ca3141655669e690db9d99e0e772a74815da513818ae5a143c5"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/_Prefabs/Base Prefabs/M1911 Handgun Base.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/_Prefabs/Base Prefabs/M1911 Handgun Base.prefab",
+    "guid": "a78a725941312494b930d664f3b315d0",
+    "sha256": "f067e3402041e3d6d1ef5b519246353a8b94a4019e8f60f0cf4048bfcf2804e5"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/_Prefabs/Base Prefabs/M1911 Magazine Base.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/_Prefabs/Base Prefabs/M1911 Magazine Base.prefab",
+    "guid": "71d42f13891e48c4487496fd15802eda",
+    "sha256": "bed9ba2be6ca1cfd19cbc5edcc2407b9d3b033d7d4e3c322569d542d8cc1f4df"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/_Prefabs/Handgun Black/M1911 Handgun_Black.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/_Prefabs/Handgun Black/M1911 Handgun_Black.prefab",
+    "guid": "87e308cb23eea97419b3c2623d8bb3fa",
+    "sha256": "0e212fc3bcbea4d1c5a484dd7bd8a3c3f9397d7550824681c3226d1ead9ea213"
+  },
+  {
+    "source": "Assets/Nokobot/Modern Guns - Handgun/_Prefabs/Handgun Black/M1911 Magazine_Black.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Nokobot/Modern Guns - Handgun/_Prefabs/Handgun Black/M1911 Magazine_Black.prefab",
+    "guid": "1630d9b67160caa44aad0385aa9bf476",
+    "sha256": "f6e301a5696cc901c28ec9e650d85a9acb332776e9cb3e6e3df3c264f9743ee4"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Boss_Mutant_V1.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Boss_Mutant_V1.asset",
+    "guid": "523a5b1cce0a3b843ae813605edea5c3",
+    "sha256": "5707b3f54fe463d35d10e57829b45f746755ab4df08443349b7d39ba7729c021"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Boss_Mutant_V2.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Boss_Mutant_V2.asset",
+    "guid": "b5d409d7494cf9d4184fef97dedfc178",
+    "sha256": "d075c9086c5d3928250c0c301891f9567c4ee972c2bc2ed627843bdcea6eff30"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Boss_Mutant_V3.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Boss_Mutant_V3.asset",
+    "guid": "1303437728fbc3743af28adaab334324",
+    "sha256": "61b320becf93e539559f0c4e97e1ccfc87a56d948c463693dca5a197f923e9a1"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Zombie_Bloater.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Zombie_Bloater.asset",
+    "guid": "b5f14f69107eef74388c1031e8dea703",
+    "sha256": "c8c99a1386d1a46cbd50e230c3df215ff0fbe8e463d200dbd5b7221f54c34b1f"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Zombie_Runner.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Zombie_Runner.asset",
+    "guid": "980f54775413bc049ba257bccfd9b6b9",
+    "sha256": "90da2d47a1bf1dbb704deeb9c2f0b2cebba34f1c1df8232ba3beec4ec4a56c5f"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Zombie_Skinless.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Zombie_Skinless.asset",
+    "guid": "53657501f0b8a3a41a21d7ace0ff773d",
+    "sha256": "64041c7ea5f20e0ed53cf22300329bcb2579453b92fffbd8c47da772c3edc258"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Configs/Zombie_Walker.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Configs/Zombie_Walker.asset",
+    "guid": "dc4a388c3bd39f44e8b302cd9756ec4a",
+    "sha256": "9bb240b2a6178ffe47ddc15ca82d055716d6ccf9689421753602f506cec903b7"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/EnemyCatalog.asset",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/EnemyCatalog.asset",
+    "guid": "eae3f801aea22d04eb7f809eac16a491",
+    "sha256": "9525f834ae718bfe0171a8ea2c223381f98e6953e1292bddd86bbb793cf80ef3"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Enemy_Zombie.controller",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Enemy_Zombie.controller",
+    "guid": "4aa44af2281371a429ee7d6b8c2378c3",
+    "sha256": "f43085888dc13acb1a3ab7eaf6dbf700b9ff796d26ff1f06f7c9c118f8c63d96"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Boss_Mutant_V1.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V1.prefab",
+    "guid": "f40e24e86307ce14fa3c9470fe29c842",
+    "sha256": "f79122cf9a9c05107be51f9b6aa19923a95e3680ffd971d2e9d2f78048bf6f53"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Boss_Mutant_V2.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V2.prefab",
+    "guid": "777c71504f66cae44801d5bfeae76bec",
+    "sha256": "617fa5bad914b8da109df887997b026cafabaf290a967b736d82f1e94ccec4e4"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Boss_Mutant_V3.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Boss_Mutant_V3.prefab",
+    "guid": "3121d4e54220acb41b40217008d787c8",
+    "sha256": "5268de58f81065536e1ec7a4258f22dd1331e6520c9984439dfa2a354f010b31"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Zombie_Bloater.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Bloater.prefab",
+    "guid": "6e52eeb600e3f6342b00d7ef37ae9ce6",
+    "sha256": "fbeb90b773d14d0183f9f92a22aefa4d5f0d527442fe89ae8cb51fe6d0bd5e75"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Zombie_Runner.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Runner.prefab",
+    "guid": "928dd19d103e1b7438414dd1caa649e5",
+    "sha256": "167772390277bc9b060d4d2820bed936eac905413fd8bdd847c985d8199178bd"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Zombie_Skinless.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Skinless.prefab",
+    "guid": "f1303619348ead84f8b8fd2cfc8c87f9",
+    "sha256": "9fcc34a6cf02bb4ededefbc45d5aa0587a3ab49f82c6cfd3c75ec9919bdd112e"
+  },
+  {
+    "source": "Assets/Outpost/Enemies/Prefabs/Zombie_Walker.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Enemies/Prefabs/Zombie_Walker.prefab",
+    "guid": "fa9c3148ecdf60f4893fc2b2e863cd32",
+    "sha256": "6d2c93717621d2859b52132b19aefb104f804e241fa4242c34ea55e6db857d0c"
+  },
+  {
+    "source": "Assets/Outpost/Materials/M_tracer.mat",
+    "destination": "Assets/TacticalOutpost/Gameplay/Materials/M_tracer.mat",
+    "guid": "27ab5d4aae36a4247a79370da37fdeb2",
+    "sha256": "25441692208c2460779f09997d319d6944a5a678f7ad3b99919aeb0a0bd52071"
+  },
+  {
+    "source": "Assets/Outpost/Pickups/Pickup_Ammo.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Pickups/Pickup_Ammo.prefab",
+    "guid": "cffb35006fa680546b33c10d40ef36b6",
+    "sha256": "e5ce3fd5a90d1780f659deb24cebad11b6d21bf77c2d44860c0611c969a0a45b"
+  },
+  {
+    "source": "Assets/Outpost/Pickups/Pickup_Health.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Pickups/Pickup_Health.prefab",
+    "guid": "6214d3718d420c84ebd62f52adfc5616",
+    "sha256": "829989ac65c4a8f40ee493224240a49e5ef17918d7bc59eb87d01886d08e8d3b"
+  },
+  {
+    "source": "Assets/Outpost/Prefabs/Player_FPS.prefab",
+    "destination": "Assets/TacticalOutpost/Gameplay/Prefabs/Player_FPS.prefab",
+    "guid": "ff4d9cb27a3672e46b251226488a22e4",
+    "sha256": "1f0a895e27c65685001d873bf38b844a3ad3e28615a0766ec1ccf0dee156107c"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Audio/EnemyAudio.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Audio/EnemyAudio.cs",
+    "guid": "dc05aca59b78bc94d9ef0a18a0b54f3d",
+    "sha256": "751d118b927133a6a50558c2662393d4292f2436ec568c225f8972e2f0e142eb"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Audio/OutpostAudio.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Audio/OutpostAudio.cs",
+    "guid": "02170f59cd49ccf4aa1821ad1656ef13",
+    "sha256": "a3a51a511a5d635c556dbeae2e9385a58cae43855c57a508638d3ee61dc73f7a"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyBrain.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyBrain.cs",
+    "guid": "c4cb30c43f7a7a448bc1c3c14c34258c",
+    "sha256": "26297d36f68e1686eda5b796c3e0774e3718187b1e6ed909c5efcb8ebc7c09ef"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyCatalog.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyCatalog.cs",
+    "guid": "58048d3c3b2decc4085882ad80774360",
+    "sha256": "a95f6c2c7649941846661cfe8ae072be005837c94c2d7aa292e2aa9898c196da"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyConfig.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyConfig.cs",
+    "guid": "427c542ba6cd2784ab2c41a7a29c8268",
+    "sha256": "02611791d3fc512d3fdd32b1113281ece66a7ce047b4645ece0527c34b75d235"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyDebugSpawner.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyDebugSpawner.cs",
+    "guid": "e71c063f03a7cb74687d5bb5d2c77b35",
+    "sha256": "ef6ba5bae21cf6d69fb37ff94c19920f8129dca09b401b51bbefccaa219ab800"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyHealth.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyHealth.cs",
+    "guid": "62bcf8a0a19eba24ab2cab6521b74ae5",
+    "sha256": "b3977726ecc4fac05af2309d63e1df8035a249eedd1e36cbb8449a2f2d4269e2"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/EnemyHealthBar.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/EnemyHealthBar.cs",
+    "guid": "ebc153d4032c13c4bba398c831982c1b",
+    "sha256": "e3d4e76a1a646aed666ac16cb72090c6a9cee6f26bdf05735f3e342bdb904db6"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/GeneratorHealth.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/GeneratorHealth.cs",
+    "guid": "0e0a2f2c4825dc84f94e97e8a0fca9d3",
+    "sha256": "048f9f6b708ef27eec2f375762036d19fb7ea77e11cee3f9a240f783aab30c8e"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/GeneratorHealthBar.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/GeneratorHealthBar.cs",
+    "guid": "76ff9c3144bb1e24caff57535a3d0d8a",
+    "sha256": "a24f94ec2c76fc39e467db3d46bac58d179f8316a17d5395648090d6151a76c3"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Enemy/WaveDirector.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Enemy/WaveDirector.cs",
+    "guid": "20a6f63319fe25848bac7519e1bf0ca9",
+    "sha256": "1f065bfd90c43d823aba074dc5116b193eac60f88091e7737d22373ad200c032"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Minimap/MinimapBlip.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Minimap/MinimapBlip.cs",
+    "guid": "0026c6877a2515d4e9b5dd1a1815f98c",
+    "sha256": "48c2c6fbd122c9bf65f745edb0dcf26e3a7addaa4cd9d21f776095e80daac1d7"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Minimap/MinimapController.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Minimap/MinimapController.cs",
+    "guid": "321e02654bbf10b4f9eaa1f62047b594",
+    "sha256": "8bda25e41a4893524eaed655e2263206434573fe839503eb47c8f4056c0e4ece"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/OutpostMarkers.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/OutpostMarkers.cs",
+    "guid": "4b0f4fd33e6765a43886e1028be5fb1c",
+    "sha256": "a0cb9b3ead127f797f8821fb54a8eb8adb04a0044d518714009ba811c144833f"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Pickups/DropManager.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Pickups/DropManager.cs",
+    "guid": "a504f4e62fb63c247a3567b1ab3b708a",
+    "sha256": "7fe8355919603b8a242478385bbef4b75d746e26d6498dacbba36199bd4b4ccb"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Pickups/PickupItem.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Pickups/PickupItem.cs",
+    "guid": "9f3969a9d91bbdc4994ed1f20fe941e5",
+    "sha256": "915744eb02d510f2f93ace8a910527b93b74928985f24f2c66865c9b4307f385"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/PlayArea.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/PlayArea.cs",
+    "guid": "214b5bf1c24e55848b14215bbc8c0c67",
+    "sha256": "dde9f051e586a78d15e77af01a136da9fb5958a183f23afa56153f76cd8960b9"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/FpsBody.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsBody.cs",
+    "guid": "eb5c194a2f2857f47ae438bd45c7a07e",
+    "sha256": "46f500dbcecefb789e591c4c317106ef8108521fd5baa107d91e8e9bd7ecce43"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/FpsController.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsController.cs",
+    "guid": "dbc017e9de923b4448a4fa24d4d6fdca",
+    "sha256": "5bef31d607b2ddfb3765ec9b1945edab26bc9c3dde2fdaa7971abccfadfaf1be"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/FpsHud.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsHud.cs",
+    "guid": "8ae91d500c9b71d41b638f2e34d91604",
+    "sha256": "6128c31f7977f769cfe39297ad0450e15daafb1dc73fd077a20f2a89b6d8e0db"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/FpsWeapon.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/FpsWeapon.cs",
+    "guid": "d8b967c22199f4147be9716579813347",
+    "sha256": "9ed3b212f4670fb762bbd263c4cc68808c7d8f7c056ae62177eafb6890da8c5d"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/PlayerHealth.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/PlayerHealth.cs",
+    "guid": "7d5bbd3a2f754c244b875169f9de29e9",
+    "sha256": "ae53b02c4addb1731128b0db4bd0d040d31b3b214b49ad799975567ea0f29fee"
+  },
+  {
+    "source": "Assets/Outpost/Scripts/Player/WeaponManager.cs",
+    "destination": "Assets/TacticalOutpost/Gameplay/Scripts/Player/WeaponManager.cs",
+    "guid": "c26485ce15d5a5b46961c47b63917bcf",
+    "sha256": "5872d0147eba0ba59307e9d53077c7f42d2dda876fb03dd3d479d77d05fd2aae"
+  },
+  {
+    "source": "Assets/Outpost/UI/icon_ak47.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/icon_ak47.png",
+    "guid": "6beb8aa396d0851478ae5eca7189bfef",
+    "sha256": "c7b0ea058735688765926a3732f7ed5e35fe5616825a9662d00212dd0973703f"
+  },
+  {
+    "source": "Assets/Outpost/UI/icon_pistol.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/icon_pistol.png",
+    "guid": "9c318e616f1799a439aae68943650182",
+    "sha256": "0d61583f80faaaec077e4bfd8a34119e6a9fa6af284f67e5ffe1a68fa2fba062"
+  },
+  {
+    "source": "Assets/Outpost/UI/mm_box.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/mm_box.png",
+    "guid": "6b09446be9afa494aaea1ad816a06aba",
+    "sha256": "8cf3368f4388eb75fdbbeb6a2143b4d09ea6458e5b37987b58b42a4824d4dbd7"
+  },
+  {
+    "source": "Assets/Outpost/UI/mm_cross.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/mm_cross.png",
+    "guid": "6003f00e13cd4524dbc701034eef4209",
+    "sha256": "851f1e7189d082c14594aafdd87ee3894f5e18ece8590adc96db1cb22fe65e20"
+  },
+  {
+    "source": "Assets/Outpost/UI/mm_dot.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/mm_dot.png",
+    "guid": "09e57bbf21c6ebe408682dd725dab86f",
+    "sha256": "5dd49909a590f8ca10735667f305faf0cc278567e179c5204ad158157d03674f"
+  },
+  {
+    "source": "Assets/Outpost/UI/mm_gen.png",
+    "destination": "Assets/TacticalOutpost/Gameplay/UI/mm_gen.png",
+    "guid": "e749e82f20233b348b6bffa194730d90",
+    "sha256": "12ca68cccfe2fc949d0a6e4f8e267e7bd9a2e97814cc875f95eea5837f981450"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Animations/Animator.controller",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Animations/Animator.controller",
+    "guid": "e56a7384982b59e4893dbf838f3b1c01",
+    "sha256": "f1d798d23d623464e78db956b7d6f6ed7b1a561ade2b1d4552c829bd477c8634"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Animations/angry01.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Animations/angry01.fbx",
+    "guid": "0dd1a06bb21981446a1861c7c1767e75",
+    "sha256": "d541778351077b569bf9139ddaaee33e953ec34a1969646a87b78c3fa7168a43"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Animations/idle01.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Animations/idle01.fbx",
+    "guid": "0636141c91b6dcd4489c6b23b480083c",
+    "sha256": "c00849351817c6e2303ca9934cb0d7c42ec0f763058b0132cd587061e2f7041b"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Animations/idle02.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Animations/idle02.fbx",
+    "guid": "402b915837b52c44db3004a62cc9ac09",
+    "sha256": "7d5603264ca02ad49ad916e08ed13781f554a7e98884e58dd1f1a15da571ee32"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Materials/Axe.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Materials/Axe.mat",
+    "guid": "393f33cc0361af64c9cc956e47ae18ba",
+    "sha256": "9392b8c6b6b84d129862fbad290532d909daeb390c6e9493a8a60d5630d4bb35"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Materials/Pants.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Materials/Pants.mat",
+    "guid": "f202c4251032f3646a3ca9d10ddfe6bb",
+    "sha256": "9627f1fa99b6d18a91ccd8804c79d0900300366e4fde7ed92f73714fd24112b8"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Materials/Skin.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Materials/Skin.mat",
+    "guid": "2254f9684215f58468106485699fcea4",
+    "sha256": "1d001bf82553fbbad846d2180484a1aea912bdfc8802d3f285b25d3d7d40184a"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Mesh/fireaxe.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Mesh/fireaxe.fbx",
+    "guid": "18ba84fae8aeeee47af407034cda9b8d",
+    "sha256": "970867eb233ce699e0070f8ae5a88496d824e36c42e058b07c72943b5f1f2df1"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Mesh/skinless zombie.fbx",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Mesh/skinless zombie.fbx",
+    "guid": "e7b3b195872dab2408896870b9dd08f5",
+    "sha256": "b5f8db4177bdbfe228361b024f42dc9f1b1702f9cb83a5470ddbcb66596dcc2d"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_BaseMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_BaseMap.png",
+    "guid": "56e23d3858906aa448bfdf0b5e41f1b2",
+    "sha256": "3631661e2a2e471648d97c61aa8641a0134f36ab0ebb90aefecf4a133770883e"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_MaskMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_MaskMap.png",
+    "guid": "e68f889681e45c147a36e9a5b7b8b71d",
+    "sha256": "36e78bdbef913b02f16237576ba12e235cc3927e1bd13b7caa0ca774fb0a1387"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/axe_fireaxe_Normal.png",
+    "guid": "ba6d6e2918e59174b92125d498ad9f24",
+    "sha256": "76c1c647ee81b5612d0278c6d6492ef3604846f5ffa7186b0a6cf5f3edb33eba"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_BaseMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_BaseMap.png",
+    "guid": "9ed9fe31d935737468cd4ab92b082319",
+    "sha256": "183131f92934182c7390a5ead1192c3003ba9085549dbb021adfac8695895f9c"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_MaskMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_MaskMap.png",
+    "guid": "463ba775d38802e4182030f144ffc0db",
+    "sha256": "1efefdf287924b5a436f044ff747308d8d8257e3730de75f808d6601dfeb5c40"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie low_zombie 2048x2048_Normal.png",
+    "guid": "b2e12ae41c3e80542822064500625d6d",
+    "sha256": "840da653be54d6512daa70d346c5f80101542f37acce40fb730b0c53851bbb7d"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_BaseMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_BaseMap.png",
+    "guid": "09a09f27a1ec74d419e7a0411adaf6ef",
+    "sha256": "e7f2d682311fcadac21d90931273dfd6dff5815d094f6445554b013ea3b89607"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_MaskMap.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_MaskMap.png",
+    "guid": "615fccc385d8a5b44af49f56ec15993c",
+    "sha256": "1a2849cc43ecf3e3b4b08cf057283eac89511a75d9e14f823a7436c566680933"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_Normal.png",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Art/Textures/zombie pants low_zombie pants_Normal.png",
+    "guid": "ac9899a0b63e5b74c97e366542c1008d",
+    "sha256": "f3ce2ad53e5333f49e07ce5c2975177472841bc0292dd51be81f971ae78bad85"
+  },
+  {
+    "source": "Assets/Tensori/SkinlessZombie/Prefabs/skinless zombie.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Tensori/SkinlessZombie/Prefabs/skinless zombie.prefab",
+    "guid": "6a57508ea9f1a2e4ba69675cdd7361e3",
+    "sha256": "21c5dcea3510720f64ead87b8b5b3cc2b11b7dee564483d25e17ad5faa44adbc"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_Attack.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_Attack.anim",
+    "guid": "de559bbb071ebfd40ab5af80881e75e8",
+    "sha256": "6b38c084d31ed6d827b4e165f7bc78bf4b9fbbf724c50d6cad83aa844390bdc9"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_FallingBack.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_FallingBack.anim",
+    "guid": "812aae90a9297f249908057eed4c0879",
+    "sha256": "3823ae0536a0bf595da78d460a88598bbb24d7b1fcb32eca3aee6cd61ec46823"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_FallingForward.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_FallingForward.anim",
+    "guid": "e44a892308e84194f9f7a5817a6285d7",
+    "sha256": "8331ea80e4a560e23d401660603aff903c1d804448afaec644df67fea9ad8ef1"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_Idle.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_Idle.anim",
+    "guid": "23ee7f6864c52b243bfb4f2da09bc287",
+    "sha256": "e99581110e7c926be74aa80d435fb4e31e6afd213361cee293c8556655d7cdd3"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_Run_InPlace.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_Run_InPlace.anim",
+    "guid": "fc9a62f9b1354f342bacfbbe077c503e",
+    "sha256": "f807e99a2bc17adb6b552a8e664c9a826117fe7d2b291ac98c15438af33c274b"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_Walk1_InPlace.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_Walk1_InPlace.anim",
+    "guid": "a0389bcc17a6335409898ddb374c1570",
+    "sha256": "b3fac16fc35cd158bfba57ba78e1792a5d4432a7c8b270b605a863f24f8095e9"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Z_Walk_InPlace.anim",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Z_Walk_InPlace.anim",
+    "guid": "37e6af8636979e04086967e3bd667606",
+    "sha256": "ba4cc0273202668f2552b9cd60dc774350f9aecd92ff8b8d7709f26b99f4aee7"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie.controller",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie.controller",
+    "guid": "2ef8e6599b7f9934e8ff0d64c5325a1f",
+    "sha256": "5da7cea57c1d71af77f5f20b803dcff413a5e8d658dcd2b9b7987bbcec6a4910"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_Attack.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_Attack.FBX",
+    "guid": "631762b9a30b33a42836730a6b37d13f",
+    "sha256": "8b3eb8abff736b100e9c3f4a7897c280483ab6a80c11cdfee2473dfa32684bc6"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_FallingBack.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_FallingBack.FBX",
+    "guid": "857241dcf6bb2ea45a0b3f46d78f44b5",
+    "sha256": "5ce40b223538630de58459d20047f77f85d08a9d0f72b237b751a24b83674623"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_FallingForward.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_FallingForward.FBX",
+    "guid": "d870b4f0cba458640b29cda304d40186",
+    "sha256": "8299ae1073ab1bc5a260723d65e59cd637aac95c9ffbaa4826a04a03cab80ad1"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_Idle.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_Idle.FBX",
+    "guid": "0d6373858f853604b960cf84b7d3dfbf",
+    "sha256": "d5befe6b815c8302cc52d9f861f63c42311e6fa986fb801228f52ba08d0c7b11"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_Run_InPlace.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_Run_InPlace.FBX",
+    "guid": "79969b20b5ba62e499ee433a4dd38701",
+    "sha256": "863ffb57d27cfe7aabfca09e2358608ba832e3fd71ff6d26f8bc1a1e5aa1ac0c"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_Walk1_InPlace.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_Walk1_InPlace.FBX",
+    "guid": "3fa7045af54b82c47852949257d136c7",
+    "sha256": "190c1b2dcd63a8abb6467dd06394dc34e68f35378a1015a9e0aa95bd4ae23378"
+  },
+  {
+    "source": "Assets/Zombie/Animations/Zombie@Z_Walk_InPlace.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Animations/Zombie@Z_Walk_InPlace.FBX",
+    "guid": "165698eac7ca81041ad603fc5a3afa55",
+    "sha256": "45298bdd005806dba4ab8d311367d845824555892b7391f0e3c6a4f8f44b2240"
+  },
+  {
+    "source": "Assets/Zombie/FBXs/Zombie1.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/FBXs/Zombie1.FBX",
+    "guid": "8f7380da49034cd488ddff94b1ac35d1",
+    "sha256": "cab9a9d2ed5061202aa9b98448d57eaa4b08b4a22505d80614e996aa4e10389e"
+  },
+  {
+    "source": "Assets/Zombie/FBXs/Zombie2.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/FBXs/Zombie2.FBX",
+    "guid": "6a28a82791e0b224081a04d42d031ccf",
+    "sha256": "e0aa4b3ad3b6a2267651d60e06594ea7cdb3d729428b5de4b43e9dc994a48b05"
+  },
+  {
+    "source": "Assets/Zombie/FBXs/Zombie3.FBX",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/FBXs/Zombie3.FBX",
+    "guid": "a1b4b8144e2a4054199287da62cdd0da",
+    "sha256": "bddf0459ba5ecd1144b7df64360ddf25fed6caa68160f3713aa5b467295f3798"
+  },
+  {
+    "source": "Assets/Zombie/Materials/Zombie.mat",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Materials/Zombie.mat",
+    "guid": "9fdb5531bdf185e448dd06dfa8192f8d",
+    "sha256": "0f6c229fc9840bed6bf94744f1042cbab5013c063cf677516e1436eabfaad3ad"
+  },
+  {
+    "source": "Assets/Zombie/Prefabs/Zombie1.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Prefabs/Zombie1.prefab",
+    "guid": "6dc4cf4496348884d8ee27743ae38562",
+    "sha256": "910a58ccdd854806f13fed58480a7254d8244e4904ee33d8631f126c8d16ce2f"
+  },
+  {
+    "source": "Assets/Zombie/Prefabs/Zombie2.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Prefabs/Zombie2.prefab",
+    "guid": "d58be77cba3adf54cb14b15052b86514",
+    "sha256": "75c23def404e15d11b02cee01b466b159fa398fcf3b8806bb9e6892bf52f9dec"
+  },
+  {
+    "source": "Assets/Zombie/Prefabs/Zombie3.prefab",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Prefabs/Zombie3.prefab",
+    "guid": "06cb2b131fe009c47a523671a8fa9ed8",
+    "sha256": "f8e78e98b370a0429032c3ec5016c48ade395b000580b7b286e0afd31a71a462"
+  },
+  {
+    "source": "Assets/Zombie/Textures/Zombie.tga",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Textures/Zombie.tga",
+    "guid": "6291fbf5d0e7c4642ad863eaf8b60622",
+    "sha256": "f3e76392953626daf3afae289ba69a3f2bfce9fb7ba6236235412260c21fe281"
+  },
+  {
+    "source": "Assets/Zombie/Textures/Zombie_ao.png",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Textures/Zombie_ao.png",
+    "guid": "4ef3438267568cd40b87841c3e2c22c5",
+    "sha256": "97d0a8cc7ee782f0b0f9c1504c5d95d1d3379a26788716b738bd0c85be1d476a"
+  },
+  {
+    "source": "Assets/Zombie/Textures/Zombie_metallic.tga",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Textures/Zombie_metallic.tga",
+    "guid": "33de7c829c3a0224c8975ad93b61b05e",
+    "sha256": "d29766caa381055dda0a2cf0ecc56e46bfcabba32edfc774937de711dd8e52aa"
+  },
+  {
+    "source": "Assets/Zombie/Textures/Zombie_nm.png",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Textures/Zombie_nm.png",
+    "guid": "decb53c07686cc94b860f8e04d438d22",
+    "sha256": "b7158700e2f6fc4f709863dd36bd77d237fdf3d445b808ab34f55b7a4438e2a9"
+  },
+  {
+    "source": "Assets/Zombie/Textures/zombie_emission.tga",
+    "destination": "Assets/ThirdParty/Gameplay/Zombie/Textures/zombie_emission.tga",
+    "guid": "d681134af7b3e50479d8d90effa0e1eb",
+    "sha256": "24b9126c548c7992448f42b31a5a857582b737b267575eab71ae875f18232b30"
+  }
+]

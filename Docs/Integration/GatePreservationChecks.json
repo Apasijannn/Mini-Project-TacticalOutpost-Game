@@ -1,0 +1,17 @@
+{
+  "method": "Multiset match of name, world position/rotation, local scale and active flag rounded to 0.0001; external preview scene has no GlobalObjectIds",
+  "original": 3891,
+  "current": 3898,
+  "unmatchedOriginalCount": 0,
+  "unmatchedOriginalNames": [],
+  "addedCount": 7,
+  "addedNames": [
+    "West gate fence to pillar connectors",
+    "South pillar connection",
+    "Concrete_fence_v2_lattice_S",
+    "Concrete_fence_v2_S",
+    "North pillar connection",
+    "Concrete_fence_v2_lattice_S",
+    "Concrete_fence_v2_S"
+  ]
+}

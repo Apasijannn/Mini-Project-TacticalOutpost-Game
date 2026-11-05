@@ -1,0 +1,84 @@
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+using Outpost.PCG;
+
+/// <summary>
+/// Membuat asset Resources/PCG_Profile.asset (parameter PCG) dan mengisi tabel prefab cover & dressing
+/// dari asset industrial yang sudah ada di project. Dijalankan otomatis sekali bila asset belum ada.
+/// </summary>
+[InitializeOnLoad]
+static class PcgProfileSetup
+{
+    const string Folder = "Assets/TacticalOutpost/Gameplay/Resources";
+    const string AssetPath = Folder + "/PCG_Profile.asset";
+
+    static readonly (string name, string path, float weight)[] Cover =
+    {
+        ("Road block", "Assets/RPG_FPS_game_assets_industrial/Fences/Road_blocks/Road_block_v1/Road_block_v1.prefab", 4f),
+        ("Sandbags on pallet", "Assets/RPG_FPS_game_assets_industrial/Other_props/Palets/Bags_on_pallet_v1/Bags_on_pallet_v1_1.prefab", 3f),
+        ("Sandbags on pallet 2", "Assets/RPG_FPS_game_assets_industrial/Other_props/Palets/Bags_on_pallet_v1/Bags_on_pallet_v1_2.prefab", 2f),
+        ("Wooden crate", "Assets/RPG_FPS_game_assets_industrial/Boxes/Wooden_box_v1/Wooden_box_v1_LD1.prefab", 2f),
+        ("Barrel cluster", "Assets/RPG_FPS_game_assets_industrial/Barrels/Barrel_v2/Barrel_v2_quadro.prefab", 2f),
+    };
+
+    static readonly (string name, string path, float weight)[] Dressing =
+    {
+        ("Construction cone", "Assets/Industrial Props/Prefabs/ConstructionCone.prefab", 3f),
+        ("Cinder block", "Assets/Industrial Props/Prefabs/CinderBlock.prefab", 3f),
+        ("Pallet", "Assets/Industrial Props/Prefabs/pallet.prefab", 2f),
+        ("Single barrel", "Assets/RPG_FPS_game_assets_industrial/Barrels/Barrel_v3/Barrel_v3_single.prefab", 1f),
+    };
+
+    static PcgProfileSetup()
+    {
+        EditorApplication.delayCall += () =>
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+            if (AssetDatabase.LoadAssetAtPath<PcgProfile>(AssetPath) == null) CreateOrUpdate();
+        };
+    }
+
+    [MenuItem("Tactical Outpost/PCG/Create or Update Profile")]
+    public static void CreateOrUpdate()
+    {
+        if (!AssetDatabase.IsValidFolder(Folder))
+        {
+            Directory.CreateDirectory(Folder);
+            AssetDatabase.Refresh();
+        }
+        var profile = AssetDatabase.LoadAssetAtPath<PcgProfile>(AssetPath);
+        bool created = profile == null;
+        if (created)
+        {
+            profile = ScriptableObject.CreateInstance<PcgProfile>();
+            AssetDatabase.CreateAsset(profile, AssetPath);
+        }
+        profile.coverTable = Load(Cover);
+        profile.dressingTable = Load(Dressing);
+        EditorUtility.SetDirty(profile);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[PCG] " + (created ? "Created " : "Updated ") + AssetPath + " (cover " + profile.coverTable.Length + ", dressing " + profile.dressingTable.Length + " prefab).", profile);
+    }
+
+    [MenuItem("Tactical Outpost/PCG/Select Profile")]
+    static void Select()
+    {
+        var profile = AssetDatabase.LoadAssetAtPath<PcgProfile>(AssetPath);
+        if (profile == null) { CreateOrUpdate(); profile = AssetDatabase.LoadAssetAtPath<PcgProfile>(AssetPath); }
+        Selection.activeObject = profile;
+        EditorGUIUtility.PingObject(profile);
+    }
+
+    static PrefabEntry[] Load((string name, string path, float weight)[] list)
+    {
+        var result = new System.Collections.Generic.List<PrefabEntry>();
+        foreach (var e in list)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(e.path);
+            if (prefab == null) { Debug.LogWarning("[PCG] Prefab tidak ditemukan: " + e.path); continue; }
+            result.Add(new PrefabEntry { name = e.name, prefab = prefab, weight = e.weight });
+        }
+        return result.ToArray();
+    }
+}
