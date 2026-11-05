@@ -2,15 +2,17 @@
 
 Mode ketiga di layar **CHOOSE YOUR OPERATION** (kartu **MODE 03 — PROCEDURAL DUNGEON**). Mini Project dan mode PCG tidak berubah; satu-satunya file lama yang disentuh adalah `PcgModeSelect.cs` (2 kartu → 3 kartu, backup di `Docs/Dungeon/Backup/PcgModeSelect.cs.orig`).
 
-**Objective:** player mulai di Start room (safe zone hijau) dan harus menyalakan **generator di Goal room** → `POWER RESTORED`. Sebelum itu ada tiga objektif:
+**Objective:** player mulai di Start room (safe zone = kotak hijau menyala mengikuti sisi-sisi Start room) dan harus menyalakan **generator di Goal room** → `POWER RESTORED`. Sebelum itu ada tiga objektif:
 
 | # | Objektif | Cara kerja |
 |---|---|---|
 | 1 | **Power relay (lock-and-key)** | Generator terkunci sampai 3 relay (`Electric_box_v3`, lampu merah → hijau) diaktifkan dengan **E**. Relay ditempatkan procedural: bukan Start/Goal/safe room, saling berjauhan (≥ 10 cell, farthest-point sampling), ≥ 1 relay di room yang tidak dilewati critical path, 1 zombie penjaga per relay. Hard constraint: BFS dengan Goal tertutup harus mencapai semua relay. |
-| 2 | **Clear room** | Masuk room berisi zombie → semua bukaan room ditutup segmen dinding yang naik dari lantai (+ NavMeshObstacle carve), zombie room itu langsung sadar posisi player. Pintu turun setelah zombie room habis (`ROOM CLEARED`). Relay di room tersegel baru bisa diaktifkan setelah room bersih. Pengaman: timeout 120 s. |
-| 3 | **Boss** | Boss baru muncul di Goal room setelah relay terakhir aktif dan langsung memburu player (`BOSS AWAKE`). Generator baru bisa dinyalakan setelah boss mati. |
+| 2 | **Clear room** | Zombie room baru di-spawn saat player masuk room → semua bukaan room ditutup segmen dinding yang naik dari lantai (+ NavMeshObstacle carve), zombie room itu langsung sadar posisi player. Pintu turun setelah zombie room habis (`ROOM CLEARED`). Relay di room tersegel baru bisa diaktifkan setelah room bersih. Pengaman: timeout 120 s. |
+| 3 | **Boss** | Setelah relay terakhir aktif, boss muncul saat player masuk Goal room (`BOSS AWAKE`). Generator baru bisa dinyalakan setelah boss mati. |
 
-Path guide di lantai menunjuk relay belum aktif terdekat (jarak BFS), lalu generator. Zombie lain berjaga di room (AI EnemyBrain asli), ammo/medkit tersebar.
+Path guide di lantai menunjuk relay belum aktif terdekat (jarak BFS), lalu generator. Ammo/medkit tersebar.
+
+**Spawn per room:** posisi zombie ditentukan generator saat dungeon dibuat, tetapi zombie baru muncul ketika player masuk ke dalam room tersebut (melewati mulut pintu). Sebelumnya room kosong, jadi zombie tidak bisa keluar mengejar player dan player tidak bisa menembak zombie dari luar. Zombie yang posisinya < 4 cell dari player dipindah ke sisi room yang lebih jauh. Combat room langsung tersegel (clear room); Goal room: zombie muncul saat masuk, boss muncul saat player masuk Goal room setelah semua relay aktif. Random Walk (tanpa room): zombie muncul saat player dalam radius 7 cell. Atur di `spawnMinPlayerCells` / `looseSpawnCells`.
 
 ## Pipeline
 
@@ -45,13 +47,27 @@ Seed → Grid TileType[60,40] → BSP split (rasio 1.25) → Room di Leaf (roomM
 | Props cover | Obstacle/dressing mode PCG yang footprint-nya muat di 1 cell |
 | Enemy / item | Zombie walker/runner/skinless/bloater + boss dari EnemyCatalog; ammo/medkit dari DropManager |
 
+## Zombie per room menurut jarak
+
+Room diurutkan dari jarak BFS ke Start lalu dibagi rata ke empat tingkat: **3 → 5 → 7 → 9 zombie** (room Start/safe room = 0; Random Walk memakai 4 pita jarak BFS). Penjaga relay ikut dihitung dalam kuota room. Jenisnya divariasikan: tiap room mendahulukan jenis yang belum dipakai, makin jauh makin condong ke runner/skinless/bloater (`heavyBiasFar`), dan bloater tidak muncul di tingkat pertama. Boss dipesan lebih dulu di Goal room. Total per dungeon 60×40 sekitar 35–63 zombie + boss (Eksperimen 11). Atur di `zombieTiers` / `zombiesByDistance`.
+
+## Isi room (props)
+
+Tiap room berisi props cover di tengah (2–3, makin luas makin banyak, `coverCellsPerExtra`), dekorasi yang menempel dinding (2–3: barrel, pallet, dumpster, barrier; `wallPropsPerRoom` / `wallCellsPerExtra`), dan peluang 75% satu **props besar** menempel dinding (cargo container dan props lain yang lebih panjang dari 1 cell; room ≥ 60 cell bisa dapat 2, `largePropChance`). Props besar menempati deretan 2–3 cell tepi room, sisi panjangnya sejajar dinding. Jenis props dalam satu room dibuat beragam (jenis yang belum dipakai di room itu didahulukan). Rata-rata ±5,5 props per room, ±0,9 di antaranya props besar. Semua props tidak di mulut pintu/critical path/safe zone/goal, sisi dalamnya tetap lantai, dan tidak bersebelahan dengan props lain sehingga room tidak terputus (80/80 seed valid pada percobaan pertama).
+
+**Ikon minimap:** power relay = bulatan magenta (hijau setelah aktif), generator = ikon generator Mini Project berwarna emas (terkunci) → cyan (siap) → hijau (menyala). Ukurannya ±1,85× dan ±2,3× ikon pickup (lebih kecil di peta besar), ada panah di tepi radar bila di luar jangkauan. Ukuran: `mapRelayIconSize` / `mapGeneratorIconSize`. Ikon medkit/ammo/zombie dibuat konsisten: aset radar membuat ikon dengan rotasi 3D objek saat spawn (yaw acak → ikon gepeng), jadi di mode Dungeon ikon diratakan kembali tiap 0,2 s dan ikon ammo diperbesar sedikit (`mapAmmoIconSize`).
+
+## Pencahayaan
+
+Lampu pengisi tanpa mesh (komponen Light, tanpa bayangan): satu per kotak 4×4 cell di setiap room (ketinggian 5 m) dan tiap 5 cell di corridor, ditambah lampu jalan dan burning barrel yang sudah ada. Cahaya bulan ×2,2 dan ambient ×2,5 hanya selama mode Dungeon (scene PCG tidak diubah). Atur di bagian **Pencahayaan dungeon** pada profile.
+
 ## Constraint
 
 | Jenis | Aturan |
 |---|---|
 | Hard | Room ≥ 2, Start & Goal di floor, Start–Goal terhubung (BFS), semua room terjangkau, enemy/item di floor valid, enemy ≥ 8 cell (BFS) dari Start, **semua relay terjangkau tanpa melewati Goal** |
-| Soft | Start–Goal ≥ 25 cell, enemy ≤ 1/25 floor, item tersebar (spacing 4), room tidak terlalu kecil, ada cabang/loop, jumlah relay sesuai, ≥ 1 relay di luar critical path |
-| Placement | Props: tidak di critical path ± 1 cell, tidak di mulut pintu, 3×3 sekitar kosong, tidak di safe zone/goal. Enemy: bukan safe room, tidak dekat start, tidak menumpuk. Boss: hanya Goal room. Item: dead-end → room tanpa Start/Goal |
+| Soft | Start–Goal ≥ 25 cell, enemy ≤ 1/10 floor, item tersebar (spacing 4), room tidak terlalu kecil, ada cabang/loop, jumlah relay sesuai, ≥ 1 relay di luar critical path |
+| Placement | Props: tidak di critical path ± 1 cell, tidak di mulut pintu, cover: 3×3 sekitar kosong, dekorasi tepi: sisi dalam tetap lantai, tidak di safe zone/goal. Enemy: bukan safe room, tidak dekat start, tidak menumpuk. Boss: hanya Goal room. Item: dead-end → room tanpa Start/Goal |
 
 ## Hotkey (mode Dungeon)
 
@@ -96,7 +112,6 @@ Parameter: **Tactical Outpost → Dungeon → Select Profile**. Untuk demo repro
 
 ## Batasan
 
-- Lampu room sederhana (1 lampu jalan per room); beberapa sudut room cukup gelap.
 - Collider mesh non-Read/Write di-bake ke NavMesh sebagai kotak (sama seperti mode PCG).
 - Belum diuji di standalone build.
 - Pertarungan pada tes Play Mode memakai debug kill-all (F8 → F4), bukan tembak-menembak penuh.

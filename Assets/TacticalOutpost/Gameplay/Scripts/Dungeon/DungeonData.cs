@@ -40,6 +40,12 @@ namespace Outpost.Dungeon
         public string id;      // id enemy (walker/runner/...) atau "Ammo"/"Health" atau index prefab props
         public int room;       // -1 = corridor / tidak di room
         public float yaw;
+        public Vector2Int wallDir;   // props dekorasi: arah dinding terdekat (0,0 = props cover di tengah)
+        public int span;             // props besar (container dsb.): jumlah cell sepanjang dinding (0/1 = satu cell)
+        public Vector2Int spanDir;   // arah deretan cell props besar
+
+        public int Cells { get { return span > 1 ? span : 1; } }
+        public Vector2Int CellAt(int k) { return cell + spanDir * k; }
     }
 
     public struct DungeonCheck
@@ -125,7 +131,11 @@ namespace Outpost.Dungeon
         public bool Occupied(Vector2Int c, int radius)
         {
             foreach (var p in placements)
-                if (Mathf.Abs(p.cell.x - c.x) <= radius && Mathf.Abs(p.cell.y - c.y) <= radius) return true;
+                for (int k = 0; k < p.Cells; k++)
+                {
+                    var q = p.CellAt(k);
+                    if (Mathf.Abs(q.x - c.x) <= radius && Mathf.Abs(q.y - c.y) <= radius) return true;
+                }
             return false;
         }
 

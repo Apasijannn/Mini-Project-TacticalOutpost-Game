@@ -1,0 +1,4 @@
+Skybox Sampler by The_KnightShift
+
+This package is distributed free of charge on the Unity Asset Store. Your use of it is governed by the
+Unity Asset Store End User License Agreement (https://unity.com/legal/as-terms). No other licence terms apply.

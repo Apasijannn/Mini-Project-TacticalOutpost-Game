@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Dungeon_MoonlitSky
+  m_Shader: {fileID: 4800000, guid: 9d00a038485c5a346a9edc9c3251936a, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BackTex:
+        m_Texture: {fileID: 2800000, guid: 0b7b72a163e1b474bb8c557f62b3957a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DownTex:
+        m_Texture: {fileID: 2800000, guid: 18772a1715e0fe44b9036efa8159988f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FrontTex:
+        m_Texture: {fileID: 2800000, guid: c1264b34156832442b3703b410ee52a1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LeftTex:
+        m_Texture: {fileID: 2800000, guid: 48d72fc358394c040bbafb6777131bc7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonBack:
+        m_Texture: {fileID: 2800000, guid: 0c452a53c5346124d949d65b8f756971, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonDown:
+        m_Texture: {fileID: 2800000, guid: ab0a775ebb0da3b4d9ad9a7219d18464, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonFront:
+        m_Texture: {fileID: 2800000, guid: 76b5c0f6b47597847afa770871eef868, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonLeft:
+        m_Texture: {fileID: 2800000, guid: 2b1ef9544fc071e4b9b4d7030b41f94d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonRight:
+        m_Texture: {fileID: 2800000, guid: 26b9e7d63670e454fa5674351f848781, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoonUp:
+        m_Texture: {fileID: 2800000, guid: c6ec2e7744fe9a64ab38ec3574086439, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RightTex:
+        m_Texture: {fileID: 2800000, guid: b995c14c2b7b97046bb4aa95e03050e2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _UpTex:
+        m_Texture: {fileID: 2800000, guid: e7a7cc38d3852b94f80a266210217d64, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _CloudOver: 0
+    - _EarthShine: 0.05
+    - _Exposure: 1
+    - _GlowIntensity: 0.8
+    - _GlowSize: 0.22
+    - _GradientPower: 0.55
+    - _MoonIntensity: 3.4
+    - _MoonLod: 0.8
+    - _MoonMaxAngle: 52
+    - _MoonOcclusion: 0.95
+    - _MoonRadius: 48.2
+    - _MoonRoll: 0
+    - _MoonScale: 7.5
+    - _Rotation: 335
+    - _SkyGlowIntensity: 0.7
+    - _SkyGlowPower: 5
+    - _StarIntensity: 1.6
+    m_Colors:
+    - _GlowColor: {r: 0.54999995, g: 0.68, b: 1, a: 1}
+    - _GroundColor: {r: 0.03, g: 0.044999972, b: 0.089999996, a: 1}
+    - _HorizonColor: {r: 0.21999997, g: 0.32999998, b: 0.56, a: 1}
+    - _MoonSource: {r: 0.8908, g: 0.4415, b: -0.1072, a: 0}
+    - _MoonTarget: {r: -0.341, g: 0.5876, b: 0.7338, a: 0}
+    - _MoonTint: {r: 0.97, g: 0.96, b: 0.92, a: 1}
+    - _SkyGlowColor: {r: 0.41999996, g: 0.54999995, b: 0.85, a: 1}
+    - _Tint: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
+    - _ZenithColor: {r: 0.059999965, g: 0.10999996, b: 0.25999996, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

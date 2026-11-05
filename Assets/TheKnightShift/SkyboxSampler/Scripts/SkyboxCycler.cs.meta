@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 34169c4039dc926e110fafa65e0c3098
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421274
+  packageName: 'Skybox Sampler: 9 Free Stylized Skies'
+  packageVersion: 1.0
+  assetPath: Assets/TheKnightShift/SkyboxSampler/Scripts/SkyboxCycler.cs
+  uploadId: 1029292

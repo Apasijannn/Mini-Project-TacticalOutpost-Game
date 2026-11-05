@@ -86,7 +86,7 @@ namespace Outpost.Dungeon
                 lines.Add("Boss: " + (ob.BossDeferred ? (ob.BossSpawned ? (ob.Boss != null && ob.Boss.IsDead ? "dead" : "AWAKE") : "menunggu relay terakhir") : "spawn di awal") + "   generator " + (ob.GeneratorUnlocked ? "UNLOCKED" : "LOCKED"));
             }
             lines.Add("Props " + L.Count(PlaceKind.Prop) + "/" + L.propStats.requested + "  rejected: " + L.propStats.Summary());
-            lines.Add("Alive " + s.EnemiesAlive + "/" + s.enemies.Count + "  kills " + s.Kills + "  time " + DungeonSession.FormatTime(s.ElapsedTime) + "  to goal " + Mathf.RoundToInt(s.RemainingCells * w.tile) + " m");
+            lines.Add("Alive " + s.EnemiesAlive + "  spawned " + s.enemies.Count + "/" + s.PlannedEnemies + "  kills " + s.Kills + "  time " + DungeonSession.FormatTime(s.ElapsedTime) + "  to goal " + Mathf.RoundToInt(s.RemainingCells * w.tile) + " m");
             lines.Add("Build " + w.gameObjectCount + " GO (floor " + w.floorObjects + ", wall " + w.wallObjects + ", column " + w.columnObjects + ", light " + w.lightObjects + ")  gen " +
                       L.generationMs.ToString("0") + " ms, build " + w.buildMs.ToString("0") + " ms, NavMesh " + w.navMs.ToString("0") + " ms");
             if (!string.IsNullOrEmpty(lastExperiment)) lines.Add("Experiments: " + lastExperiment);

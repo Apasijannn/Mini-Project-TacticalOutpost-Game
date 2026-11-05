@@ -74,6 +74,16 @@ namespace Outpost.Dungeon
         [Min(1)] public int safeRadiusCells = 3;
 
         [Header("Spawn Settings")]
+        [Tooltip("True = jumlah zombie per room bertingkat menurut jarak BFS dari Start (zombieTiers). False = enemyCount / density acak seperti modul.")]
+        public bool zombiesByDistance = true;
+        [Tooltip("Jumlah zombie per room dari room terdekat → terjauh (dibagi rata ke beberapa tingkat). Room Start/safe room selalu 0.")]
+        public int[] zombieTiers = { 3, 5, 7, 9 };
+        [Tooltip("Seberapa kuat room jauh condong ke zombie berat (runner/skinless/bloater). 0 = sama semua.")]
+        [Range(0f, 3f)] public float heavyBiasFar = 1.5f;
+        [Tooltip("Zombie room baru di-spawn saat player masuk room. Cell spawn minimal sejauh ini (cell) dari player.")]
+        [Min(0f)] public float spawnMinPlayerCells = 4f;
+        [Tooltip("Random Walk (tanpa room): zombie di-spawn saat player berada dalam radius ini (cell).")]
+        [Min(1f)] public float looseSpawnCells = 7f;
         [Min(0)] public int enemyCount = 8;
         [Tooltip("Modul §107: jumlah enemy = floor / floorTilesPerEnemy (bukan angka absolut).")]
         public bool useEnemyDensity = false;
@@ -123,6 +133,18 @@ namespace Outpost.Dungeon
 
         [Header("Cover props di dalam room (tidak boleh menghalangi jalur wajib)")]
         [Min(0)] public int propsPerRoom = 2;
+        [Tooltip("Tambahan 1 props cover per sekian cell luas room (room besar lebih terisi).")]
+        [Min(1)] public int coverCellsPerExtra = 30;
+        [Min(0)] public int maxCoverPerRoom = 3;
+        [Tooltip("Props dekorasi menempel dinding room (barrel, pallet, dumpster, barrier) supaya room tidak kosong.")]
+        [Min(0)] public int wallPropsPerRoom = 2;
+        [Min(1)] public int wallCellsPerExtra = 24;
+        [Min(0)] public int maxWallPropsPerRoom = 3;
+        [Tooltip("Peluang tiap room mendapat 1 props besar (container, dumpster, road block) yang menempel dinding; room luas bisa 2.")]
+        [Range(0f, 1f)] public float largePropChance = 0.75f;
+        [Min(1)] public int largePropSecondCells = 60;
+        [Tooltip("Diisi otomatis oleh DungeonBuilder.PropAllowed: panjang props (cell) di sepanjang dinding. 1 = props biasa.")]
+        [HideInInspector] public int[] propSpan;
         [Tooltip("Props tidak boleh berada sejauh ini (cell) dari critical path start → goal.")]
         [Min(0)] public int pathBuffer = 1;
 
@@ -138,8 +160,32 @@ namespace Outpost.Dungeon
         public GameObject relayPrefab;
         [Tooltip("Pintu room clear (kosong = segmen dinding yang naik dari lantai).")]
         public GameObject doorPrefab;
+        [Header("Ikon minimap objektif")]
+        [Tooltip("Ikon relay di minimap (mm_dot). Kosong = ikon pickup.")]
+        public Sprite mapRelayIcon;
+        [Tooltip("Ikon generator di minimap (mm_gen, sama dengan Mini Project). Kosong = ikon generator scene game.")]
+        public Sprite mapGeneratorIcon;
+        [Min(0f)] public float mapRelayIconSize = 0.85f;
+        [Min(0f)] public float mapGeneratorIconSize = 1.3f;
+        [Tooltip("Tambahan ukuran ikon ammo di minimap (ikon kotak ammo tipis, jadi sedikit diperbesar).")]
+        [Min(0f)] public float mapAmmoIconSize = 0.35f;
         [Min(4)] public int corridorLightSpacing = 7;
         public PrefabEntry[] propTable = new PrefabEntry[0];
+
+        [Header("Pencahayaan dungeon")]
+        [Tooltip("Lampu pengisi per room (komponen Light tanpa mesh), satu per kotak ~roomLightSpacing cell.")]
+        public bool roomFillLights = true;
+        [Min(2)] public int roomLightSpacing = 4;
+        public Color roomLightColor = new Color(1f, 0.88f, 0.7f);
+        [Min(0f)] public float roomLightIntensity = 17f;
+        [Min(1f)] public float roomLightHeight = 5f;
+        [Tooltip("Lampu pengisi di corridor setiap sekian cell.")]
+        [Min(2)] public int corridorFillSpacing = 5;
+        [Min(0f)] public float corridorLightIntensity = 10f;
+        [Tooltip("Pengali directional light (cahaya bulan bawaan scene PCG) selama mode Dungeon.")]
+        [Min(0f)] public float moonBoost = 2.2f;
+        [Tooltip("Pengali ambient bawaan scene PCG selama mode Dungeon.")]
+        [Min(1f)] public float ambientBoost = 2.5f;
 
         [Header("Visual helper")]
         public Color safeZoneColor = new Color(0.15f, 1f, 0.35f);

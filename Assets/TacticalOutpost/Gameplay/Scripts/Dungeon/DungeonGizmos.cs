@@ -47,7 +47,8 @@ namespace Outpost.Dungeon
             Gizmos.color = new Color(0.2f, 1f, 0.3f); Gizmos.DrawSphere(world.CellToWorld(L.startPosition) + Vector3.up, t * 0.25f);
             Gizmos.color = new Color(1f, 0.2f, 0.15f); Gizmos.DrawSphere(world.CellToWorld(L.goalPosition) + Vector3.up * 4f, t * 0.3f);
             Gizmos.color = new Color(0.2f, 1f, 0.3f, 0.5f);
-            Circle(world.CellToWorld(L.startPosition), world.profile.safeRadiusCells * t);
+            if (L.startRoom >= 0 && L.startRoom < L.rooms.Count) { var sr = L.rooms[L.startRoom]; Rect(sr.x, sr.y, sr.width, sr.height, y + 0.1f); }
+            else Circle(world.CellToWorld(L.startPosition), world.profile.safeRadiusCells * t);
 
             if (!showSpawns) return;
             foreach (var q in L.placements)

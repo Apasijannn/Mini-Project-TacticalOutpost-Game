@@ -49,6 +49,19 @@ namespace Outpost.Dungeon
         public DungeonObjectives Objectives { get; private set; }
         /// <summary>Zombie → index room asal (untuk objektif clear room).</summary>
         public readonly Dictionary<EnemyHealth, int> roomEnemies = new Dictionary<EnemyHealth, int>();
+        /// <summary>Total zombie + boss yang direncanakan generator (sebagian baru di-spawn saat player masuk room).</summary>
+        public int PlannedEnemies { get; private set; }
+        /// <summary>Boss Goal room yang belum di-spawn (menunggu player masuk Goal room).</summary>
+        public bool BossPending { get; private set; }
+
+        // Spawn tertunda: zombie baru muncul saat player masuk room-nya (sebelum itu tidak bisa mengejar / ditembak).
+        readonly Dictionary<int, List<DungeonPlacement>> pendingRooms = new Dictionary<int, List<DungeonPlacement>>();
+        readonly List<DungeonPlacement> pendingLoose = new List<DungeonPlacement>();     // Random Walk: tanpa room → jarak
+        Dictionary<string, EnemyVariant> variantsById;
+        /// <summary>Prefab ikon/panah minimap (diambil dari MinimapBlip pickup ammo) + ikon generator Mini Project.</summary>
+        public MinimapBlip MapIconTemplate { get; private set; }
+        public Sprite GeneratorMapIcon { get; private set; }
+        EnemyVariant bossVariantRuntime;
 
         Scene gameScene;
         EnemyCatalog catalog;
@@ -109,6 +122,7 @@ namespace Outpost.Dungeon
                     if (env.templatesRoot != null) env.templatesRoot.gameObject.SetActive(false);
                     if (env.staticObjects != null) env.staticObjects.gameObject.SetActive(false);   // objek manual khusus arena PCG
                     SceneManager.SetActiveScene(environment);
+                    BrightenAtmosphere(environment);
                     DynamicGI.UpdateEnvironment();
                 }
             }
@@ -123,6 +137,7 @@ namespace Outpost.Dungeon
             var wd = FindInGame<WaveDirector>();
             if (wd != null) { catalog = wd.catalog; bossScale = wd.bossScale; bossVariantId = wd.bossVariantId; Destroy(wd); }
             var gen = FindInGame<GeneratorHealth>();
+            if (gen != null) { var gb = gen.GetComponentInChildren<MinimapBlip>(true); if (gb != null) GeneratorMapIcon = gb.icon; }
             if (gen != null) { if (gen.gameObject != systems) gen.gameObject.SetActive(false); else gen.enabled = false; }
             yield return null;
 
@@ -152,6 +167,22 @@ namespace Outpost.Dungeon
             startTime = Time.time;
             Ready = true;
             HudEvents.ShowToast("DUNGEON SEED " + Seed + "  //  " + (Objectives.relays.Count > 0 ? "ACTIVATE " + Objectives.relays.Count + " POWER RELAYS" : "REACH THE GENERATOR"), new Color(1f, .82f, .35f));
+        }
+
+        /// <summary>Malam tetap malam, tapi cahaya bulan & ambient dinaikkan supaya isi dungeon terbaca (hanya sesi ini; scene asli tidak diubah).</summary>
+        void BrightenAtmosphere(Scene environment)
+        {
+            int moons = 0;
+            foreach (var root in environment.GetRootGameObjects())
+                foreach (var l in root.GetComponentsInChildren<Light>(true))
+                    if (l.type == LightType.Directional) { l.intensity *= Profile.moonBoost; moons++; }
+            float boost = Mathf.Max(1f, Profile.ambientBoost);
+            RenderSettings.ambientIntensity *= boost;
+            RenderSettings.ambientLight *= boost;
+            RenderSettings.ambientSkyColor *= boost;
+            RenderSettings.ambientEquatorColor *= boost;
+            RenderSettings.ambientGroundColor *= boost;
+            Debug.Log("[DUNGEON] Pencahayaan: " + moons + " directional x" + Profile.moonBoost + ", ambient x" + boost, this);
         }
 
         public DungeonBuildContext MakeContext(bool preview)
@@ -212,47 +243,136 @@ namespace Outpost.Dungeon
         {
             bossCell = null;
             bool deferBoss = Profile.bossAfterRelays && Layout.Count(PlaceKind.Relay) > 0;
-            var byId = catalog != null ? catalog.variants.Where(v => v != null && v.prefab != null && v.kind == EnemyKind.Normal).GroupBy(v => v.id).ToDictionary(g => g.Key, g => g.First())
-                                       : new Dictionary<string, EnemyVariant>();
-            var boss = BossVariant();
+            variantsById = catalog != null ? catalog.variants.Where(v => v != null && v.prefab != null && v.kind == EnemyKind.Normal).GroupBy(v => v.id).ToDictionary(g => g.Key, g => g.First())
+                                           : new Dictionary<string, EnemyVariant>();
+            bossVariantRuntime = BossVariant();
             var drop = FindInGame<DropManager>();
-            var counts = new Dictionary<string, int>();
+            if (drop != null && drop.ammoPrefab != null) MapIconTemplate = drop.ammoPrefab.GetComponent<MinimapBlip>();
             var itemRoot = new GameObject("Items (ammo / medkit)").transform; itemRoot.SetParent(World.root, false);
             foreach (var q in Layout.placements)
             {
                 Vector3 pos = World.CellToWorld(q.cell);
                 if (q.kind == PlaceKind.Boss) bossCell = q.cell;
-                if (q.kind == PlaceKind.Boss && deferBoss) continue;               // boss baru muncul setelah relay terakhir aktif
                 if (q.kind == PlaceKind.Enemy || q.kind == PlaceKind.Boss)
                 {
-                    EnemyVariant v = null;
-                    if (q.kind == PlaceKind.Boss) v = boss;
-                    else if (!byId.TryGetValue(q.id, out v)) v = byId.Values.FirstOrDefault();
-                    if (v == null) continue;
-                    var go = EnemyDebugSpawner.SpawnAt(v.prefab, pos);
-                    if (go == null) continue;
-                    go.transform.rotation = Quaternion.Euler(0f, q.yaw, 0f);
-                    go.name = (q.kind == PlaceKind.Boss ? "Boss " : "Zombie ") + v.id + " @" + q.cell.x + "," + q.cell.y;
-                    var hp = go.GetComponent<EnemyHealth>();
-                    if (q.kind == PlaceKind.Boss && hp != null && hp.config != null)
-                        go.transform.localScale = Vector3.one * (bossScale / Mathf.Max(0.01f, hp.config.visualScale));
-                    if (hp != null) { enemies.Add(hp); if (q.kind == PlaceKind.Enemy) roomEnemies[hp] = q.room; }
-                    counts.TryGetValue(v.id, out int n); counts[v.id] = n + 1;
-                    SpawnedEnemies++;
+                    PlannedEnemies++;
+                    if (q.kind == PlaceKind.Boss && deferBoss) continue;           // boss baru muncul setelah relay terakhir aktif
+                    if (q.kind == PlaceKind.Boss) BossPending = true;
+                    if (q.room >= 0)
+                    {
+                        List<DungeonPlacement> list;
+                        if (!pendingRooms.TryGetValue(q.room, out list)) pendingRooms[q.room] = list = new List<DungeonPlacement>();
+                        list.Add(q);
+                    }
+                    else pendingLoose.Add(q);
                 }
                 else if (q.kind == PlaceKind.Item && drop != null)
                 {
                     var prefab = q.id == SupplyKind.Health.ToString() ? drop.healthPrefab : drop.ammoPrefab;
                     if (prefab == null) continue;
-                    var go = Instantiate(prefab, pos, Quaternion.Euler(0f, q.yaw, 0f), itemRoot);
+                    // Rotasi identity: ikon minimap (Aux_MP) mewarisi rotasi 3D objek saat dibuat; yaw acak membuat ikon terlihat gepeng.
+                    // Model pickup tetap berputar sendiri (PickupItem).
+                    var go = Instantiate(prefab, pos, Quaternion.identity, itemRoot);
                     go.name = "Item " + q.id + " @" + q.cell.x + "," + q.cell.y;
                     var item = go.GetComponent<PickupItem>();
                     if (item != null) item.lifetime = 100000f;
                     SpawnedItems++;
                 }
             }
-            Debug.Log("[DUNGEON] Spawned: " + string.Join(", ", counts.Select(k => k.Key + " " + k.Value)) + " | item " + SpawnedItems +
+            Debug.Log("[DUNGEON] Zombie menunggu player: " + pendingRooms.Count + " room (" + pendingRooms.Values.Sum(l => l.Count) + " zombie)" +
+                      (pendingLoose.Count > 0 ? " + " + pendingLoose.Count + " area terbuka" : "") + " | item " + SpawnedItems +
                       " | rencana enemy " + Layout.Count(PlaceKind.Enemy) + " + boss " + Layout.Count(PlaceKind.Boss), this);
+        }
+
+        /// <summary>Player berada di dalam room (bukan di mulut pintu / cell tepi).</summary>
+        public bool InsideRoom(Vector2Int cell, int room)
+        {
+            if (room < 0 || room >= Layout.rooms.Count) return false;
+            var r = Layout.rooms[room];
+            return cell.x > r.x && cell.x < r.x + r.width - 1 && cell.y > r.y && cell.y < r.y + r.height - 1;
+        }
+
+        public bool RoomSpawned(int room) { return !pendingRooms.ContainsKey(room); }
+        public int PendingInRoom(int room) { List<DungeonPlacement> l; return pendingRooms.TryGetValue(room, out l) ? l.Count : 0; }
+
+        /// <summary>Spawn semua zombie milik room (sekali). Cell yang terlalu dekat player dipindah ke sisi room yang lebih jauh.</summary>
+        public List<EnemyHealth> SpawnRoom(int room, Vector3 playerPos)
+        {
+            var spawned = new List<EnemyHealth>();
+            List<DungeonPlacement> list;
+            if (!pendingRooms.TryGetValue(room, out list)) return spawned;
+            pendingRooms.Remove(room);
+            var r = Layout.rooms[room];
+            var playerCell = World.WorldToCell(playerPos);
+            var used = new HashSet<Vector2Int>();
+            var free = new List<Vector2Int>();
+            for (int x = r.x; x < r.x + r.width; x++)
+                for (int y = r.y; y < r.y + r.height; y++)
+                {
+                    var c = new Vector2Int(x, y);
+                    if (Layout.Walkable(c) && !Layout.goalArea[c.x, c.y] && Vector2Int.Distance(c, playerCell) >= Profile.spawnMinPlayerCells) free.Add(c);
+                }
+            free.Sort((a, b) => Vector2Int.Distance(b, playerCell).CompareTo(Vector2Int.Distance(a, playerCell)));
+            int moved = 0;
+            foreach (var q in list)
+            {
+                var cell = q.cell;
+                if (Vector2Int.Distance(cell, playerCell) < Profile.spawnMinPlayerCells || used.Contains(cell))
+                {
+                    int k = free.FindIndex(c => !used.Contains(c));
+                    if (k >= 0) { cell = free[k]; moved++; }
+                }
+                used.Add(cell);
+                var hp = SpawnEnemy(q, cell);
+                if (hp == null) continue;
+                spawned.Add(hp);
+                if (q.kind == PlaceKind.Enemy) roomEnemies[hp] = room;
+                DungeonObjectives.Alert(hp, playerPos);                             // zombie room langsung sadar posisi player
+            }
+            Debug.Log("[DUNGEON] Player masuk room " + room + ": spawn " + spawned.Count + " zombie" + (moved > 0 ? " (" + moved + " dipindah menjauhi player)" : "") + ".", this);
+            return spawned;
+        }
+
+        EnemyHealth SpawnEnemy(DungeonPlacement q, Vector2Int cell)
+        {
+            EnemyVariant v = null;
+            if (q.kind == PlaceKind.Boss) v = bossVariantRuntime;
+            else if (!variantsById.TryGetValue(q.id, out v)) v = variantsById.Values.FirstOrDefault();
+            if (v == null) return null;
+            var go = EnemyDebugSpawner.SpawnAt(v.prefab, World.CellToWorld(cell));
+            if (go == null) return null;
+            // Tanpa yaw acak: ikon minimap zombie dibuat dari rotasi awal objek (lihat item di atas). Zombie langsung berbalik ke player.
+            go.name = (q.kind == PlaceKind.Boss ? "Boss " : "Zombie ") + v.id + " @" + cell.x + "," + cell.y;
+            var hp = go.GetComponent<EnemyHealth>();
+            if (q.kind == PlaceKind.Boss && hp != null && hp.config != null)
+                go.transform.localScale = Vector3.one * (bossScale / Mathf.Max(0.01f, hp.config.visualScale));
+            if (hp != null)
+            {
+                enemies.Add(hp);
+                if (q.kind == PlaceKind.Boss) { BossPending = false; if (Objectives != null) Objectives.RegisterBoss(hp); }
+            }
+            SpawnedEnemies++;
+            return hp;
+        }
+
+        /// <summary>Trigger spawn: room yang dimasuki player (yang tidak punya clear-room lock) + zombie area terbuka (Random Walk).</summary>
+        void UpdateSpawns(Vector3 playerPos)
+        {
+            var cell = World.WorldToCell(playerPos);
+            int room = Layout.RoomAt(cell);
+            if (room >= 0 && !RoomSpawned(room) && InsideRoom(cell, room) && (Objectives == null || !Objectives.HasLock(room)))
+            {
+                int n = SpawnRoom(room, playerPos).Count;
+                if (n > 0) HudEvents.ShowToast(room == Layout.goalRoom && !BossPending && Objectives != null && Objectives.Boss != null ? "BOSS ROOM  //  " + n + " CONTACTS" : "CONTACTS DETECTED  //  " + n, new Color(1f, .45f, .25f));
+            }
+            for (int i = pendingLoose.Count - 1; i >= 0; i--)
+            {
+                var q = pendingLoose[i];
+                if (Vector2Int.Distance(q.cell, cell) > Profile.looseSpawnCells) continue;
+                pendingLoose.RemoveAt(i);
+                var hp = SpawnEnemy(q, q.cell);
+                if (hp != null) DungeonObjectives.Alert(hp, playerPos);
+            }
         }
 
         void OnEnemyDied(EnemyHealth e) { if (enemies.Contains(e)) Kills++; }
@@ -265,6 +385,29 @@ namespace Outpost.Dungeon
         public int EnemiesAlive { get { int n = 0; foreach (var e in enemies) if (e != null && !e.IsDead) n++; return n; } }
 
         // ---------------------------------------------------------------- loop: path guide + goal
+
+        // ---------------------------------------------------------------- ikon minimap konsisten
+        // Aux_MP (aset radar) membuat ikon dengan rotasi 3D objeknya saat itu, jadi item/zombie yang di-spawn dengan yaw acak
+        // (termasuk drop zombie dari DropManager) tampil gepeng. Di mode Dungeon saja, ikon diratakan kembali dan ikon ammo
+        // sedikit diperbesar. Script aset & Mini Project tidak diubah.
+        static readonly System.Reflection.FieldInfo auxIconField =
+            typeof(MiniMapModular.Aux_MP).GetField("Icon_M", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        float nextIconFix;
+
+        void LateUpdate()
+        {
+            if (!Ready || Time.unscaledTime < nextIconFix) return;
+            nextIconFix = Time.unscaledTime + 0.2f;
+            Sprite ammo = MapIconTemplate != null ? MapIconTemplate.icon : null;
+            foreach (var a in FindObjectsByType<MiniMapModular.Aux_MP>(FindObjectsSortMode.None))
+            {
+                if (a == null) continue;
+                if (ammo != null && a.Sprite_Me == ammo && a.SizeIconAdd < Profile.mapAmmoIconSize) a.SizeIconAdd = Profile.mapAmmoIconSize;
+                if (a.RotIconMe == 1 || auxIconField == null) continue;
+                var icon = auxIconField.GetValue(a) as RectTransform;
+                if (icon != null && icon.localRotation != Quaternion.identity) icon.localRotation = Quaternion.identity;
+            }
+        }
 
         void Update()
         {
@@ -279,6 +422,7 @@ namespace Outpost.Dungeon
                 if (DungeonGenerator.FindPath(Layout, cell, target, guide)) RemainingCells = guide.Count - 1;
                 UpdateGuideLine();
             }
+            if (hp != null && !hp.IsDead && !GoalReached) UpdateSpawns(hp.transform.position);
             if (hp != null && !hp.IsDead && !GoalReached && (Objectives == null || Objectives.GeneratorUnlocked) && NearGoal(hp.transform.position)) ReachGoal();
             if (GoalReached)
             {
@@ -333,7 +477,7 @@ namespace Outpost.Dungeon
             if (c != null) c.InputEnabled = false;
             FpsController.LockCursor(false);
             foreach (var l in World.root.GetComponentsInChildren<Light>()) if (l.transform.IsChildOf(World.root.Find("Goal (generator)"))) { l.color = new Color(0.55f, 1f, 0.6f); l.intensity *= 1.6f; }
-            Debug.Log("[DUNGEON] GOAL tercapai: seed " + Seed + ", waktu " + ElapsedTime.ToString("0.0") + " s, kill " + Kills + "/" + enemies.Count, this);
+            Debug.Log("[DUNGEON] GOAL tercapai: seed " + Seed + ", waktu " + ElapsedTime.ToString("0.0") + " s, kill " + Kills + "/" + PlannedEnemies, this);
             string extra = Objectives != null ? "  //  relays " + Objectives.ActiveRelays + "/" + Objectives.relays.Count + "  //  rooms cleared " + Objectives.RoomsCleared : "";
             ShowEnd("POWER RESTORED", "Goal reached in " + FormatTime(ElapsedTime) + "  //  seed " + Seed + "  //  " + Kills + " kills" + extra + "\nENTER new dungeon   ·   F7 replay this seed");
             StartCoroutine(FreezeLater());
@@ -416,7 +560,7 @@ namespace Outpost.Dungeon
             var hp = PlayerHealth.Instance;
             if (GoalReached) status.text = "GOAL REACHED  //  " + FormatTime(ElapsedTime);
             else if (hp != null && hp.IsDead) status.text = "KIA  //  ENTER retries seed " + Seed;
-            else status.text = (Objectives != null ? Objectives.ObjectiveText() : "REACH THE GENERATOR") + "  //  " + Mathf.RoundToInt(RemainingCells * World.tile) + " m  //  CONTACTS " + EnemiesAlive + "/" + enemies.Count + "  //  " + FormatTime(ElapsedTime);
+            else status.text = (Objectives != null ? Objectives.ObjectiveText() : "REACH THE GENERATOR") + "  //  " + Mathf.RoundToInt(RemainingCells * World.tile) + " m  //  CONTACTS " + EnemiesAlive + "/" + PlannedEnemies + "  //  " + FormatTime(ElapsedTime);
             prompt.text = !GoalReached && Objectives != null && !string.IsNullOrEmpty(Objectives.Prompt) ? Objectives.Prompt : "";
         }
 

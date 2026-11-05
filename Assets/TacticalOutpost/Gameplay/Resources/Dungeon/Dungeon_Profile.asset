@@ -66,6 +66,8 @@ MonoBehaviour:
   corridorLight: {fileID: 0}
   corridorLightSpacing: 7
   propTable: []
+  mapRelayIcon: {fileID: 21300000, guid: 09e57bbf21c6ebe408682dd725dab86f, type: 3}
+  mapGeneratorIcon: {fileID: 21300000, guid: e749e82f20233b348b6bffa194730d90, type: 3}
   safeZoneColor: {r: 0.15, g: 1, b: 0.35, a: 1}
   pathColor: {r: 1, g: 0.72, b: 0.2, a: 1}
   lineGlow: 4

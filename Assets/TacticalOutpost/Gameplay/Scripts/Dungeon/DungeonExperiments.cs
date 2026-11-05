@@ -131,13 +131,13 @@ namespace Outpost.Dungeon
             sb.AppendLine("|---|---|---:|---:|---:|---|");
             foreach (int count in new[] { 5, 10, 20 })
             {
-                var L = Gen(With(x => x.enemyCount = count), 500);
+                var L = Gen(With(x => { x.enemyCount = count; x.zombiesByDistance = false; }), 500);
                 int e = L.Count(PlaceKind.Enemy);
                 sb.AppendLine("| Absolut " + count + " | 60×40 | " + L.floorCount + " | " + e + " | " + (L.floorCount / (float)Mathf.Max(1, e)).ToString("0") + " | " + L.enemyStats.Summary() + " |");
             }
             foreach (var size in new[] { new Vector2Int(40, 30), new Vector2Int(60, 40), new Vector2Int(80, 60) })
             {
-                var L = Gen(With(x => { x.mapWidth = size.x; x.mapHeight = size.y; x.useEnemyDensity = true; x.floorTilesPerEnemy = 50; }), 500);
+                var L = Gen(With(x => { x.mapWidth = size.x; x.mapHeight = size.y; x.useEnemyDensity = true; x.floorTilesPerEnemy = 50; x.zombiesByDistance = false; }), 500);
                 int e = L.Count(PlaceKind.Enemy);
                 sb.AppendLine("| Density 1/50 floor | " + size.x + "×" + size.y + " | " + L.floorCount + " | " + e + " | " + (L.floorCount / (float)Mathf.Max(1, e)).ToString("0") + " | " + L.enemyStats.Summary() + " |");
             }
@@ -220,6 +220,28 @@ namespace Outpost.Dungeon
                 }
                 sb.AppendLine("| " + n + " | " + (placed / 5f).ToString("0.0") + " | " + (off / 5f).ToString("0.0") + " | " + (guards / 5f).ToString("0.0") + " | " + (direct / 5f).ToString("0.0") +
                               " | " + (route / 5f).ToString("0.0") + " | " + (route / Mathf.Max(1f, direct)).ToString("0.00") + "× | " + valid + "/5 |");
+            }
+            sb.AppendLine();
+
+            // ------------------------------------------------------------ Zombie bertingkat menurut jarak
+            sb.AppendLine("## Eksperimen 11 — Zombie per room menurut jarak dari Start (default, tingkat " + string.Join("/", System.Array.ConvertAll(baseProfile.zombieTiers, x => x.ToString())) + ")");
+            sb.AppendLine();
+            sb.AppendLine("Room diurutkan dari jarak BFS ke Start (room Start/safe room = 0). Huruf = jenis: w walker, r runner, s skinless, b bloater.");
+            sb.AppendLine();
+            sb.AppendLine("| Seed | Total zombie | Room (jarak BFS → jumlah [jenis]) |");
+            sb.AppendLine("|---:|---:|---|");
+            foreach (int seed in new[] { 101, 202, 303, 404, 505 })
+            {
+                var L = Gen(def, seed);
+                var parts = new List<string>();
+                var rooms = new List<DungeonRoom>(L.rooms);
+                rooms.Sort((a, b2) => DungeonGenerator.RoomDistance(L, a).CompareTo(DungeonGenerator.RoomDistance(L, b2)));
+                foreach (var r in rooms)
+                {
+                    var ids = L.placements.Where(q => q.kind == PlaceKind.Enemy && q.room == r.index).Select(q => q.id.Substring(0, 1)).ToArray();
+                    parts.Add("d" + DungeonGenerator.RoomDistance(L, r) + "→" + ids.Length + (ids.Length > 0 ? " [" + string.Join("", ids) + "]" : ""));
+                }
+                sb.AppendLine("| " + seed + " | " + L.Count(PlaceKind.Enemy) + " | " + string.Join(", ", parts.ToArray()) + " |");
             }
             sb.AppendLine();
 

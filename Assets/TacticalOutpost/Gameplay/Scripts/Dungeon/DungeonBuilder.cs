@@ -87,13 +87,19 @@ namespace Outpost.Dungeon
         public static bool[] PropAllowed(DungeonProfile p, PcgArena helper, float tile)
         {
             var allowed = new bool[p.propTable != null ? p.propTable.Length : 0];
+            var spans = new int[allowed.Length];
             for (int i = 0; i < allowed.Length; i++)
             {
                 var e = p.propTable[i];
                 if (e == null || e.prefab == null) continue;
                 Vector3 s = helper.SizeOf(e.prefab);
-                allowed[i] = Mathf.Max(s.x, s.z) <= tile * 0.8f && s.y <= 4f;
+                float longSide = Mathf.Max(s.x, s.z), shortSide = Mathf.Min(s.x, s.z);
+                // Props biasa: muat 1 cell. Props besar (container, dumpster panjang): lebar ≤ 1 cell, panjang 2–3 cell, menempel dinding.
+                int cellSpan = longSide <= tile * 0.8f ? 1 : Mathf.CeilToInt(longSide / (tile * 0.95f));
+                spans[i] = cellSpan;
+                allowed[i] = s.y <= 4f && shortSide <= tile * 0.85f && cellSpan <= 3;
             }
+            p.propSpan = spans;
             return allowed;
         }
 
@@ -117,6 +123,7 @@ namespace Outpost.Dungeon
             BuildWalls(w);
             BuildGoal(w, ctx);
             BuildLights(w, ctx);
+            BuildFillLights(w);
             BuildProps(w);
             BuildRelays(w);
             BuildSafeZone(w);
@@ -319,6 +326,56 @@ namespace Outpost.Dungeon
                 }
         }
 
+        /// <summary>
+        /// Lampu pengisi (komponen Light, tanpa mesh) supaya isi room terang dan jelas: satu point light per kotak
+        /// roomLightSpacing x roomLightSpacing cell di ketinggian roomLightHeight, plus lampu di corridor tiap corridorFillSpacing cell.
+        /// Tanpa bayangan supaya ringan.
+        /// </summary>
+        static void BuildFillLights(DungeonWorld w)
+        {
+            var p = w.profile; var L = w.layout;
+            if (!p.roomFillLights) return;
+            var root = Child(w.root, "Fill lights (penerang room & corridor)");
+            float range = p.roomLightSpacing * w.tile * 1.15f;
+            System.Action<Vector3, float, float> Add = (pos, intensity, r) =>
+            {
+                var go = new GameObject("Fill light");
+                go.transform.SetParent(root, false);
+                go.transform.position = pos;
+                var l = go.AddComponent<Light>();
+                l.type = LightType.Point; l.color = p.roomLightColor; l.intensity = intensity; l.range = r;
+                l.shadows = LightShadows.None; l.renderMode = LightRenderMode.ForcePixel;
+                w.lightObjects++;
+            };
+            if (L.algorithm == DungeonAlgorithm.BSP)
+            {
+                foreach (var r in L.rooms)
+                {
+                    int nx = Mathf.Max(1, Mathf.RoundToInt(r.width / (float)p.roomLightSpacing));
+                    int ny = Mathf.Max(1, Mathf.RoundToInt(r.height / (float)p.roomLightSpacing));
+                    for (int i = 0; i < nx; i++)
+                        for (int j = 0; j < ny; j++)
+                        {
+                            // Titik tengah tiap kotak pembagian room.
+                            float fx = r.x + (i + 0.5f) * r.width / nx, fy = r.y + (j + 0.5f) * r.height / ny;
+                            Vector3 pos = w.VertexToWorld(0, 0) + new Vector3(fx * w.tile, p.roomLightHeight, fy * w.tile);
+                            Add(pos, p.roomLightIntensity, range);
+                        }
+                }
+            }
+            // Corridor (dan seluruh area Random Walk): titik dengan jarak minimum corridorFillSpacing.
+            var placed = new List<Vector2Int>();
+            for (int x = 1; x < L.width - 1; x++)
+                for (int y = 1; y < L.height - 1; y++)
+                {
+                    var c = new Vector2Int(x, y);
+                    if (!L.IsFloor(c) || L.roomId[x, y] >= 0) continue;
+                    if (placed.Exists(q => Mathf.Abs(q.x - c.x) + Mathf.Abs(q.y - c.y) < p.corridorFillSpacing)) continue;
+                    placed.Add(c);
+                    Add(w.CellToWorld(c) + Vector3.up * (p.roomLightHeight * 0.8f), p.corridorLightIntensity, p.corridorFillSpacing * w.tile);
+                }
+        }
+
         static bool FreeForDecor(DungeonLayout L, Vector2Int c)
         {
             if (!L.Walkable(c) || L.goalArea[c.x, c.y] || c == L.startPosition) return false;
@@ -358,7 +415,31 @@ namespace Outpost.Dungeon
                 if (q.kind != PlaceKind.Prop) continue;
                 int index;
                 if (!int.TryParse(q.id, out index) || p.propTable == null || index < 0 || index >= p.propTable.Length || p.propTable[index] == null || p.propTable[index].prefab == null) continue;
-                var go = w.helper.Place(p.propTable[index].prefab, w.CellToWorld(q.cell), q.yaw, w.propRoot);
+                Vector3 pos = w.CellToWorld(q.cell);
+                if (q.Cells > 1)
+                {
+                    // Props besar: di tengah deretan cell, sisi panjang sejajar dinding, digeser mendekati dinding.
+                    pos = (w.CellToWorld(q.cell) + w.CellToWorld(q.CellAt(q.Cells - 1))) * 0.5f;
+                    var prefab = p.propTable[index].prefab;
+                    Vector3 size = w.helper.SizeOf(prefab);
+                    float slack = Mathf.Max(0f, (w.tile - Mathf.Min(size.x, size.z)) * 0.5f - 0.5f);
+                    pos += new Vector3(q.wallDir.x, 0f, q.wallDir.y) * slack;
+                    float yawAlong = Mathf.Atan2(q.spanDir.x, q.spanDir.y) * Mathf.Rad2Deg;          // arah sejajar dinding
+                    float yaw = size.z >= size.x ? yawAlong : yawAlong - 90f;                      // sumbu panjang prefab → sejajar dinding
+                    var big = w.helper.Place(prefab, pos, yaw, w.propRoot);
+                    PcgArena.EnsureSolid(big);
+                    big.name = "Prop besar " + q.cell.x + "," + q.cell.y + " x" + q.Cells + " " + prefab.name;
+                    w.propObjects++;
+                    continue;
+                }
+                if (q.wallDir != Vector2Int.zero)
+                {
+                    // Dekorasi tepi: geser mendekati dinding (sisa ruang cell), tetap di dalam cell sendiri.
+                    Vector3 size = w.helper.SizeOf(p.propTable[index].prefab);
+                    float slack = Mathf.Max(0f, (w.tile - Mathf.Max(size.x, size.z)) * 0.5f - 0.5f);
+                    pos += new Vector3(q.wallDir.x, 0f, q.wallDir.y) * slack;
+                }
+                var go = w.helper.Place(p.propTable[index].prefab, pos, q.yaw, w.propRoot);
                 PcgArena.EnsureSolid(go);
                 go.name = "Prop " + q.cell.x + "," + q.cell.y + " " + p.propTable[index].prefab.name;
                 w.propObjects++;
@@ -391,10 +472,24 @@ namespace Outpost.Dungeon
             w.startYaw = d.sqrMagnitude > 0.01f ? Mathf.Atan2(d.x, d.z) * Mathf.Rad2Deg : 0f;
         }
 
-        /// <summary>Garis hijau bercahaya di tepi safe zone; bagian yang melewati Wall tidak digambar.</summary>
+        /// <summary>
+        /// Penanda safe zone: kotak hijau bercahaya yang mengikuti keempat sisi room Start (sedikit di dalam dinding).
+        /// Random Walk (tanpa room): lingkaran radius safeRadiusCells, bagian yang melewati Wall tidak digambar.
+        /// </summary>
         static void BuildSafeZone(DungeonWorld w)
         {
             var p = w.profile; var L = w.layout;
+            if (L.startRoom >= 0 && L.startRoom < L.rooms.Count)
+            {
+                var r = L.rooms[L.startRoom];
+                float inset = 0.45f;
+                Vector3 a = w.VertexToWorld(r.x, r.y), c = w.VertexToWorld(r.x + r.width, r.y + r.height);
+                float x0 = a.x + inset, z0 = a.z + inset, x1 = c.x - inset, z1 = c.z - inset, y = 0.05f;
+                var rect = new List<Vector3> { new Vector3(x0, y, z0), new Vector3(x1, y, z0), new Vector3(x1, y, z1), new Vector3(x0, y, z1) };
+                Line(w.markerRoot, "Safe zone room (core)", rect, p.lineWidth, p.safeZoneColor * p.lineGlow, false, true);
+                Line(w.markerRoot, "Safe zone room (glow)", rect, p.lineWidth * 4f, p.safeZoneColor * 0.4f, true, true);
+                return;
+            }
             float radius = p.safeRadiusCells * w.tile;
             Vector3 center = w.CellToWorld(L.startPosition);
             const int segments = 160;

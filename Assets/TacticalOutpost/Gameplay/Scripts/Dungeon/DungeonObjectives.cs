@@ -13,9 +13,9 @@ namespace Outpost.Dungeon
     /// Objektif di sepanjang dungeon (sebelum Goal):
     ///  1. POWER RELAY (lock-and-key): generator di Goal terkunci sampai semua relay aktif (tekan E di dekat relay).
     ///     Posisi relay hasil generator (DungeonGenerator.PlaceRelays) dan sudah divalidasi BFS: terjangkau tanpa melewati Goal.
-    ///  2. CLEAR ROOM: masuk room berisi zombie → semua bukaan room ditutup pintu (segmen dinding naik dari lantai)
-    ///     sampai zombie milik room itu habis. Relay di room yang sedang terkunci baru bisa diaktifkan setelah room bersih.
-    ///  3. BOSS: boss baru muncul di Goal room setelah relay terakhir aktif lalu memburu player; generator baru bisa
+    ///  2. CLEAR ROOM: zombie room baru di-spawn saat player masuk room → semua bukaan room ditutup pintu (segmen dinding
+    ///     naik dari lantai) sampai zombie milik room itu habis. Relay di room yang sedang terkunci baru bisa diaktifkan setelah room bersih.
+    ///  3. BOSS: setelah relay terakhir aktif, boss muncul saat player masuk Goal room; generator baru bisa
     ///     dinyalakan setelah boss mati (bossMustDie).
     /// Semua objek memakai prefab existing (Electric_box_v3 untuk relay, segmen dinding untuk pintu). Lampu indikator relay
     /// adalah komponen Light (merah = mati, hijau = aktif).
@@ -28,6 +28,7 @@ namespace Outpost.Dungeon
             public int room;
             public GameObject go;
             public Light indicator;
+            public DungeonMapIcon mapIcon;
             public bool active;
         }
 
@@ -58,7 +59,7 @@ namespace Outpost.Dungeon
         public string Prompt { get; private set; }
         public int ActiveRelays { get { int n = 0; foreach (var r in relays) if (r.active) n++; return n; } }
         public bool RelaysDone { get { return ActiveRelays >= relays.Count; } }
-        public bool BossDone { get { return !s.Profile.bossMustDie || (!BossDeferred && Boss == null) || (Boss != null && Boss.IsDead) || (BossDeferred && BossSpawned && Boss == null); } }
+        public bool BossDone { get { return !s.Profile.bossMustDie || (!BossDeferred && !s.BossPending && Boss == null) || (Boss != null && Boss.IsDead) || (BossDeferred && BossSpawned && Boss == null); } }
         public bool GeneratorUnlocked { get { return RelaysDone && BossDone; } }
         public RoomLock LockedRoom { get { foreach (var l in locks) if (l.locked) return l; return null; } }
         public int RoomsCleared { get { int n = 0; foreach (var l in locks) if (l.cleared) n++; return n; } }
@@ -67,13 +68,17 @@ namespace Outpost.Dungeon
             typeof(EnemyBrain).GetMethod("HearGunfire", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         static readonly Color RelayOff = new Color(1f, 0.15f, 0.1f), RelayOn = new Color(0.3f, 1f, 0.45f);
+        // Warna ikon minimap: relay mati = magenta (beda dari zombie kuning, boss merah, ammo kuning, medkit hijau).
+        static readonly Color MapRelayOff = new Color(1f, 0.3f, 0.85f), MapRelayOn = new Color(0.3f, 1f, 0.45f);
+        static readonly Color MapGenLocked = new Color(1f, 0.88f, 0.35f), MapGenReady = new Color(0.35f, 0.9f, 1f), MapGenDone = new Color(0.3f, 1f, 0.45f);
+        DungeonMapIcon generatorIcon;
 
         public void Setup(DungeonSession session, EnemyVariant bossVariant, float bossScale, Vector2Int? bossCell)
         {
             s = session;
             bossVariantCache = bossVariant; this.bossScale = bossScale; this.bossCell = bossCell;
             BossDeferred = s.Profile.bossAfterRelays && bossCell.HasValue && bossVariant != null && s.Layout.Count(PlaceKind.Relay) > 0;
-            if (!BossDeferred) Boss = s.enemies.FirstOrDefault(e => e != null && e.config != null && e.config.kind == EnemyKind.Boss);
+            // Boss tidak ditunda relay: ikut spawn saat player masuk Goal room (RegisterBoss).
 
             // Relay: objek sudah dibangun builder (ikut NavMesh). Tambah lampu indikator.
             foreach (var q in s.Layout.placements)
@@ -92,8 +97,27 @@ namespace Outpost.Dungeon
                     r.indicator.type = LightType.Point; r.indicator.range = 7f; r.indicator.intensity = 4f; r.indicator.color = RelayOff;
                     r.indicator.shadows = LightShadows.None;
                 }
+                var relaySprite = s.Profile.mapRelayIcon != null ? s.Profile.mapRelayIcon : (s.MapIconTemplate != null ? s.MapIconTemplate.icon : null);
+                if (go != null)
+                {
+                    // Penanda ikon terpisah dengan rotasi identity (relay sendiri diputar menurut yaw generator).
+                    var marker = new GameObject("Relay map icon");
+                    marker.transform.SetParent(go.transform, true);
+                    marker.transform.SetPositionAndRotation(s.World.CellToWorld(q.cell), Quaternion.identity);
+                    r.mapIcon = DungeonMapIcon.Attach(marker, s.MapIconTemplate, relaySprite, MapRelayOff, s.Profile.mapRelayIconSize, true);
+                }
                 relays.Add(r);
             }
+            var goalRoot = s.World.root.Find("Goal (generator)");
+            var genSprite = s.Profile.mapGeneratorIcon != null ? s.Profile.mapGeneratorIcon : s.GeneratorMapIcon;
+            GameObject genMarker = null;
+            if (goalRoot != null && s.World.goalBounds.size.sqrMagnitude > 0f)
+            {
+                genMarker = new GameObject("Generator map icon");
+                genMarker.transform.SetParent(goalRoot, false);
+                genMarker.transform.position = new Vector3(s.World.goalBounds.center.x, 0f, s.World.goalBounds.center.z);
+            }
+            if (genMarker != null) generatorIcon = DungeonMapIcon.Attach(genMarker, s.MapIconTemplate, genSprite, relays.Count > 0 ? MapGenLocked : MapGenReady, s.Profile.mapGeneratorIconSize, true);
             if (relays.Count > 0) SetGeneratorLights(new Color(1f, 0.12f, 0.08f), 1f);
 
             // Clear room: room selain Start/Goal yang punya zombie.
@@ -102,9 +126,8 @@ namespace Outpost.Dungeon
                 var doorRoot = new GameObject("Clear-room doors").transform; doorRoot.SetParent(s.World.root, false);
                 foreach (int room in DungeonGenerator.CombatRooms(s.Layout))
                 {
+                    if (s.PendingInRoom(room) == 0) continue;                      // zombie room di-spawn saat player masuk
                     var l = new RoomLock { room = room };
-                    foreach (var kv in s.roomEnemies.Where(k => k.Value == room)) l.enemies.Add(kv.Key);
-                    if (l.enemies.Count == 0) continue;
                     foreach (var edge in DungeonGenerator.DoorEdges(s.Layout, room)) l.doors.Add(BuildDoor(edge.Key, edge.Value, doorRoot));
                     locks.Add(l);
                 }
@@ -112,6 +135,9 @@ namespace Outpost.Dungeon
             Debug.Log("[DUNGEON] Objektif: relay " + relays.Count + " (off-path " + s.Layout.relaysOffPath + ", penjaga " + s.Layout.relayGuards + ") | clear room " + locks.Count +
                       " room, " + locks.Sum(l => l.doors.Count) + " pintu | boss " + (BossDeferred ? "muncul setelah relay terakhir" : "langsung") + (s.Profile.bossMustDie ? ", wajib dikalahkan" : ""), this);
         }
+
+        public void RegisterBoss(EnemyHealth hp) { if (Boss == null) Boss = hp; }
+        public bool HasLock(int room) { foreach (var l in locks) if (l.room == room) return true; return false; }
 
         EnemyVariant bossVariantCache;
         float bossScale;
@@ -182,10 +208,13 @@ namespace Outpost.Dungeon
             if (s == null || !s.Ready) return;
             Prompt = null;
             AnimateDoors();
+            if (generatorIcon != null)
+                generatorIcon.Set(s.GoalReached ? MapGenDone : GeneratorUnlocked ? MapGenReady : MapGenLocked, !s.GoalReached);
             var hp = PlayerHealth.Instance;
             if (hp == null || hp.IsDead || s.GoalReached) return;
             var cell = s.World.WorldToCell(hp.transform.position);
             UpdateRoomLocks(cell, hp.transform.position);
+            UpdateBossTrigger(cell);
             UpdateRelays(hp.transform.position);
             if (!GeneratorUnlocked && s.NearGoal(hp.transform.position))
                 Prompt = !RelaysDone ? "GENERATOR LOCKED  //  ACTIVATE RELAYS " + ActiveRelays + "/" + relays.Count : "ELIMINATE THE BOSS FIRST";
@@ -199,13 +228,14 @@ namespace Outpost.Dungeon
                 int alive = AliveInside(l);
                 if (!l.locked)
                 {
-                    if (alive == 0) { l.cleared = true; continue; }                   // dibersihkan dari luar
-                    var r = s.Layout.rooms[l.room];
-                    bool inside = playerCell.x > r.x && playerCell.x < r.x + r.width - 1 && playerCell.y > r.y && playerCell.y < r.y + r.height - 1;
-                    if (!inside) continue;
+                    if (s.RoomSpawned(l.room) && alive == 0) { l.cleared = true; continue; }
+                    if (!s.InsideRoom(playerCell, l.room)) continue;
+                    // Player sampai di room → zombie room baru muncul, pintu ditutup sampai room bersih.
+                    l.enemies.AddRange(s.SpawnRoom(l.room, playerPos));
+                    alive = AliveInside(l);
+                    if (alive == 0) { l.cleared = true; continue; }
                     l.locked = true; l.lockedAt = Time.time; l.timesLocked++;
                     foreach (var d in l.doors) SetDoor(d, true, false);
-                    foreach (var e in l.enemies) Alert(e, playerPos);                  // zombie room langsung sadar posisi player
                     HudEvents.ShowToast("ROOM SEALED  //  ELIMINATE " + alive + " CONTACTS", new Color(1f, .3f, .2f));
                     Debug.Log("[DUNGEON] Clear room: room " + l.room + " terkunci, " + alive + " zombie, " + l.doors.Count + " pintu.", this);
                 }
@@ -234,7 +264,7 @@ namespace Outpost.Dungeon
             return n;
         }
 
-        static void Alert(EnemyHealth e, Vector3 position)
+        public static void Alert(EnemyHealth e, Vector3 position)
         {
             if (e == null || e.IsDead || hearGunfire == null) return;
             var brain = e.GetComponent<EnemyBrain>();
@@ -262,15 +292,30 @@ namespace Outpost.Dungeon
         {
             r.active = true;
             if (r.indicator != null) { r.indicator.color = RelayOn; r.indicator.intensity = 6f; }
+            if (r.mapIcon != null) r.mapIcon.Set(MapRelayOn, false);
             HudEvents.ShowToast("POWER RELAY " + ActiveRelays + "/" + relays.Count + " ONLINE", new Color(.5f, 1f, .6f));
             Debug.Log("[DUNGEON] Relay " + r.cell + " aktif (" + ActiveRelays + "/" + relays.Count + ") pada " + DungeonSession.FormatTime(s.ElapsedTime), this);
             if (!RelaysDone) return;
             SetGeneratorLights(new Color(1f, 0.75f, 0.3f), 1.4f);                   // generator siap (amber)
-            if (BossDeferred && !BossSpawned) SpawnBoss();
+            if (BossDeferred && !BossSpawned)
+            {
+                bossArmed = true;                                                     // boss muncul saat player masuk Goal room
+                HudEvents.ShowToast("ALL RELAYS ONLINE  //  SOMETHING WAITS AT THE GENERATOR", new Color(1f, .35f, .2f));
+            }
             else HudEvents.ShowToast("ALL RELAYS ONLINE  //  RESTORE THE GENERATOR", new Color(1f, .82f, .35f));
         }
 
         // ---------------------------------------------------------------- boss
+
+        bool bossArmed;
+
+        void UpdateBossTrigger(Vector2Int playerCell)
+        {
+            if (!bossArmed || BossSpawned) return;
+            bool inGoal = s.Layout.goalRoom >= 0 ? s.InsideRoom(playerCell, s.Layout.goalRoom)
+                                                 : Vector2Int.Distance(playerCell, bossCell.Value) <= s.Profile.looseSpawnCells;
+            if (inGoal) SpawnBoss();
+        }
 
         void SpawnBoss()
         {
@@ -283,9 +328,9 @@ namespace Outpost.Dungeon
             Boss = hp;
             if (hp != null) s.enemies.Add(hp);
             var player = PlayerHealth.Instance;
-            if (player != null) Alert(hp, player.transform.position);                 // boss langsung memburu player
-            HudEvents.ShowToast("BOSS AWAKE  //  IT IS HUNTING YOU", new Color(1f, .2f, .15f));
-            Debug.Log("[DUNGEON] Boss muncul di Goal room " + bossCell.Value + " setelah semua relay aktif.", this);
+            if (player != null) Alert(hp, player.transform.position);                 // boss langsung menyerang player
+            HudEvents.ShowToast("BOSS AWAKE  //  ELIMINATE IT", new Color(1f, .2f, .15f));
+            Debug.Log("[DUNGEON] Boss muncul di Goal room " + bossCell.Value + " (semua relay aktif, player masuk Goal room).", this);
         }
 
         void SetGeneratorLights(Color c, float intensityMul)
@@ -318,6 +363,7 @@ namespace Outpost.Dungeon
             var l = LockedRoom;
             if (l != null) return "ROOM SEALED  //  CLEAR " + AliveInside(l) + " CONTACTS";
             if (!RelaysDone) return "ACTIVATE POWER RELAYS " + ActiveRelays + "/" + relays.Count;
+            if (bossArmed && !BossSpawned) return "ALL RELAYS ONLINE  //  ENTER THE GENERATOR ROOM";
             if (!BossDone) return "BOSS AWAKE  //  ELIMINATE IT";
             return "RESTORE THE GENERATOR";
         }

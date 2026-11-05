@@ -498,11 +498,14 @@ namespace Outpost.Dungeon
         {
             if (p.propsPerRoom <= 0 || p.propTable == null || p.propTable.Length == 0) return;
             var weights = new List<float>();
+            var largeWeights = new List<float>();
             for (int i = 0; i < p.propTable.Length; i++)
             {
                 var e = p.propTable[i];
                 bool ok = e != null && (propAllowed == null || (i < propAllowed.Length && propAllowed[i]));
-                weights.Add(ok ? Mathf.Max(0f, e.weight) : 0f);
+                bool large = p.propSpan != null && i < p.propSpan.Length && p.propSpan[i] > 1;
+                weights.Add(ok && !large ? Mathf.Max(0f, e.weight) : 0f);
+                largeWeights.Add(ok && large ? Mathf.Max(0f, e.weight) : 0f);
             }
             var pathZone = new bool[L.width, L.height];
             foreach (var c in L.criticalPath)
@@ -515,31 +518,143 @@ namespace Outpost.Dungeon
             if (L.algorithm == DungeonAlgorithm.BSP) foreach (var r in L.rooms) areas.Add(new RectInt(r.x, r.y, r.width, r.height));
             else for (int i = 0; i < 4; i++) areas.Add(new RectInt(1, 1, L.width - 2, L.height - 2));
 
+            bool bsp = L.algorithm == DungeonAlgorithm.BSP;
             foreach (var area in areas)
-                for (int k = 0; k < p.propsPerRoom; k++)
+            {
+                int cells = area.width * area.height;
+                var usedInRoom = new HashSet<int>();                                     // variasi: jenis yang belum dipakai di room didahulukan
+                int large = PlaceLargeProps(L, p, rng, area, cells, largeWeights, usedInRoom, pathZone);
+                int cover = bsp ? Mathf.Min(Mathf.Max(p.propsPerRoom, p.maxCoverPerRoom), p.propsPerRoom + cells / Mathf.Max(1, p.coverCellsPerExtra)) : p.propsPerRoom;
+                for (int k = 0; k < cover; k++)
                 {
                     L.propStats.requested++;
                     for (int attempt = 0; attempt < 30; attempt++)
                     {
                         L.propStats.attempts++;
                         var c = new Vector2Int(rng.Range(area.xMin, area.xMax), rng.Range(area.yMin, area.yMax));
-                        DRule rule = DRule.Accepted;
-                        if (!L.Walkable(c)) rule = DRule.NotFloor;
-                        else if (L.goalArea[c.x, c.y] || Vector2Int.Distance(c, L.goalPosition) < 2.5f) rule = DRule.GoalArea;
-                        else if (Vector2Int.Distance(c, L.startPosition) <= p.safeRadiusCells) rule = DRule.NearStart;
-                        else if (pathZone[c.x, c.y]) rule = DRule.OnCriticalPath;                 // jangan halangi jalur wajib
-                        else if (NearCorridor(L, c)) rule = DRule.Doorway;                         // pintu room tetap terbuka
-                        else if (!Open(L, c, 1)) rule = DRule.NotOpen;                             // sisakan lorong di semua sisi
-                        else if (L.Occupied(c, 1)) rule = DRule.Occupied;
+                        DRule rule = PropRule(L, p, c, pathZone);
+                        if (rule == DRule.Accepted && !Open(L, c, 1)) rule = DRule.NotOpen;            // sisakan lorong di semua sisi
                         if (rule != DRule.Accepted) { L.propStats.Reject(rule); continue; }
-                        int index = rng.WeightedIndex(weights);
+                        int index = PickVaried(rng, weights, usedInRoom);
                         if (index < 0) return;
                         L.blocked[c.x, c.y] = true;
                         L.placements.Add(new DungeonPlacement { kind = PlaceKind.Prop, cell = c, id = index.ToString(), room = L.RoomAt(c), yaw = 90f * rng.Range(0, 4) + rng.Range(-12f, 12f) });
+                        usedInRoom.Add(index);
                         L.propStats.accepted++;
                         break;
                     }
                 }
+
+                // Dekorasi tepi: menempel dinding room, tidak menutup pintu/jalur wajib, tidak memutus room.
+                int wall = bsp ? Mathf.Min(Mathf.Max(p.wallPropsPerRoom, p.maxWallPropsPerRoom), p.wallPropsPerRoom + cells / Mathf.Max(1, p.wallCellsPerExtra)) : p.wallPropsPerRoom;
+                wall = Mathf.Max(1, wall - large);                                      // container sudah mengisi satu sisi dinding
+                var edge = new List<KeyValuePair<Vector2Int, Vector2Int>>();
+                for (int x = area.xMin; x < area.xMax; x++)
+                    for (int y = area.yMin; y < area.yMax; y++)
+                    {
+                        var c = new Vector2Int(x, y);
+                        Vector2Int dir;
+                        if (L.Walkable(c) && WallSide(L, c, out dir)) edge.Add(new KeyValuePair<Vector2Int, Vector2Int>(c, dir));
+                    }
+                for (int k = 0; k < wall && edge.Count > 0; k++)
+                {
+                    L.propStats.requested++;
+                    for (int attempt = 0; attempt < 30; attempt++)
+                    {
+                        L.propStats.attempts++;
+                        var e = edge[rng.Range(0, edge.Count)];
+                        var c = e.Key;
+                        DRule rule = PropRule(L, p, c, pathZone);
+                        if (rule == DRule.Accepted && !L.Walkable(c - e.Value)) rule = DRule.NotOpen;    // sisi dalam harus tetap lantai
+                        if (rule != DRule.Accepted) { L.propStats.Reject(rule); continue; }
+                        int index = PickVaried(rng, weights, usedInRoom);
+                        if (index < 0) return;
+                        L.blocked[c.x, c.y] = true;
+                        float face = Mathf.Atan2(-e.Value.x, -e.Value.y) * Mathf.Rad2Deg;              // menghadap ke dalam room
+                        L.placements.Add(new DungeonPlacement { kind = PlaceKind.Prop, cell = c, id = index.ToString(), room = L.RoomAt(c), yaw = face + rng.Range(-15f, 15f), wallDir = e.Value });
+                        usedInRoom.Add(index);
+                        L.propStats.accepted++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>Weighted random, tetapi jenis yang sudah dipakai di room ini diberi bobot 0 selama masih ada jenis lain.</summary>
+        static int PickVaried(PcgRandom rng, List<float> weights, HashSet<int> used)
+        {
+            var pick = new List<float>(weights);
+            bool anyUnused = false;
+            for (int j = 0; j < pick.Count; j++) if (pick[j] > 0f && !used.Contains(j)) anyUnused = true;
+            if (anyUnused) for (int j = 0; j < pick.Count; j++) if (used.Contains(j)) pick[j] = 0f;
+            return rng.WeightedIndex(pick);
+        }
+
+        /// <summary>
+        /// Props besar (lebih panjang dari 1 cell, mis. cargo container): diletakkan menempel dinding room di atas deretan
+        /// 2–3 cell tepi. Semua cell harus lantai tepi dengan dinding di sisi yang sama, sisi dalamnya tetap lantai, bukan
+        /// mulut pintu / critical path / safe zone / goal, dan tidak bersebelahan dengan props lain → room tidak terputus.
+        /// </summary>
+        static int PlaceLargeProps(DungeonLayout L, DungeonProfile p, PcgRandom rng, RectInt area, int cells, List<float> largeWeights, HashSet<int> used, bool[,] pathZone)
+        {
+            int placed = 0;
+            if (L.algorithm != DungeonAlgorithm.BSP || CountPositive(largeWeights) == 0) return 0;
+            int count = rng.Value < p.largePropChance ? 1 : 0;
+            if (count > 0 && cells >= p.largePropSecondCells && rng.Value < 0.5f) count = 2;
+            for (int n = 0; n < count; n++)
+            {
+                int index = PickVaried(rng, largeWeights, used);
+                if (index < 0) return placed;
+                int span = p.propSpan[index];
+                L.propStats.requested++;
+                for (int attempt = 0; attempt < 40; attempt++)
+                {
+                    L.propStats.attempts++;
+                    var start = new Vector2Int(rng.Range(area.xMin, area.xMax), rng.Range(area.yMin, area.yMax));
+                    Vector2Int dir;
+                    if (!L.Walkable(start) || !WallSide(L, start, out dir)) { L.propStats.Reject(DRule.NotFloor); continue; }
+                    var along = new Vector2Int(Mathf.Abs(dir.y), Mathf.Abs(dir.x));         // sejajar dinding
+                    if (rng.Range(0, 2) == 0) along = new Vector2Int(-along.x, -along.y);
+                    DRule rule = DRule.Accepted;
+                    for (int k = 0; k < span && rule == DRule.Accepted; k++)
+                    {
+                        var c = start + along * k;
+                        if (!L.IsInsideGrid(c) || L.RoomAt(c) != L.RoomAt(start)) { rule = DRule.NotFloor; break; }
+                        rule = PropRule(L, p, c, pathZone);
+                        if (rule == DRule.Accepted && L.IsFloor(c + dir)) rule = DRule.NotOpen;     // dinding harus di sisi yang sama
+                        if (rule == DRule.Accepted && !L.Walkable(c - dir)) rule = DRule.NotOpen;   // sisi dalam tetap lantai
+                    }
+                    if (rule != DRule.Accepted) { L.propStats.Reject(rule); continue; }
+                    for (int k = 0; k < span; k++) { var c = start + along * k; L.blocked[c.x, c.y] = true; }
+                    float face = Mathf.Atan2(-dir.x, -dir.y) * Mathf.Rad2Deg;
+                    L.placements.Add(new DungeonPlacement { kind = PlaceKind.Prop, cell = start, id = index.ToString(), room = L.RoomAt(start), yaw = face, wallDir = dir, span = span, spanDir = along });
+                    used.Add(index);
+                    L.propStats.accepted++;
+                    placed++;
+                    break;
+                }
+            }
+            return placed;
+        }
+
+        static DRule PropRule(DungeonLayout L, DungeonProfile p, Vector2Int c, bool[,] pathZone)
+        {
+            if (!L.Walkable(c)) return DRule.NotFloor;
+            if (L.goalArea[c.x, c.y] || Vector2Int.Distance(c, L.goalPosition) < 2.5f) return DRule.GoalArea;
+            if (Vector2Int.Distance(c, L.startPosition) <= p.safeRadiusCells) return DRule.NearStart;
+            if (pathZone[c.x, c.y]) return DRule.OnCriticalPath;                 // jangan halangi jalur wajib
+            if (NearCorridor(L, c)) return DRule.Doorway;                         // pintu room tetap terbuka
+            if (L.Occupied(c, 1)) return DRule.Occupied;
+            return DRule.Accepted;
+        }
+
+        /// <summary>Cell lantai yang bersebelahan dengan dinding (bukan lantai) di salah satu sisi; dir = arah dinding.</summary>
+        static bool WallSide(DungeonLayout L, Vector2Int c, out Vector2Int dir)
+        {
+            dir = Vector2Int.zero;
+            foreach (var d in DungeonLayout.Directions)
+                if (!L.IsInsideGrid(c + d) || !L.IsFloor(c + d)) { dir = d; return true; }
+            return false;
         }
 
         static bool NearCorridor(DungeonLayout L, Vector2Int c)
@@ -689,9 +804,126 @@ namespace Outpost.Dungeon
             return total + path.Count - 1;
         }
 
+        /// <summary>
+        /// Zombie bertingkat menurut jarak: area (room BSP, atau pita jarak BFS pada Random Walk) diurutkan dari jarak BFS ke Start,
+        /// lalu dibagi rata ke tingkat zombieTiers (default 3/5/7/9). Makin jauh, makin banyak dan makin condong ke jenis berat.
+        /// Penjaga relay yang sudah ada di room ikut dihitung dalam kuota room tersebut.
+        /// </summary>
+        static void PlaceEnemiesByDistance(DungeonLayout L, DungeonProfile p, PcgRandom rng)
+        {
+            var tiers = p.zombieTiers != null && p.zombieTiers.Length > 0 ? p.zombieTiers : new[] { 3, 5, 7, 9 };
+            var areas = new List<List<Vector2Int>>();
+            var areaRoom = new List<int>();
+            if (L.algorithm == DungeonAlgorithm.BSP)
+            {
+                var rooms = new List<DungeonRoom>();
+                foreach (var r in L.rooms) if (r.index != L.startRoom && !L.safeRooms.Contains(r.index) && RoomDistance(L, r) >= 0) rooms.Add(r);
+                rooms.Sort((a, b) => RoomDistance(L, a).CompareTo(RoomDistance(L, b)));
+                foreach (var r in rooms)
+                {
+                    var cells = new List<Vector2Int>();
+                    for (int x = r.x; x < r.x + r.width; x++) for (int y = r.y; y < r.y + r.height; y++) cells.Add(new Vector2Int(x, y));
+                    areas.Add(cells); areaRoom.Add(r.index);
+                }
+            }
+            else
+            {
+                int max = 0;
+                for (int x = 0; x < L.width; x++) for (int y = 0; y < L.height; y++) max = Mathf.Max(max, L.distance[x, y]);
+                for (int t = 0; t < tiers.Length; t++) { areas.Add(new List<Vector2Int>()); areaRoom.Add(-1); }
+                for (int x = 0; x < L.width; x++)
+                    for (int y = 0; y < L.height; y++)
+                    {
+                        int d = L.distance[x, y];
+                        if (d < p.minEnemyDistance) continue;
+                        int band = Mathf.Min(tiers.Length - 1, (d - p.minEnemyDistance) * tiers.Length / Mathf.Max(1, max - p.minEnemyDistance + 1));
+                        areas[band].Add(new Vector2Int(x, y));
+                    }
+            }
+
+            for (int a = 0; a < areas.Count; a++)
+            {
+                int tier = L.algorithm == DungeonAlgorithm.BSP ? Mathf.Min(tiers.Length - 1, a * tiers.Length / Mathf.Max(1, areas.Count)) : a;
+                float far = tiers.Length > 1 ? tier / (float)(tiers.Length - 1) : 0f;
+                // Bobot jenis: entry ke-j (walker → bloater) makin berat makin dominan di area jauh; bloater tidak ada di tingkat pertama.
+                var weights = new List<float>();
+                for (int j = 0; j < p.enemyTable.Length; j++)
+                {
+                    var e = p.enemyTable[j];
+                    float w = e != null && !string.IsNullOrEmpty(e.id) ? e.weight : 0f;
+                    if (tier == 0 && j == p.enemyTable.Length - 1 && p.enemyTable.Length > 2) w = 0f;
+                    weights.Add(w * (1f + far * p.heavyBiasFar * j));
+                }
+                int quota = tiers[tier];
+                int existing = 0;
+                foreach (var q in L.placements) if (q.kind == PlaceKind.Enemy && areaRoom[a] >= 0 && q.room == areaRoom[a]) existing++;
+                var used = new HashSet<int>();
+                var cells = areas[a];
+                for (int i = existing; i < quota; i++)
+                {
+                    L.enemyStats.requested++;
+                    // Variasi: jenis yang belum dipakai di area ini didahulukan.
+                    var pick = new List<float>(weights);
+                    if (used.Count < CountPositive(weights)) for (int j = 0; j < pick.Count; j++) if (used.Contains(j)) pick[j] = 0f;
+                    int index = Mathf.Max(0, rng.WeightedIndex(pick));
+                    bool placed = false;
+                    for (int attempt = 0; attempt < 80 && !placed && cells.Count > 0; attempt++)
+                    {
+                        L.enemyStats.attempts++;
+                        var c = cells[rng.Range(0, cells.Count)];
+                        DRule rule = DRule.Accepted;
+                        if (!L.Walkable(c)) rule = DRule.NotFloor;
+                        else if (L.goalArea[c.x, c.y]) rule = DRule.GoalArea;
+                        else if (L.Distance(c) < 0) rule = DRule.Unreachable;
+                        else if (L.Distance(c) < p.minEnemyDistance || Vector2Int.Distance(c, L.startPosition) <= p.safeRadiusCells) rule = DRule.NearStart;
+                        else if (L.Occupied(c, attempt < 50 ? 1 : 0)) rule = DRule.Occupied;          // room kecil: boleh bersebelahan
+                        if (rule != DRule.Accepted) { L.enemyStats.Reject(rule); continue; }
+                        L.placements.Add(new DungeonPlacement { kind = PlaceKind.Enemy, cell = c, id = p.enemyTable[index].id, room = L.RoomAt(c), yaw = rng.Range(0f, 360f) });
+                        L.enemyStats.accepted++;
+                        used.Add(index);
+                        placed = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>Jarak BFS terdekat dari Start ke cell mana pun di room (center bisa saja tertutup props).</summary>
+        public static int RoomDistance(DungeonLayout L, DungeonRoom r)
+        {
+            int best = int.MaxValue;
+            for (int x = r.x; x < r.x + r.width; x++)
+                for (int y = r.y; y < r.y + r.height; y++) { int d = L.distance[x, y]; if (d >= 0 && d < best) best = d; }
+            return best == int.MaxValue ? -1 : best;
+        }
+
+        static void PlaceBoss(DungeonLayout L, DungeonProfile p, PcgRandom rng)
+        {
+            // Boss Room (modul §116): boss hanya boleh spawn di Goal Room.
+            if (!p.bossRoom) return;
+            var candidates = new List<Vector2Int>();
+            for (int x = 1; x < L.width - 1; x++)
+                for (int y = 1; y < L.height - 1; y++)
+                {
+                    var c = new Vector2Int(x, y);
+                    bool inGoal = L.goalRoom >= 0 ? L.RoomAt(c) == L.goalRoom : Vector2Int.Distance(c, L.goalPosition) <= 5f;
+                    if (!inGoal || !L.Walkable(c) || L.goalArea[c.x, c.y] || L.Distance(c) < 0 || L.Occupied(c, 1)) continue;
+                    if (Vector2Int.Distance(c, L.goalPosition) < 2.5f) continue;
+                    candidates.Add(c);
+                }
+            if (candidates.Count > 0)
+            {
+                var c = candidates[rng.Range(0, candidates.Count)];
+                L.placements.Add(new DungeonPlacement { kind = PlaceKind.Boss, cell = c, id = "boss", room = L.RoomAt(c), yaw = rng.Range(0f, 360f) });
+            }
+        }
+
+        static int CountPositive(List<float> w) { int n = 0; foreach (var x in w) if (x > 0f) n++; return n; }
+
         static void PlaceEnemies(DungeonLayout L, DungeonProfile p, PcgRandom rng)
         {
-            int count = p.useEnemyDensity ? Mathf.Max(1, CountFloor(L) / Mathf.Max(1, p.floorTilesPerEnemy)) : p.enemyCount;
+            PlaceBoss(L, p, rng);                                   // dipesan dulu supaya Goal room tidak keburu penuh zombie
+            if (p.zombiesByDistance) PlaceEnemiesByDistance(L, p, rng);
+            int count = !p.zombiesByDistance ? (p.useEnemyDensity ? Mathf.Max(1, CountFloor(L) / Mathf.Max(1, p.floorTilesPerEnemy)) : p.enemyCount) : 0;
             var weights = new List<float>();
             foreach (var e in p.enemyTable) weights.Add(e != null && !string.IsNullOrEmpty(e.id) ? e.weight : 0f);
             for (int i = 0; i < count; i++)
@@ -716,23 +948,7 @@ namespace Outpost.Dungeon
                 }
             }
 
-            // Boss Room (modul §116): boss hanya boleh spawn di Goal Room.
-            if (!p.bossRoom) return;
-            var candidates = new List<Vector2Int>();
-            for (int x = 1; x < L.width - 1; x++)
-                for (int y = 1; y < L.height - 1; y++)
-                {
-                    var c = new Vector2Int(x, y);
-                    bool inGoal = L.goalRoom >= 0 ? L.RoomAt(c) == L.goalRoom : Vector2Int.Distance(c, L.goalPosition) <= 5f;
-                    if (!inGoal || !L.Walkable(c) || L.goalArea[c.x, c.y] || L.Distance(c) < 0 || L.Occupied(c, 1)) continue;
-                    if (Vector2Int.Distance(c, L.goalPosition) < 2.5f) continue;
-                    candidates.Add(c);
-                }
-            if (candidates.Count > 0)
-            {
-                var c = candidates[rng.Range(0, candidates.Count)];
-                L.placements.Add(new DungeonPlacement { kind = PlaceKind.Boss, cell = c, id = "boss", room = L.RoomAt(c), yaw = rng.Range(0f, 360f) });
-            }
+
         }
 
         static void PlaceItems(DungeonLayout L, DungeonProfile p, PcgRandom rng)
@@ -810,8 +1026,8 @@ namespace Outpost.Dungeon
                     if (d < best) { best = d; worst = i; }
                 }
                 if (worst < 0) break;
-                var c = L.placements[worst].cell;
-                L.blocked[c.x, c.y] = false;
+                var removed = L.placements[worst];
+                for (int k = 0; k < removed.Cells; k++) { var c = removed.CellAt(k); L.blocked[c.x, c.y] = false; }
                 L.placements.RemoveAt(worst);
                 L.propRemovals++;
                 ok = CheckReachability(L, out reason);
@@ -893,7 +1109,7 @@ namespace Outpost.Dungeon
             }
             Add("Start–Goal cukup jauh (≥ " + p.minStartGoalDistance + ")", false, L.criticalPath.Count - 1 >= p.minStartGoalDistance, (L.criticalPath.Count - 1) + " cell");
             int floor = CountFloor(L);
-            Add("Enemy tidak terlalu padat (≤ 1 / 25 floor)", false, enemies <= floor / 25, enemies + " enemy / " + floor + " floor");
+            Add("Enemy tidak terlalu padat (≤ 1 / 10 floor)", false, enemies <= floor / 10, enemies + " enemy / " + floor + " floor");
             Add("Item tersebar (spacing ≥ " + p.itemSpacing + ")", false, items >= Mathf.Min(p.itemCount, 1), items + " item");
             int smallest = int.MaxValue; foreach (var r in L.rooms) smallest = Mathf.Min(smallest, r.Area);
             if (L.rooms.Count > 0) Add("Room tidak terlalu kecil", false, smallest >= p.minRoomSize * p.minRoomSize, "terkecil " + smallest + " cell");
@@ -935,13 +1151,16 @@ namespace Outpost.Dungeon
             L.startGoalEuclid = Vector2Int.Distance(L.startPosition, L.goalPosition);
         }
 
-        /// <summary>Peta ASCII (# wall, . floor, S start, G goal, E enemy, B boss, i item, R relay, o props) seperti contoh di modul §3.</summary>
+        /// <summary>Peta ASCII (# wall, . floor, S start, G goal, E enemy, B boss, i item, R relay, o props, O props besar) seperti contoh di modul §3.</summary>
         public static string ToAscii(DungeonLayout L)
         {
             var sb = new System.Text.StringBuilder();
             var marks = new Dictionary<Vector2Int, char>();
             foreach (var q in L.placements)
-                marks[q.cell] = q.kind == PlaceKind.Enemy ? 'E' : q.kind == PlaceKind.Boss ? 'B' : q.kind == PlaceKind.Item ? 'i' : q.kind == PlaceKind.Relay ? 'R' : 'o';
+            {
+                marks[q.cell] = q.kind == PlaceKind.Enemy ? 'E' : q.kind == PlaceKind.Boss ? 'B' : q.kind == PlaceKind.Item ? 'i' : q.kind == PlaceKind.Relay ? 'R' : q.Cells > 1 ? 'O' : 'o';
+                for (int k = 1; k < q.Cells; k++) marks[q.CellAt(k)] = 'O';
+            }
             for (int y = L.height - 1; y >= 0; y--)
             {
                 for (int x = 0; x < L.width; x++)
