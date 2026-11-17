@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90d39bd1c7bebd489f986ffb2568b40, type: 3}
+  m_Name: Final_Profile
+  m_EditorClassIdentifier: Assembly-CSharp::Outpost.Final.FinalProfile
+  useRandomSeed: 1
+  seed: 2026
+  ddaEnabled: 1
+  startDifficulty: 0.5
+  smoothing: 0.6
+  maxStep: 0.2
+  retryRelief: 0.15
+  accuracyWeight: 0.3
+  damageTakenWeight: 0.25
+  generatorLossWeight: 0.25
+  killRateWeight: 0.2
+  accuracyLow: 0.15
+  accuracyHigh: 0.6
+  damagePerMinuteHigh: 60
+  generatorLossPerMinuteHigh: 150
+  killsPerMinuteHigh: 20
+  minShotsForAccuracy: 10
+  zombieCountMultiplier: {x: 0.75, y: 1.3}
+  spawnInterval: {x: 0.6, y: 0.3}
+  enemyHealthMultiplier: {x: 0.85, y: 1.2}
+  enemySpeedMultiplier: {x: 0.9, y: 1.1}
+  dropChance: {x: 0.4, y: 0.18}
+  variantWeights:
+  - id: walker
+    weight: {x: 5, y: 2}
+  - id: runner
+    weight: {x: 1.5, y: 3}
+  - id: skinless
+    weight: {x: 1, y: 3}
+  - id: bloater
+    weight: {x: 0.8, y: 2}
+  eventBudgetBase: 0.5
+  eventBudgetPerWave: 0.75
+  eventBudgetByDifficulty: 2
+  maxEventAttempts: 12
+  supplyAssistBelow: 0.35
+  blackoutLightFactor: 0.25
+  blackoutSightFactor: 0.7
+  fogDensity: 0.035
+  hordeCountFactor: 1.3
+  hordeIntervalFactor: 0.6
+  frenzySpeedFactor: 1.2
+  frenzyCooldownFactor: 0.8
+  supplyDropCount: 4
+  tacticalPointCount: 8
+  tacticalCandidates: 160
+  tacticalMinRadius: 5
+  tacticalMaxRadius: 18
+  tacticalSpacing: 4
+  tacticalAttackPointClear: 2.5
+  tacticalSightRange: 30
+  allyCount: 1
+  allyHealth: 220
+  allyDamage: 18
+  allyRoundsPerMinute: 450
+  allyMagazine: 30
+  allyReloadTime: 2.4
+  allySpread: 2.2
+  allyRange: 40
+  allyNoiseRadius: 16
+  allyMoveSpeed: 4.2
+  allyRepairPerSecond: 12
+  allyRegenPerSecond: 6
+  allyRespawnDelay: 15
+  defendWeight: 0.35
+  interceptWeight: 0.9
+  supportWeight: 1
+  repairWeight: 0.9
+  retreatWeight: 1
+  ddaAllyShift: 0.35

@@ -15,13 +15,13 @@ namespace Outpost.Enemy
     public class EnemyBrain : MonoBehaviour
     {
         public enum State { Spawning, Advance, Chase, AttackPlayer, AttackGenerator, Stagger, Dead }
-        enum TargetType { None, Player, Generator }
+        enum TargetType { None, Player, Generator, Ally }
 
         public EnemyConfig config;
         public Animator animator;
 
         public State CurrentState { get { return state; } }
-        public string DebugTarget { get { return targetType == TargetType.Player ? "Player" : targetType == TargetType.Generator ? "Generator" : "None"; } }
+        public string DebugTarget { get { return targetType == TargetType.Player ? "Player" : targetType == TargetType.Generator ? "Generator" : targetType == TargetType.Ally ? "Ally" : "None"; } }
         public bool IsAware { get { return Time.time - lastSeen < (config != null ? config.memoryTime : 8f); } }
 
         // reservasi titik serang generator: 1 titik = 1 zombie
@@ -58,6 +58,14 @@ namespace Outpost.Enemy
         float provokedUntil = -1f, lastHeard = -999f, playerDistance;
         long playerRequestOrder;
         static long nextPlayerRequestOrder;
+
+        // ---- Final Project hook: NPC sekutu. Daftar kosong di Mini Project/PCG/Dungeon, jadi perilaku lama tidak berubah.
+        /// <summary>Sekutu yang boleh diserang zombie (diisi mode Final).</summary>
+        public static readonly List<IAllyTarget> Allies = new List<IAllyTarget>();
+        /// <summary>Penembak saat ini bila bukan player (diisi sekutu tepat sebelum TakeDamage, lalu dikosongkan).</summary>
+        public static IAllyTarget DamageSource;
+        IAllyTarget allyTarget, provokedAlly;
+        float allyProvokedUntil = -1f, allyShotUntil = -1f;
 
         static readonly int pSpeed = Animator.StringToHash("Speed");
         static readonly int pAttack = Animator.StringToHash("Attack");
@@ -326,6 +334,52 @@ namespace Outpost.Enemy
             if (committedGenerator != null) bestGen = committedGenerator;
             decisionGen = bestGen;
             wantsPlayer = closeThreat || committedGenerator == null && playerKnown && (playerRequestOrder > 0 || playerScore > bestGenScore || bestGen == null);
+            allyTarget = Allies.Count > 0 ? PickAlly(bestGen != null ? bestGenScore : 0f) : null;
+        }
+
+        /// <summary>Skor utility sekutu dibandingkan skor generator. Jarak melee selalu menang; zombie yang sudah terkunci di generator hanya bereaksi ke melee.</summary>
+        IAllyTarget PickAlly(float generatorScore)
+        {
+            IAllyTarget best = null; float bestScore = 0f;
+            foreach (var a in Allies)
+            {
+                if (a == null || !a.IsTargetable) continue;
+                Vector3 p = a.TargetTransform.position;
+                float d = Vector3.Distance(transform.position, p);
+                bool melee = Flat(p - transform.position).magnitude <= config.attackRange + .6f && Mathf.Abs(p.y - transform.position.y) < 1.8f;
+                float s;
+                if (melee) s = 1.3f;
+                else if (committedGenerator != null) continue;
+                else if (a == provokedAlly && Time.time < allyShotUntil) s = 0.95f + 0.2f * Mathf.Clamp01(1f - d / config.sightRadius);
+                else if (a == provokedAlly && Time.time < allyProvokedUntil) s = 0.7f + 0.25f * Mathf.Clamp01(1f - d / config.sightRadius);
+                else if (d <= config.sightRadius * .5f) s = 0.5f + 0.35f * Mathf.Clamp01(1f - d / (config.sightRadius * .5f));
+                else continue;
+                if (a == allyTarget) s += .08f;                                  // hysteresis
+                if (s > bestScore) { bestScore = s; best = a; }
+            }
+            return best != null && (bestScore >= 1.3f || bestScore > generatorScore) ? best : null;
+        }
+
+        /// <summary>Suara tembakan sekutu: zombie dalam radius menoleh ke sekutu selama 2 detik.</summary>
+        public static void AllyNoise(IAllyTarget ally, Vector3 pos, float radius)
+        {
+            foreach (var b in active)
+            {
+                if (b.state == State.Dead || b.config == null) continue;
+                if ((pos - b.transform.position).magnitude > radius * b.config.hearingMultiplier) continue;
+                if (b.provokedAlly != ally && Time.time < b.allyShotUntil) continue;    // tidak menimpa sekutu lain yang menembaknya
+                b.provokedAlly = ally; b.allyProvokedUntil = Mathf.Max(b.allyProvokedUntil, Time.time + 2f);
+            }
+        }
+
+        void ChaseAlly()
+        {
+            if (targetType != TargetType.Ally) { ReleaseTarget(); targetType = TargetType.Ally; }
+            Vector3 p = allyTarget.TargetTransform.position;
+            MoveTo(p, true);
+            state = State.Chase;
+            if (Flat(p - transform.position).magnitude <= config.attackRange && Mathf.Abs(p.y - transform.position.y) < 1.8f && Time.time >= nextAttackTime)
+                BeginAttack(TargetType.Ally);
         }
 
         void Think()
@@ -348,6 +402,7 @@ namespace Outpost.Enemy
                     if (flatD <= config.attackRange && Mathf.Abs(playerTr.position.y - transform.position.y) < 1.8f && Time.time >= nextAttackTime) BeginAttack(TargetType.Player);
                 }
             }
+            else if (allyTarget != null) ChaseAlly();
             else if (bestGen != null)
             {
                 SetTargetGenerator(bestGen);
@@ -422,7 +477,7 @@ namespace Outpost.Enemy
 
         void BeginAttack(TargetType type)
         {
-            state = type == TargetType.Player ? State.AttackPlayer : State.AttackGenerator;
+            state = type == TargetType.Generator ? State.AttackGenerator : State.AttackPlayer;
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
             nextAttackTime = Time.time + config.attackCooldown * cooldownMul;
@@ -435,7 +490,8 @@ namespace Outpost.Enemy
         void TickAttack()
         {
             // menghadap target
-            Vector3 targetPos = state == State.AttackPlayer && playerTr != null ? playerTr.position
+            Vector3 targetPos = targetType == TargetType.Ally && allyTarget != null ? allyTarget.TargetTransform.position
+                : state == State.AttackPlayer && playerTr != null ? playerTr.position
                 : (targetGen != null ? targetGen.transform.position : transform.position + transform.forward);
             Vector3 dir = Flat(targetPos - transform.position);
             if (dir.sqrMagnitude > 0.01f)
@@ -454,6 +510,13 @@ namespace Outpost.Enemy
 
         void ApplyHit()
         {
+            if (targetType == TargetType.Ally)
+            {
+                if (allyTarget == null || !allyTarget.IsTargetable) return;
+                Vector3 to = Flat(allyTarget.TargetTransform.position - transform.position);
+                if (to.magnitude <= config.attackRange * 1.4f) allyTarget.TakeHit(config.attackDamage, to.normalized);
+                return;
+            }
             if (state == State.AttackPlayer)
             {
                 if (playerHp == null || playerHp.IsDead || playerTr == null) return;
@@ -484,14 +547,26 @@ namespace Outpost.Enemy
         void OnDamaged(float amount, Vector3 dir)
         {
             if (state == State.Dead) return;
-            // ditembak: langsung tahu posisi player
-            FindPlayer();
-            if (playerTr != null) { lastKnownPos = playerTr.position; lastSeen = Time.time; }
-            provokedUntil = Time.time + config.memoryTime; nextAllocation = -1f;
-            if (playerTr != null)
+            var shooter = DamageSource;
+            if (shooter != null)
+            {
+                // ditembak sekutu (mode Final): incar sekutu itu, zombie sekitar ikut menoleh
+                provokedAlly = shooter; allyShotUntil = allyProvokedUntil = Time.time + config.memoryTime; nextAllocation = -1f;
                 foreach (var other in active)
-                    if (other != this && (other.transform.position - transform.position).sqrMagnitude <= 64f)
-                        other.HearGunfire(playerTr.position);
+                    if (other != this && (other.transform.position - transform.position).sqrMagnitude <= 64f && Time.time >= other.allyShotUntil)
+                    { other.provokedAlly = shooter; other.allyProvokedUntil = Mathf.Max(other.allyProvokedUntil, Time.time + 2f); }
+            }
+            else
+            {
+                // ditembak: langsung tahu posisi player
+                FindPlayer();
+                if (playerTr != null) { lastKnownPos = playerTr.position; lastSeen = Time.time; }
+                provokedUntil = Time.time + config.memoryTime; nextAllocation = -1f;
+                if (playerTr != null)
+                    foreach (var other in active)
+                        if (other != this && (other.transform.position - transform.position).sqrMagnitude <= 64f)
+                            other.HearGunfire(playerTr.position);
+            }
 
             if (config.kind == EnemyKind.Boss && !enraged && health.Fraction <= config.enrageHealthFraction)
             {

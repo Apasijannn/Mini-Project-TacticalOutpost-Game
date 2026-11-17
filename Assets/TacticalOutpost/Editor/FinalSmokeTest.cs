@@ -1,0 +1,137 @@
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Outpost.Enemy;
+using Outpost.Final;
+using Outpost.UI;
+
+namespace Outpost.EditorTools
+{
+    /// <summary>
+    /// Smoke test Play Mode tanpa input manusia (bisa dari command line):
+    ///   -executeMethod Outpost.EditorTools.FinalSmokeTest.RunFinal   (mode Final, zombie dibunuh berkala agar wave maju)
+    ///   -executeMethod Outpost.EditorTools.FinalSmokeTest.RunMini    (Mini Project, cek hook sekutu tidak aktif)
+    /// Hasil dicetak ke log dengan prefix [SMOKE]. Di batchmode editor keluar sendiri setelah selesai.
+    /// </summary>
+    [InitializeOnLoad]
+    public static class FinalSmokeTest
+    {
+        const string Key = "FinalSmoke.Mode";
+        static double start = -1, nextKill, nextReport;
+
+        static FinalSmokeTest()
+        {
+            if (string.IsNullOrEmpty(SessionState.GetString(Key, ""))) return;
+            EditorApplication.playModeStateChanged += OnState;
+            EditorApplication.update += Tick;
+        }
+
+        [MenuItem("Tactical Outpost/Final/Smoke Test (Final mode)")] public static void RunFinal() { Begin("final"); }
+        [MenuItem("Tactical Outpost/Final/Smoke Test (Mini Project)")] public static void RunMini() { Begin("mini"); }
+
+        static void Begin(string mode)
+        {
+            SessionState.SetString(Key, mode);
+            EditorApplication.playModeStateChanged -= OnState; EditorApplication.playModeStateChanged += OnState;
+            EditorApplication.update -= Tick; EditorApplication.update += Tick;
+            EditorApplication.EnterPlaymode();
+        }
+
+        static string Mode { get { return SessionState.GetString(Key, ""); } }
+        static float Duration { get { return Mode == "final" ? 190f : 45f; } }
+
+        static void OnState(PlayModeStateChange s)
+        {
+            if (s == PlayModeStateChange.EnteredPlayMode)
+            {
+                FinalMode.Active = Mode == "final";
+                SceneManager.LoadScene(GameMenu.GameScene);
+                start = EditorApplication.timeSinceStartup; nextKill = start + 32; nextReport = start + 10;
+                Debug.Log("[SMOKE] start mode " + Mode);
+            }
+            else if (s == PlayModeStateChange.EnteredEditMode)
+            {
+                SessionState.EraseString(Key);
+                if (Application.isBatchMode) EditorApplication.Exit(0);
+            }
+        }
+
+        static void Tick()
+        {
+            if (!EditorApplication.isPlaying || start < 0) return;
+            double now = EditorApplication.timeSinceStartup, t = now - start;
+            var wave = WaveDirector.Instance;
+            if (now >= nextReport)
+            {
+                nextReport = now + 10;
+                var s = FinalSession.Instance;
+                Debug.Log(string.Format("[SMOKE] t={0:0}s phase={1} wave={2}/{3} alive={4} allies(EnemyBrain)={5} gen={6:0} {7}",
+                    t, wave != null ? wave.CurrentPhase.ToString() : "-", wave != null ? wave.CurrentWave : 0, wave != null ? wave.TotalWaves : 0,
+                    EnemyHealth.Alive.Count, EnemyBrain.Allies.Count, GeneratorHealth.All.Count > 0 ? GeneratorHealth.All[0].Health : -1f,
+                    s != null ? "D=" + s.Difficulty.ToString("0.00") + " event=" + (s.CurrentEvent != null ? s.CurrentEvent.Title : "-")
+                        + " allies=" + string.Join(";", AllyBrain.All.Select(a => a.Callsign + ":" + a.Action + ":" + a.Health.ToString("0") + "hp:k" + a.Kills
+                        + ":target=" + (a.Target != null ? a.Target.name : "-") + ":pos=" + a.transform.position.ToString("F0") + ":nav=" + a.GetComponent<UnityEngine.AI.NavMeshAgent>().isOnNavMesh + ":score=" + string.Join("/", a.Scores.Select(x => x.ToString("0.00")).ToArray())).ToArray()) : "no final session"));
+                var targets = Object.FindObjectsByType<EnemyBrain>(FindObjectsSortMode.None).GroupBy(b => b.DebugTarget).Select(g => g.Key + " " + g.Count()).ToArray();
+                Debug.Log("[SMOKE] zombie targets: " + string.Join(", ", targets));
+            }
+            // Final: zombie dibunuh berkala supaya wave cepat maju dan DDA dievaluasi
+            if (Mode == "final" && now >= nextKill && t < Duration - 10)
+            {
+                nextKill = now + 22;
+                int n = 0;
+                foreach (var e in EnemyHealth.Alive.ToList()) if (e != null && !e.IsDead) { e.Kill(); n++; }
+                Debug.Log("[SMOKE] debug kill-all: " + n);
+            }
+            if (Mode == "final" && t > Duration - 5 && FinalSession.Instance != null && !experimented)
+            {
+                experimented = true;
+                Debug.Log("[SMOKE] experiments → " + FinalExperiments.Run(FinalSession.Instance));
+            }
+            if (Mode == "final" && shots < ShotTimes.Length && t > ShotTimes[shots]) { Capture(shots); shots++; }
+            if (t > Duration) { start = -1; experimented = false; shots = 0; Debug.Log("[SMOKE] done"); EditorApplication.ExitPlaymode(); }
+        }
+        static bool experimented;
+        static int shots;
+        static readonly float[] ShotTimes = { 26f, 27f, 28f, 62f, 63f };
+
+        /// <summary>Screenshot bukti visual (tanpa UI OnGUI) ke Docs/Final/Screens.</summary>
+        static void Capture(int index)
+        {
+            var ally = AllyBrain.All.FirstOrDefault();
+            var main = Camera.main;
+            if (ally != null) Debug.Log("[SMOKE] ally hands: " + ally.GetComponent<AllyBody>().ReachReport());
+            Vector3 pos, target; float fov = 45f; int mask = ~((1 << 14) | (1 << 30));
+            string name;
+            if (index == 0 && ally != null) { name = "ally_front"; target = ally.transform.position + Vector3.up * 1.1f; pos = target + ally.transform.forward * 3f + Vector3.up * 0.4f; }
+            else if (index == 1 && ally != null) { name = "ally_side"; target = ally.transform.position + Vector3.up * 1.1f; pos = target + (ally.transform.right * 2.6f + ally.transform.forward * 1.2f) + Vector3.up * 0.3f; }
+            else if ((index == 2 || index == 4) && main != null) { name = index == 2 ? "player_view_w1" : "player_view_w2"; pos = main.transform.position; target = pos + main.transform.forward; fov = main.fieldOfView; mask = main.cullingMask; }
+            else if (index == 3 && FinalSession.Instance != null) { name = "overview_w2"; target = FinalSession.Instance.GroundCenter; pos = target + new Vector3(-22f, 26f, -24f); fov = 55f; }
+            else return;
+            string dir = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "../Docs/Final/Screens"));
+            System.IO.Directory.CreateDirectory(dir);
+            string path = System.IO.Path.Combine(dir, name + ".png");
+
+            var go = new GameObject("Smoke Camera") { hideFlags = HideFlags.HideAndDontSave };
+            var cam = go.AddComponent<Camera>();
+            cam.fieldOfView = fov; cam.nearClipPlane = 0.05f; cam.farClipPlane = 600f; cam.cullingMask = mask;
+            cam.clearFlags = CameraClearFlags.Skybox; cam.allowHDR = true; cam.allowMSAA = false;
+            var data = go.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(); data.renderPostProcessing = true;
+            go.transform.SetPositionAndRotation(pos, Quaternion.LookRotation(target - pos));
+            const int W = 1280, H = 720;
+            var rt = new RenderTexture(W, H, 24, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB); rt.Create();
+            var request = new UnityEngine.Rendering.RenderPipeline.StandardRequest { destination = rt };
+            if (UnityEngine.Rendering.RenderPipeline.SupportsRenderRequest(cam, request)) UnityEngine.Rendering.RenderPipeline.SubmitRenderRequest(cam, request);
+            else { cam.targetTexture = rt; cam.Render(); cam.targetTexture = null; }
+            var rb = UnityEngine.Rendering.AsyncGPUReadback.Request(rt, 0, TextureFormat.RGBA32); rb.WaitForCompletion();
+            if (!rb.hasError)
+            {
+                var tex = new Texture2D(W, H, TextureFormat.RGBA32, false); tex.SetPixelData(rb.GetData<byte>(), 0); tex.Apply();
+                System.IO.File.WriteAllBytes(path, tex.EncodeToPNG()); Object.DestroyImmediate(tex);
+                Debug.Log("[SMOKE] screenshot " + path);
+            }
+            else Debug.LogWarning("[SMOKE] readback gagal " + name);
+            rt.Release(); Object.DestroyImmediate(rt); Object.DestroyImmediate(go);
+        }
+    }
+}

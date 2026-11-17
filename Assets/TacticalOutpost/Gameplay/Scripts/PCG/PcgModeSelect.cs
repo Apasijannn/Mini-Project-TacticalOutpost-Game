@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Outpost.UI;
 using Outpost.Dungeon;
+using Outpost.Final;
 
 namespace Outpost.PCG
 {
@@ -60,20 +61,21 @@ namespace Outpost.PCG
 
         void Close() { chooser.SetActive(false); }
 
-        /// <summary>0 = Mini Project, 1 = PCG, 2 = Procedural Dungeon.</summary>
+        /// <summary>0 = Mini Project, 1 = PCG, 2 = Procedural Dungeon, 3 = Final Project.</summary>
         void Launch(int mode)
         {
             PcgMode.Active = mode == 1;
             DungeonMode.Active = mode == 2;
+            FinalMode.Active = mode == 3;
             chooser.SetActive(false);
             menu.StartGame();
         }
 
         // ---------------------------------------------------------------- UI
 
-        // Tiga kartu berdampingan; lebar kartu dihitung dari jumlah kartu, gambar tetap 16:9.
-        const int Cards = 3;
-        const float PanelW = 1500, PanelH = 820, Gap = 30, CardH = 590;
+        // Empat kartu berdampingan; lebar kartu dihitung dari jumlah kartu, gambar tetap 16:9.
+        const int Cards = 4;
+        const float PanelW = 1800, PanelH = 820, Gap = 30, CardH = 590;
         const float CardW = (PanelW - 80 - Gap * (Cards - 1)) / Cards, ImageH = CardW * 9f / 16f;
 
         void BuildUi()
@@ -110,12 +112,17 @@ namespace Outpost.PCG
                 "A walled compound is generated from a grid every run: BSP rooms, L-corridors, start, goal, zombies and supplies. Validated with BFS. Reach the generator to restore power.",
                 DungeonPreviewPath, () => Launch(2));
 
+            var finalCard = MakeCard("MODE FINAL", panel, 40 + (CardW + Gap) * 3, cardY, "MODE 04", "FINAL OPERATION", "DDA + PCG events + ally AI (Final Project).",
+                "The original static outpost, now adaptive. Difficulty follows your performance, every wave rolls a procedural event, and an AI squadmate defends the generator with you.",
+                MiniPreviewPath, () => Launch(3));
+
             // Navigasi keyboard/gamepad kiri-kanan antar kartu (berantai).
             firstChoice.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnRight = pcgCard };
             pcgCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = firstChoice, selectOnRight = dungeonCard };
-            dungeonCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = pcgCard };
+            dungeonCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = pcgCard, selectOnRight = finalCard };
+            finalCard.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnLeft = dungeonCard };
 
-            Label("Footer", panel, "Modes 01-02: protect the generator for 3 waves.  Mode 03: reach the generator.   ← → select  ·  ENTER start  ·  ESC back",
+            Label("Footer", panel, "Modes 01, 02, 04: protect the generator for 3 waves.  Mode 03: reach the generator.   ← → select  ·  ENTER start  ·  ESC back",
                 40, PanelH - 50, PanelW - 80, 30, 15, GameMenu.Muted, menu.monoFont);
         }
 
