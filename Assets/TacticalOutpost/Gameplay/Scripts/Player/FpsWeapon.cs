@@ -89,6 +89,7 @@ namespace Outpost.Player
         public bool NeedsAmmo { get { EnsureInit(); return reserveAmmo < maxReserve; } }
         public bool IsReloading { get; private set; }
         public bool IsAiming { get; private set; }
+        public float AdsWeight { get { return adsT; } }
         public event Action OnHit;          // peluru/tebasan kena target yang bisa dilukai
         public event Action OnFired;
         /// <summary>Suara tembakan (posisi, radius). Didengar musuh.</summary>

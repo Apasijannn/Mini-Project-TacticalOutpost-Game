@@ -77,11 +77,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 82398115320995231, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.075
+      value: 0.018
       objectReference: {fileID: 0}
     - target: {fileID: 82398115320995231, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.28
+      value: 0.245
       objectReference: {fileID: 0}
     - target: {fileID: 1151899062947241212, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_Name
@@ -173,15 +173,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2599918521650991908, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.x
-      value: 0.07
+      value: 0.045
       objectReference: {fileID: 0}
     - target: {fileID: 2599918521650991908, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.y
-      value: -0.11
+      value: -0.095
       objectReference: {fileID: 0}
     - target: {fileID: 2599918521650991908, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.z
-      value: 0.32
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 2599918521650991908, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: maxRecoilPitch
@@ -241,7 +241,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipEuler.y
-      value: -4
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: muzzleFlash
@@ -253,19 +253,19 @@ PrefabInstance:
       objectReference: {fileID: 5988796029041759355, guid: 261f3beabd567004fb8d3336adfb1fe8, type: 3}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: adsPosition.z
-      value: 0.24
+      value: 0.175
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.x
-      value: 0.11
+      value: 0.125
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.y
-      value: -0.14
+      value: -0.15
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: hipPosition.z
-      value: 0.22
+      value: 0.17
       objectReference: {fileID: 0}
     - target: {fileID: 2793841358978819378, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: enemyImpactPrefab
@@ -273,15 +273,15 @@ PrefabInstance:
       objectReference: {fileID: 1980254140660754485, guid: 3b63d28c062f4fc4ba86a49f0addf090, type: 3}
     - target: {fileID: 9042926086307910376, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.045
+      value: -0.014
       objectReference: {fileID: 0}
     - target: {fileID: 9042926086307910376, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.1
+      value: -0.086
       objectReference: {fileID: 0}
     - target: {fileID: 9042926086307910376, guid: ff4d9cb27a3672e46b251226488a22e4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.06
+      value: 0.02
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Outpost.Enemy;
+using Outpost.Env;
 using Outpost.Final;
 using Outpost.UI;
 
@@ -29,9 +30,11 @@ namespace Outpost.EditorTools
 
         [MenuItem("Tactical Outpost/Final/Smoke Test (Final mode)")] public static void RunFinal() { Begin("final"); }
         [MenuItem("Tactical Outpost/Final/Smoke Test (Mini Project)")] public static void RunMini() { Begin("mini"); }
+        [MenuItem("Tactical Outpost/Final/Verify Blackout + VIPER Blip")] public static void RunFeatureVerify() { Begin("verify"); }
 
         static void Begin(string mode)
         {
+            verifyStage = 0;
             SessionState.SetString(Key, mode);
             EditorApplication.playModeStateChanged -= OnState; EditorApplication.playModeStateChanged += OnState;
             EditorApplication.update -= Tick; EditorApplication.update += Tick;
@@ -39,13 +42,13 @@ namespace Outpost.EditorTools
         }
 
         static string Mode { get { return SessionState.GetString(Key, ""); } }
-        static float Duration { get { return Mode == "final" ? 190f : 45f; } }
+        static float Duration { get { return Mode == "final" ? 190f : Mode == "verify" ? 26f : 45f; } }
 
         static void OnState(PlayModeStateChange s)
         {
             if (s == PlayModeStateChange.EnteredPlayMode)
             {
-                FinalMode.Active = Mode == "final";
+                FinalMode.Active = Mode == "final" || Mode == "verify";
                 SceneManager.LoadScene(GameMenu.GameScene);
                 start = EditorApplication.timeSinceStartup; nextKill = start + 32; nextReport = start + 10;
                 Debug.Log("[SMOKE] start mode " + Mode);
@@ -88,8 +91,74 @@ namespace Outpost.EditorTools
                 experimented = true;
                 Debug.Log("[SMOKE] experiments → " + FinalExperiments.Run(FinalSession.Instance));
             }
+            if (Mode == "verify") { TickVerify(t); return; }
             if (Mode == "final" && shots < ShotTimes.Length && t > ShotTimes[shots]) { Capture(shots); shots++; }
             if (t > Duration) { start = -1; experimented = false; shots = 0; Debug.Log("[SMOKE] done"); EditorApplication.ExitPlaymode(); }
+        }
+        static int verifyStage;
+        static void TickVerify(double t)
+        {
+            var s = FinalSession.Instance;
+            var blk = DynamicBlackoutSystem.Instance;
+            var gen = s != null ? s.Generator : null;
+            if (s == null || blk == null || gen == null || AllyBrain.All.Count == 0)
+            {
+                if (t > 20) { Debug.LogError("[VERIFY] Timeout waiting for FinalSession/Blackout/VIPER"); start = -1; EditorApplication.ExitPlaymode(); }
+                return;
+            }
+            if (verifyStage == 0 && t > 3.0)
+            {
+                verifyStage = 1;
+                var viper = AllyBrain.All[0];
+                var blip = viper.GetComponent<AllyMinimapBlip>();
+                var aux = viper.GetComponent<MiniMapModular.Aux_MP>();
+                var body = Object.FindFirstObjectByType<Outpost.Player.FpsBody>();
+                Debug.Log("[VERIFY] VIPER=" + viper.Callsign + " blip=" + (blip != null) + " aux=" + (aux != null) + " sprite=" + (aux != null && aux.Sprite_Me != null ? aux.Sprite_Me.name : "null") + " rot=" + (aux != null ? aux.RotIconMe : -1));
+                if (body != null) Debug.Log("[VERIFY] Player FpsBody: " + body.DebugReach());
+                Debug.Log("[VERIFY] Stage0 HP=" + gen.Fraction.ToString("0.00") + " tier=" + blk.CurrentTier + " status=" + blk.StatusLabel + " light=" + blk.CombinedLightFactor.ToString("0.00"));
+                gen.Damage(gen.maxHealth * 0.35f); // → 65%
+            }
+            else if (verifyStage == 1 && t > 5.0)
+            {
+                verifyStage = 2;
+                Debug.Log("[VERIFY] Stage1 HP=" + gen.Fraction.ToString("0.00") + " tier=" + blk.CurrentTier + " status=" + blk.StatusLabel + " light=" + blk.CombinedLightFactor.ToString("0.00"));
+                gen.Damage(gen.maxHealth * 0.25f); // → 40%
+            }
+            else if (verifyStage == 2 && t > 7.5)
+            {
+                verifyStage = 3;
+                Debug.Log("[VERIFY] Stage2 HP=" + gen.Fraction.ToString("0.00") + " tier=" + blk.CurrentTier + " status=" + blk.StatusLabel + " light=" + blk.CombinedLightFactor.ToString("0.00"));
+                gen.Damage(gen.maxHealth * 0.28f); // → 12%
+            }
+            else if (verifyStage == 3 && t > 11.0)
+            {
+                verifyStage = 4;
+                Debug.Log("[VERIFY] Stage3 HP=" + gen.Fraction.ToString("0.00") + " tier=" + blk.CurrentTier + " status=" + blk.StatusLabel + " totalDark=" + blk.IsTotalDarkness + " light=" + blk.CombinedLightFactor.ToString("0.00")
+                    + " DDA(0.50) flicker=" + blk.FlickerScale.ToString("0.00") + " off=" + blk.OffDurationScale.ToString("0.00") + " thr=" + blk.ThresholdFlickerLow.ToString("0.00"));
+                s.ForceDifficulty(+0.45f); // → 0.95 Veteran
+            }
+            else if (verifyStage == 4 && t > 13.0)
+            {
+                verifyStage = 5;
+                Debug.Log("[VERIFY] Stage4 DDA(Veteran=" + s.Difficulty.ToString("0.00") + ") flicker=" + blk.FlickerScale.ToString("0.00") + " off=" + blk.OffDurationScale.ToString("0.00")
+                    + " thr=" + blk.ThresholdFlickerLow.ToString("0.00") + "/" + blk.ThresholdFlickerHeavy.ToString("0.00") + "/" + blk.ThresholdChaos.ToString("0.00"));
+                s.ForceDifficulty(-0.85f); // → 0.10 Recruit
+            }
+            else if (verifyStage == 5 && t > 15.0)
+            {
+                verifyStage = 6;
+                Debug.Log("[VERIFY] Stage5 DDA(Recruit=" + s.Difficulty.ToString("0.00") + ") flicker=" + blk.FlickerScale.ToString("0.00") + " off=" + blk.OffDurationScale.ToString("0.00")
+                    + " thr=" + blk.ThresholdFlickerLow.ToString("0.00") + "/" + blk.ThresholdFlickerHeavy.ToString("0.00") + "/" + blk.ThresholdChaos.ToString("0.00"));
+                gen.ResetHealth();
+            }
+            else if (verifyStage == 6 && t > 17.0)
+            {
+                verifyStage = 7;
+                Debug.Log("[VERIFY] Stage6 Reset HP=" + gen.Fraction.ToString("0.00") + " tier=" + blk.CurrentTier + " status=" + blk.StatusLabel + " light=" + blk.CombinedLightFactor.ToString("0.00"));
+                Debug.Log("[VERIFY] ALL CHECKS PASSED");
+                start = -1;
+                EditorApplication.ExitPlaymode();
+            }
         }
         static bool experimented;
         static int shots;

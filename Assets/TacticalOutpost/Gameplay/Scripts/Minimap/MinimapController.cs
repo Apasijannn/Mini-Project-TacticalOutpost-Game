@@ -73,7 +73,7 @@ namespace Outpost.UI
         {
             if (cam != mapCam) return;
             prevFog = RenderSettings.fog; RenderSettings.fog = false;
-            if (sun != null) { prevSun = sun.intensity; sun.intensity = prevSun * sunBoost; }
+            if (sun != null) { prevSun = sun.intensity; sun.intensity = Mathf.Max(prevSun, 0.55f) * sunBoost; }
         }
         void OnEnd(ScriptableRenderContext c, Camera cam)
         {

@@ -159,6 +159,7 @@ namespace Outpost.PCG
             // 5. Nyalakan gameplay asli.
             Random.InitState(Seed);
             systems.SetActive(true);
+            Outpost.Env.DynamicBlackoutSystem.EnsureInstalled();
             Ready = true;
             yield return null;
             var fps = FindInGame<FpsController>();

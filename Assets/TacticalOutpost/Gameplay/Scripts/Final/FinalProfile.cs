@@ -55,6 +55,18 @@ namespace Outpost.Final
             new VariantWeight { id = "bloater",  weight = new Vector2(0.8f, 2f) },
         };
 
+        [Header("Dynamic Blackout (reaktif HP generator + skala DDA)")]
+        public bool dynamicBlackoutEnabled = true;
+        [Range(0.5f, 0.95f)] public float blackoutTierFlickerLow = 0.75f;
+        [Range(0.3f, 0.75f)] public float blackoutTierFlickerHeavy = 0.50f;
+        [Range(0.1f, 0.45f)] public float blackoutTierChaos = 0.25f;
+        [Tooltip("Skala intensitas & kecepatan kedipan oleh DDA (x = easy, y = hard).")]
+        public Vector2 blackoutFlickerMultiplier = new Vector2(0.70f, 1.45f);
+        [Tooltip("Skala durasi lampu padam total oleh DDA (x = easy, y = hard).")]
+        public Vector2 blackoutOffDurationMultiplier = new Vector2(0.60f, 1.65f);
+        [Tooltip("Pergeseran ambang HP generator oleh DDA (easy = lebih lambat gelap, hard = lebih cepat gelap).")]
+        public Vector2 blackoutThresholdShift = new Vector2(-0.08f, 0.08f);
+
         [Header("PCG — event wave (weighted + budget + constraint)")]
         public float eventBudgetBase = 0.5f;
         public float eventBudgetPerWave = 0.75f;

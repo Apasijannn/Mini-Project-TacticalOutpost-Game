@@ -16,6 +16,7 @@ namespace Outpost.Final
     {
         public float difficulty, countMultiplier, spawnInterval, enemyHealth, enemySpeed, dropChance;
         public float supportWeight, repairWeight, interceptWeight;
+        public float blackoutFlickerScale, blackoutOffScale, blackoutThresholdShift;
     }
 
     /// <summary>
@@ -60,6 +61,9 @@ namespace Outpost.Final
                 supportWeight = Mathf.Max(0f, p.supportWeight - shift),
                 repairWeight = Mathf.Max(0f, p.repairWeight - shift),
                 interceptWeight = Mathf.Max(0f, p.interceptWeight + shift),
+                blackoutFlickerScale = Mathf.Lerp(p.blackoutFlickerMultiplier.x, p.blackoutFlickerMultiplier.y, d),
+                blackoutOffScale = Mathf.Lerp(p.blackoutOffDurationMultiplier.x, p.blackoutOffDurationMultiplier.y, d),
+                blackoutThresholdShift = Mathf.Lerp(p.blackoutThresholdShift.x, p.blackoutThresholdShift.y, d),
             };
         }
 

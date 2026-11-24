@@ -13,7 +13,7 @@ namespace Outpost.Env
         void Update()
         {
             if (target == null) return;
-            target.intensity = baseIntensity * (1f + (Mathf.PerlinNoise(seed, Time.time * speed) - 0.5f) * 2f * amount);
+            target.intensity = baseIntensity * (1f + (Mathf.PerlinNoise(seed, Time.time * speed) - 0.5f) * 2f * amount) * DynamicBlackoutSystem.GlobalGridFactor;
         }
     }
 }

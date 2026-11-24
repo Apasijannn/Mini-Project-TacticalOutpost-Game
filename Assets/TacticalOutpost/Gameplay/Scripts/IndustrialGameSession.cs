@@ -47,6 +47,7 @@ namespace Outpost
             if (additionalNavigation != null)
                 foreach (var surface in additionalNavigation) if (surface != null) surface.enabled = true;
             systems.SetActive(true);
+            Outpost.Env.DynamicBlackoutSystem.EnsureInstalled();
         }
     }
 }

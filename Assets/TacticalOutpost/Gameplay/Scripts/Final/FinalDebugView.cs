@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Outpost.Enemy;
+using Outpost.Env;
 using Outpost.Player;
 
 namespace Outpost.Final
@@ -49,10 +50,17 @@ namespace Outpost.Final
             var cam = Camera.main;
             if (cam != null) { AllyTags(cam); if (details) TacticalMarkers(cam, s); }
 
+            var blk = DynamicBlackoutSystem.Instance;
+            string gridLine = blk != null
+                ? string.Format("Grid: {0}  light {1:0%}  (DDA flicker ×{2:0.00}  off ×{3:0.00}  thr {4:0%}/{5:0%}/{6:0%})",
+                    blk.StatusLabel, blk.CombinedLightFactor, blk.FlickerScale, blk.OffDurationScale,
+                    blk.ThresholdFlickerLow, blk.ThresholdFlickerHeavy, blk.ThresholdChaos)
+                : "Grid: -";
             var lines = new List<string>
             {
                 "FINAL MODE   SEED " + s.Seed + "   DDA " + (s.DdaEnabled ? "ON" : "OFF") + "   D " + s.Difficulty.ToString("0.00") + " " + DdaModel.Label(s.Difficulty) + "   skill " + s.Skill.ToString("0.00"),
                 "Event: " + (s.CurrentEvent != null ? s.CurrentEvent.Title : "-") + "   next: " + (s.NextEvent != null ? s.NextEvent.Title + " (D' " + s.PreviewDifficulty.ToString("0.00") + ")" : "-"),
+                gridLine,
             };
             foreach (var a in AllyBrain.All)
                 lines.Add("Ally " + a.Callsign + "  " + AllyBrain.ActionNames[(int)a.Action] + "  HP " + a.Health.ToString("0") + "/" + a.MaxHealth.ToString("0") + "  kills " + a.Kills);
@@ -69,6 +77,7 @@ namespace Outpost.Final
             lines.Add(string.Format("  zombies x{0:0.00}  spawn interval {1:0.00}s  enemy HP x{2:0.00}  speed x{3:0.00}  drop {4:0%}",
                 o.countMultiplier, o.spawnInterval, o.enemyHealth, o.enemySpeed, o.dropChance));
             lines.Add(string.Format("  ally weights: support {0:0.00}  repair {1:0.00}  intercept {2:0.00}", o.supportWeight, o.repairWeight, o.interceptWeight));
+            lines.Add(string.Format("  blackout DDA: flicker ×{0:0.00}  off duration ×{1:0.00}  threshold shift {2:+0%;-0%;0%}", o.blackoutFlickerScale, o.blackoutOffScale, o.blackoutThresholdShift));
             if (s.CurrentEvent != null)
                 lines.Add("PCG EVENT W" + s.CurrentEvent.wave + ": " + s.CurrentEvent.Title + "  budget " + s.CurrentEvent.budget.ToString("0.0") + "  attempts " + s.CurrentEvent.attempts + "  rejected " + s.CurrentEvent.RejectionText);
             lines.Add("Tactical points " + s.Tactical.points.Count + "  (candidates " + s.Tactical.candidates + ", valid " + s.Tactical.valid + ")  rejected: " + s.Tactical.RejectionText);

@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1021313632799940185}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.07, y: -0.06, z: -0.081}
+  m_LocalPosition: {x: -0.014, y: -0.086, z: 0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -187,13 +187,13 @@ MonoBehaviour:
   cameraRoot: {fileID: 1323418211704465131}
   bodyOffset: {x: 0, y: 0, z: -0.12}
   eyeHeight: 1.62
-  armScale: 1.25
+  armScale: 1
   handAimLocal: {x: 0, y: -0.3, z: 1}
   rollRight: 0
   rollLeft: 0
   curlRight: 60
   curlLeft: 70
-  poleOut: {x: 0.55, y: -0.9, z: -0.2}
+  poleOut: {x: 0.55, y: -0.82, z: -0.15}
   stride: 26
 --- !u!1 &1401949266107671571
 GameObject:
@@ -349,7 +349,7 @@ Transform:
   m_GameObject: {fileID: 3731102258165178618}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.025, y: -0.114, z: -0.093}
+  m_LocalPosition: {x: 0.004, y: -0.07, z: -0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -380,7 +380,7 @@ Transform:
   m_GameObject: {fileID: 5172456296056649861}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.07, z: 0.14}
+  m_LocalPosition: {x: 0.012, y: 0.018, z: 0.245}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -841,6 +841,9 @@ MonoBehaviour:
   controller: {fileID: 4683211513694239210}
   muzzle: {fileID: 8530571504565990041}
   muzzleLight: {fileID: 5774772015474042986}
+  muzzleFlash: {fileID: 0}
+  impactPrefab: {fileID: 0}
+  enemyImpactPrefab: {fileID: 0}
   tracer: {fileID: 5097891542377212694}
   slide: {fileID: 3674284972969664855}
   gripRight: {fileID: 8241039623877921958}
@@ -864,9 +867,9 @@ MonoBehaviour:
   shootVolume: 0.85
   reloadVolume: 0.9
   emptyVolume: 0.8
-  hipPosition: {x: 0.14, y: -0.07, z: 0.36}
-  hipEuler: {x: 0, y: 0, z: 0}
-  adsPosition: {x: 0, y: -0.03, z: 0.3}
+  hipPosition: {x: 0.045, y: -0.095, z: 0.35}
+  hipEuler: {x: 1, y: -2, z: 0}
+  adsPosition: {x: 0, y: -0.03, z: 0.355}
   adsEuler: {x: 0, y: 0, z: 0}
   customHands: 1
   aimR: {x: 0, y: 0.3, z: 1}
@@ -881,6 +884,22 @@ MonoBehaviour:
   kickBack: 0.05
   recoilUp: 2
   recoilSide: 0.4
+  recoilPattern:
+  - {x: 0, y: 1}
+  - {x: -0.25, y: 1.08}
+  - {x: 0.35, y: 1.15}
+  - {x: 0.7, y: 1.2}
+  - {x: 0.5, y: 1.25}
+  - {x: -0.6, y: 1.25}
+  - {x: -0.8, y: 1.3}
+  - {x: -0.3, y: 1.3}
+  recoilRandomness: 0.12
+  recoilResponse: 38
+  recoilRecovery: 7
+  recoilRecoveryDelay: 0.08
+  burstResetDelay: 0.28
+  maxRecoilPitch: 10
+  maxRecoilYaw: 3
   equipTime: 0.26
   slideTravel: 0.022
   noiseRadius: 20
@@ -1144,7 +1163,7 @@ Transform:
   m_GameObject: {fileID: 8971722774568041550}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.085, z: -0.075}
+  m_LocalPosition: {x: 0.013, y: -0.058, z: 0.008}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1206,6 +1225,9 @@ MonoBehaviour:
   controller: {fileID: 4683211513694239210}
   muzzle: {fileID: 99087168071243587}
   muzzleLight: {fileID: 980637014645704375}
+  muzzleFlash: {fileID: 0}
+  impactPrefab: {fileID: 0}
+  enemyImpactPrefab: {fileID: 0}
   tracer: {fileID: 1454348379072234628}
   slide: {fileID: 0}
   gripRight: {fileID: 2727850676778343806}
@@ -1229,9 +1251,9 @@ MonoBehaviour:
   shootVolume: 0.8
   reloadVolume: 0.9
   emptyVolume: 0.8
-  hipPosition: {x: 0.17, y: -0.19, z: 0.34}
-  hipEuler: {x: 0, y: 0, z: 0}
-  adsPosition: {x: 0, y: -0.115, z: 0.28}
+  hipPosition: {x: 0.125, y: -0.15, z: 0.17}
+  hipEuler: {x: 0, y: -3, z: 0}
+  adsPosition: {x: 0, y: -0.115, z: 0.175}
   adsEuler: {x: 0, y: 0, z: 0}
   customHands: 0
   aimR: {x: 0, y: -0.3, z: 1}
@@ -1246,6 +1268,22 @@ MonoBehaviour:
   kickBack: 0.035
   recoilUp: 0.9
   recoilSide: 0.25
+  recoilPattern:
+  - {x: 0, y: 1}
+  - {x: -0.25, y: 1.08}
+  - {x: 0.35, y: 1.15}
+  - {x: 0.7, y: 1.2}
+  - {x: 0.5, y: 1.25}
+  - {x: -0.6, y: 1.25}
+  - {x: -0.8, y: 1.3}
+  - {x: -0.3, y: 1.3}
+  recoilRandomness: 0.12
+  recoilResponse: 38
+  recoilRecovery: 7
+  recoilRecoveryDelay: 0.08
+  burstResetDelay: 0.28
+  maxRecoilPitch: 10
+  maxRecoilYaw: 3
   equipTime: 0.38
   slideTravel: 0.02
   noiseRadius: 28

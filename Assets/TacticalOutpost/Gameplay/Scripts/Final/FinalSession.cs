@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using Outpost.Enemy;
+using Outpost.Env;
 using Outpost.Pickups;
 using Outpost.Player;
 using Outpost.UI;
@@ -121,6 +122,7 @@ namespace Outpost.Final
             for (int i = 0; i < Profile.allyCount; i++) SpawnAlly(i);
 
             BuildUi();
+            DynamicBlackoutSystem.EnsureInstalled();
             gameObject.AddComponent<FinalDebugView>();
             ApplyOutputs();
             ready = true;
@@ -249,13 +251,20 @@ namespace Outpost.Final
             eventSight = eventSpeed = eventCooldown = 1f;
             if (plan.Has(WaveEvent.Blackout))
             {
-                foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None))
+                if (DynamicBlackoutSystem.Instance != null)
                 {
-                    if (l == null || l.GetComponentInParent<AllyBrain>() != null || l.GetComponentInParent<PlayerHealth>() != null) continue;
-                    lightBackup[l] = l.intensity;
-                    l.intensity *= l.type == LightType.Directional ? 0.5f : Profile.blackoutLightFactor;
+                    DynamicBlackoutSystem.Instance.SetWaveEventBlackout(true, Profile.blackoutLightFactor);
                 }
-                ambientWas = RenderSettings.ambientIntensity; RenderSettings.ambientIntensity *= 0.4f;
+                else
+                {
+                    foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None))
+                    {
+                        if (l == null || l.GetComponentInParent<AllyBrain>() != null || l.GetComponentInParent<PlayerHealth>() != null) continue;
+                        lightBackup[l] = l.intensity;
+                        l.intensity *= l.type == LightType.Directional ? 0.5f : Profile.blackoutLightFactor;
+                    }
+                    ambientWas = RenderSettings.ambientIntensity; RenderSettings.ambientIntensity *= 0.4f;
+                }
                 eventSight = Profile.blackoutSightFactor;
             }
             if (plan.Has(WaveEvent.Fog))
@@ -273,6 +282,8 @@ namespace Outpost.Final
 
         void ClearEventEffects()
         {
+            if (DynamicBlackoutSystem.Instance != null)
+                DynamicBlackoutSystem.Instance.SetWaveEventBlackout(false, 1f);
             foreach (var kv in lightBackup) if (kv.Key != null) kv.Key.intensity = kv.Value;
             if (lightBackup.Count > 0) RenderSettings.ambientIntensity = ambientWas;
             lightBackup.Clear();
@@ -327,6 +338,8 @@ namespace Outpost.Final
             var brain = go.AddComponent<AllyBrain>();
             string[] names = { "VIPER", "ECHO", "NOMAD" };
             brain.Init(Profile, this, body, AgentTypeId, names[index % names.Length]);
+            Color allyMapColor = index == 0 ? new Color(0.22f, 0.90f, 1.00f, 1f) : new Color(0.40f, 1.00f, 0.55f, 1f);
+            AllyMinimapBlip.Attach(go, allyMapColor);
             go.SetActive(true);
             if (!agent.isOnNavMesh) agent.Warp(hit.position);
             Log(brain.Callsign + " deployed (Utility AI) at " + hit.position.ToString("F1") + ", on NavMesh " + agent.isOnNavMesh + ", agent type " + AgentTypeId);

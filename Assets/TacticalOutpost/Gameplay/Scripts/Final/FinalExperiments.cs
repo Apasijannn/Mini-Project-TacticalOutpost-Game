@@ -54,18 +54,18 @@ namespace Outpost.Final
             // ---- 2. output gameplay per difficulty
             sb.AppendLine("## Eksperimen 2 — Parameter gameplay hasil DDA");
             sb.AppendLine();
-            sb.AppendLine("| Difficulty | Label | Zombie wave 1/2/3 | Spawn interval | HP zombie | Speed zombie | Drop chance | Walker : Runner : Skinless : Bloater | Ally support / repair / intercept |");
-            sb.AppendLine("|---:|---|---|---:|---:|---:|---:|---|---|");
+            sb.AppendLine("| Difficulty | Label | Zombie wave 1/2/3 | Spawn interval | HP zombie | Speed zombie | Drop chance | Walker : Runner : Skinless : Bloater | Ally support / repair / intercept | Blackout flicker / off / shift |");
+            sb.AppendLine("|---:|---|---|---:|---:|---:|---:|---|---|---|");
             int[] baseCounts = { 24, 36, 48 };
             foreach (float d in new[] { 0f, 0.25f, 0.5f, 0.75f, 1f })
             {
                 var o = DdaModel.Output(p, d);
                 var weights = new[] { "walker", "runner", "skinless", "bloater" }.Select(id => DdaModel.VariantWeight(p, id, d, 1f)).ToArray();
                 float total = weights.Sum();
-                sb.AppendLine(string.Format("| {0:0.00} | {1} | {2} | {3:0.00} s | ×{4:0.00} | ×{5:0.00} | {6:0%} | {7} | {8:0.00} / {9:0.00} / {10:0.00} |", d, DdaModel.Label(d),
+                sb.AppendLine(string.Format("| {0:0.00} | {1} | {2} | {3:0.00} s | ×{4:0.00} | ×{5:0.00} | {6:0%} | {7} | {8:0.00} / {9:0.00} / {10:0.00} | ×{11:0.00} / ×{12:0.00} / {13:+0%;-0%;0%} |", d, DdaModel.Label(d),
                     string.Join(" / ", baseCounts.Select(b => (Mathf.Max(2, Mathf.RoundToInt(b / 2 * o.countMultiplier)) * 2).ToString()).ToArray()),
                     o.spawnInterval, o.enemyHealth, o.enemySpeed, o.dropChance, string.Join(" : ", weights.Select(x => (x / total).ToString("0%")).ToArray()),
-                    o.supportWeight, o.repairWeight, o.interceptWeight));
+                    o.supportWeight, o.repairWeight, o.interceptWeight, o.blackoutFlickerScale, o.blackoutOffScale, o.blackoutThresholdShift));
             }
             sb.AppendLine();
 
